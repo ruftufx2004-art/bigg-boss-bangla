@@ -1,0 +1,32 @@
+name: One-time unzip site
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract site zip and commit
+        run: |
+          set -e
+          unzip -o bigg-boss-site.zip
+          if [ ! -f index.html ]; then
+            for d in */; do
+              if [ -f "$d/index.html" ]; then
+                shopt -s dotglob
+                mv "$d"* .
+                rmdir "$d"
+                break
+              fi
+            done
+          fi
+          rm -f bigg-boss-site.zip
+          rm -rf .github __MACOSX
+          git config user.name "ruftufx2004-art"
+          git config user.email "ruftufx2004-art@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Episodes: autoplay, locked YouTube controls, custom player buttons"
+          git push origin main
