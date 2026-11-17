@@ -1,0 +1,31 @@
+name: Extract site zip (one-time)
+
+on:
+  push:
+    paths:
+      - 'bigg-boss-site.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify zip contents before extracting
+        run: |
+          python3 -c "import zipfile; z = zipfile.ZipFile('bigg-boss-site.zip'); names = z.namelist(); print('\n'.join(names)); assert 'admin.html' in names, 'admin.html missing from zip'; assert 'functions/api/config.js' in names, 'functions/api/config.js missing from zip'; assert 'functions/api/poll.js' in names; assert 'index.html' in names"
+      - name: Extract zip
+        run: unzip -o bigg-boss-site.zip
+      - name: Commit extracted files, remove zip and workflow
+        run: |
+          rm -f bigg-boss-site.zip
+          rm -f .github/workflows/extract-zip.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Admin Panel: live links, poll names, vote reset"
+          git push
