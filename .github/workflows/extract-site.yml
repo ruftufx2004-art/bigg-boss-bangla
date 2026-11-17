@@ -1,0 +1,36 @@
+name: Extract site zip (one-time)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract zip and commit fix
+        run: |
+          set -e
+          test -f bigg-boss-site.zip || { echo "zip not found"; exit 1; }
+          mkdir -p /tmp/extract
+          unzip -o bigg-boss-site.zip -d /tmp/extract
+          SRC=/tmp/extract
+          COUNT=$(find "$SRC" -mindepth 1 -maxdepth 1 | wc -l)
+          if [ "$COUNT" -eq 1 ]; then
+            ONLY=$(find "$SRC" -mindepth 1 -maxdepth 1)
+            if [ -d "$ONLY" ]; then SRC="$ONLY"; fi
+          fi
+          cp -a "$SRC"/. .
+          rm -f bigg-boss-site.zip
+          rm -f .github/workflows/extract-site.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git diff --cached --stat
+          if git diff --cached --quiet; then echo "No changes to commit"; exit 0; fi
+          git commit -m "Fix: LIVE NOW overlay fallback"
+          git push
