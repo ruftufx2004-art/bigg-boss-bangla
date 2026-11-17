@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: real shared poll votes, 1 vote per device.
 // Requires a KV namespace bound as POLL_KV in the Pages project settings.
-const NAMES = ["Monami Ghosh","Bharat Kaul","Durnibar Saha","Sohini Paul","Niranjan Mondal (Laughtersane)","Nandini Dutta","Srijla Guha","Dipendu Biswas","Tanushree Roy Das","Sayak Chakraborty","Joyita Chatterjee","Alexandra Taylor","Jhilam Gupta","Sonamoni Saha","Rajveer Dey"];
+const NAMES = ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das","Ranieeta Dash"];
 
 function json(data, status) {
   return new Response(JSON.stringify(data), { status: status || 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
