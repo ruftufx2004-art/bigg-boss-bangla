@@ -158,6 +158,13 @@
 .bbb-ott-msg--me .bbb-ott-msg-body b{color:var(--bbb-gold);}
 .bbb-ott-msg--me .bbb-ott-msg-body p{color:#fff;}
 .bbb-ott-badge-me{font-size:9px; padding:1px 6px; border-radius:4px; background:var(--bbb-gold); color:#000; font-weight:800; margin-left:4px; font-family:'Poppins',sans-serif;}
+.bbb-ott-msg-actions{display:flex; flex-wrap:wrap; gap:4px 10px; margin-top:5px; align-items:center;}
+.bbb-ott-msg-actions button{padding:2px 6px; border:0; border-radius:6px; background:transparent; color:#9a9bb0; font-size:11px; font-weight:600; cursor:pointer; font-family:'Poppins',sans-serif;}
+.bbb-ott-msg-actions button:hover{background:rgba(255,255,255,.08); color:#fff;}
+.bbb-ott-msg-actions button.bbb-ott-liked{color:#ffcc00;}
+.bbb-ott-msg-actions .bbb-ott-reacts{display:flex; gap:2px;}
+.bbb-ott-msg-actions .bbb-ott-reacts button{font-size:13px; padding:1px 5px;}
+.bbb-ott-msg-actions .bbb-ott-reacts button.bbb-ott-reacted{background:rgba(255,204,0,.18); box-shadow:inset 0 0 0 1px rgba(255,204,0,.5);}
 .bbb-ott-chat-form{display:flex; gap:8px; padding:12px; border-top:1px solid var(--bbb-line); background:rgba(0,0,0,.25);}
 .bbb-ott-chat-form input{
   flex:1 1 auto; min-width:0; padding:11px 13px; border-radius:10px; font-size:13px; color:#fff; outline:none;
@@ -841,6 +848,37 @@
     var p = document.createElement("p");
     p.textContent = text;   // textContent keeps user input safe (no HTML injection)
     body.appendChild(p);
+    var acts = document.createElement("div");
+    acts.className = "bbb-ott-msg-actions";
+    var likeBtn = document.createElement("button");
+    likeBtn.type = "button";
+    var likeCount = Math.floor(Math.random()*28);
+    likeBtn.textContent = "👍 Like " + likeCount;
+    likeBtn.addEventListener("click", function(){
+      var liked = likeBtn.classList.toggle("bbb-ott-liked");
+      likeCount += liked ? 1 : -1;
+      likeBtn.textContent = "👍 Like " + likeCount;
+    });
+    acts.appendChild(likeBtn);
+    var replyBtn = document.createElement("button");
+    replyBtn.type = "button";
+    replyBtn.textContent = "↩ Reply";
+    replyBtn.addEventListener("click", function(){
+      input.value = "@" + name + " ";
+      input.focus();
+    });
+    acts.appendChild(replyBtn);
+    var reacts = document.createElement("span");
+    reacts.className = "bbb-ott-reacts";
+    ["❤️","🔥","😂"].forEach(function(em){
+      var rb = document.createElement("button");
+      rb.type = "button";
+      rb.textContent = em;
+      rb.addEventListener("click", function(){ rb.classList.toggle("bbb-ott-reacted"); });
+      reacts.appendChild(rb);
+    });
+    acts.appendChild(reacts);
+    body.appendChild(acts);
     row.appendChild(av); row.appendChild(body);
     list.appendChild(row);
     bbbOttChatMsgCount++;
