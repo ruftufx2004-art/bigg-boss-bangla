@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bigg Boss Bangla — Live 24/7 Uncut House Feed</title>
+<meta name="description" content="Watch Bigg Boss Bangla live — grand telecast, 24/7 uncut house feed, live fan chat and highlights." />
+<style>html,body{margin:0;padding:0;background:#0b0c10;}</style>
+</head>
+<body>
+
+<!-- ================================================================== -->
+<!-- ===== BIGG BOSS BANGLA OTT — COPY FROM HERE (Blogger-ready) ====== -->
+<!-- ================================================================== -->
+<div class="bbb-ott-root" id="bbb-ott-root">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+.bbb-ott-root{
+  --bbb-bg:#0b0c10; --bbb-card:#14151f; --bbb-card2:#1b1c2a;
+  --bbb-red:#e50914; --bbb-gold:#ffcc00; --bbb-purple:#9d4dff;
+  --bbb-text:#f3f3f7; --bbb-muted:#9a9cb0; --bbb-line:rgba(255,255,255,.08);
+  position:relative; box-sizing:border-box; width:100%; max-width:1440px; margin:0 auto;
+  padding:18px clamp(12px,2.5vw,32px) 40px; color:var(--bbb-text);
+  font-family:'Poppins','Hind Siliguri',system-ui,sans-serif; line-height:1.5;
+  background:
+    radial-gradient(900px 420px at 8% -8%, rgba(229,9,20,.18), transparent 60%),
+    radial-gradient(800px 420px at 100% 10%, rgba(157,77,255,.14), transparent 60%),
+    var(--bbb-bg);
+  border-radius:18px; overflow:hidden; -webkit-font-smoothing:antialiased;
+}
+.bbb-ott-root *,.bbb-ott-root *::before,.bbb-ott-root *::after{box-sizing:border-box;}
+.bbb-ott-root .bbb-ott-bn{font-family:'Hind Siliguri','Poppins',sans-serif;}
+.bbb-ott-root button{font-family:inherit; cursor:pointer;}
+
+/* ---------- Header ---------- */
+.bbb-ott-header{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px;
+  padding:14px 18px; margin-bottom:20px; border-radius:16px;
+  background:rgba(20,21,31,.6); border:1px solid var(--bbb-line);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  box-shadow:0 10px 40px rgba(0,0,0,.45);
+}
+.bbb-ott-brand{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+.bbb-ott-logo{
+  margin:0; font-size:clamp(18px,2.4vw,26px); font-weight:900; letter-spacing:.06em; line-height:1;
+  background:linear-gradient(92deg,#fff 0%,var(--bbb-gold) 45%,var(--bbb-red) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 0 14px rgba(229,9,20,.35));
+}
+.bbb-ott-logo span{display:block; font-size:.42em; letter-spacing:.42em; color:var(--bbb-muted); -webkit-text-fill-color:var(--bbb-muted); margin-top:4px; font-weight:600;}
+.bbb-ott-live{
+  display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border-radius:999px;
+  background:var(--bbb-red); color:#fff; font-size:12px; font-weight:800; letter-spacing:.08em;
+  animation:bbbOttPulse 1.8s infinite;
+}
+.bbb-ott-live i{width:8px; height:8px; border-radius:50%; background:#fff; animation:bbbOttBlink 1s infinite;}
+@keyframes bbbOttPulse{0%{box-shadow:0 0 0 0 rgba(229,9,20,.7);}70%{box-shadow:0 0 0 12px rgba(229,9,20,0);}100%{box-shadow:0 0 0 0 rgba(229,9,20,0);}}
+@keyframes bbbOttBlink{50%{opacity:.25;}}
+.bbb-ott-pills{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+.bbb-ott-pill{
+  padding:6px 11px; border-radius:8px; font-size:11px; font-weight:700; letter-spacing:.06em;
+  border:1px solid var(--bbb-line); background:rgba(255,255,255,.04); color:var(--bbb-text);
+}
+.bbb-ott-pill--gold{color:var(--bbb-gold); border-color:rgba(255,204,0,.35); background:rgba(255,204,0,.07);}
+.bbb-ott-pill--purple{color:#c9a4ff; border-color:rgba(157,77,255,.4); background:rgba(157,77,255,.1);}
+.bbb-ott-viewers{
+  display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:8px;
+  font-size:12px; font-weight:700; background:rgba(229,9,20,.12); border:1px solid rgba(229,9,20,.45); color:#fff;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- Theater grid ---------- */
+.bbb-ott-theater{display:grid; grid-template-columns:minmax(0,7fr) minmax(0,3fr); gap:20px; align-items:stretch;}
+.bbb-ott-playercol{min-width:0;}
+.bbb-ott-player{
+  position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:#000;
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 0 0 1px rgba(229,9,20,.15), 0 25px 70px rgba(0,0,0,.75), 0 0 60px rgba(229,9,20,.12);
+}
+@supports not (aspect-ratio:16/9){ .bbb-ott-player{height:0; padding-top:56.25%;} }
+.bbb-ott-player iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:block;}
+.bbb-ott-overlay{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; text-align:center; padding:20px; z-index:2;
+  background:radial-gradient(circle at 50% 40%, rgba(229,9,20,.25), transparent 60%), linear-gradient(160deg,#16101c,#07070b);
+  transition:opacity .35s;
+}
+.bbb-ott-overlay[hidden]{display:none;}
+.bbb-ott-overlay-eye{
+  width:74px; height:74px; border-radius:50%; display:grid; place-items:center; font-size:34px;
+  border:2px solid var(--bbb-gold); box-shadow:0 0 30px rgba(255,204,0,.35), inset 0 0 20px rgba(229,9,20,.4);
+}
+.bbb-ott-overlay h3{margin:6px 0 0; font-size:clamp(15px,2vw,20px); font-weight:700;}
+.bbb-ott-overlay p{margin:0; color:var(--bbb-muted); font-size:13px; max-width:420px;}
+.bbb-ott-overlay--loading .bbb-ott-overlay-eye{animation:bbbOttSpin 1.2s linear infinite; border-color:var(--bbb-red) transparent var(--bbb-gold) transparent;}
+@keyframes bbbOttSpin{to{transform:rotate(360deg);}}
+.bbb-ott-nowtag{
+  position:absolute; top:12px; left:12px; z-index:3; padding:5px 10px; border-radius:7px; font-size:11px; font-weight:700;
+  background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.15); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  pointer-events:none;
+}
+
+/* helper bar */
+.bbb-ott-helper{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;
+  margin-top:10px; padding:9px 14px; border-radius:12px; font-size:12px; color:var(--bbb-muted);
+  background:rgba(255,204,0,.05); border:1px dashed rgba(255,204,0,.25);
+}
+.bbb-ott-helper b{color:var(--bbb-gold);}
+.bbb-ott-helper-btns{display:flex; gap:8px;}
+.bbb-ott-mini{
+  padding:6px 11px; border-radius:8px; font-size:11px; font-weight:600; color:var(--bbb-text);
+  background:rgba(255,255,255,.06); border:1px solid var(--bbb-line); transition:.2s;
+}
+.bbb-ott-mini:hover{background:rgba(255,255,255,.12);}
+
+/* server toolbar */
+.bbb-ott-servers{
+  display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; padding:12px; border-radius:14px;
+  background:rgba(20,21,31,.75); border:1px solid var(--bbb-line); box-shadow:0 12px 34px rgba(0,0,0,.4);
+}
+.bbb-ott-srv{
+  flex:1 1 160px; padding:11px 14px; border-radius:10px; font-size:13px; font-weight:600; color:var(--bbb-text);
+  background:var(--bbb-card2); border:1px solid var(--bbb-line); transition:transform .15s, background .2s, box-shadow .2s;
+}
+.bbb-ott-srv small{display:block; font-size:10px; font-weight:500; color:var(--bbb-muted); margin-top:2px;}
+.bbb-ott-srv:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.2);}
+.bbb-ott-srv.is-active{background:linear-gradient(135deg,var(--bbb-red),#a1050d); border-color:transparent; box-shadow:0 8px 26px rgba(229,9,20,.45);}
+.bbb-ott-srv.is-active small{color:rgba(255,255,255,.85);}
+.bbb-ott-srv--reload{flex:0 1 150px; background:rgba(157,77,255,.12); border-color:rgba(157,77,255,.45);}
+.bbb-ott-srv--reload:hover{box-shadow:0 8px 24px rgba(157,77,255,.35);}
+
+/* ---------- Chat ---------- */
+.bbb-ott-chat{
+  display:flex; flex-direction:column; min-height:0; height:100%; max-height:640px; border-radius:16px; overflow:hidden;
+  background:rgba(20,21,31,.82); border:1px solid var(--bbb-line);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 20px 60px rgba(0,0,0,.55);
+}
+.bbb-ott-chat-head{
+  display:flex; align-items:center; justify-content:space-between; padding:14px 16px;
+  border-bottom:1px solid var(--bbb-line); background:linear-gradient(90deg,rgba(229,9,20,.14),rgba(157,77,255,.1));
+}
+.bbb-ott-chat-head h2{margin:0; font-size:15px; font-weight:700;}
+.bbb-ott-chat-head span{font-size:11px; color:var(--bbb-muted);}
+.bbb-ott-chat-list{flex:1 1 auto; min-height:280px; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:10px; scroll-behavior:smooth;}
+.bbb-ott-chat-list::-webkit-scrollbar{width:6px;}
+.bbb-ott-chat-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12); border-radius:6px;}
+.bbb-ott-msg{display:flex; gap:9px; align-items:flex-start; animation:bbbOttIn .35s ease;}
+@keyframes bbbOttIn{from{opacity:0; transform:translateY(8px);}to{opacity:1; transform:none;}}
+.bbb-ott-av{flex:0 0 30px; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff;}
+.bbb-ott-msg-body{min-width:0; font-size:13px; font-family:'Hind Siliguri','Poppins',sans-serif;}
+.bbb-ott-msg-body b{font-family:'Poppins',sans-serif; font-size:12px; margin-right:6px;}
+.bbb-ott-msg-body p{margin:1px 0 0; color:#dcdce6; word-wrap:break-word; overflow-wrap:anywhere;}
+.bbb-ott-msg--me .bbb-ott-msg-body b{color:var(--bbb-gold);}
+.bbb-ott-msg--me .bbb-ott-msg-body p{color:#fff;}
+.bbb-ott-badge-me{font-size:9px; padding:1px 6px; border-radius:4px; background:var(--bbb-gold); color:#000; font-weight:800; margin-left:4px; font-family:'Poppins',sans-serif;}
+.bbb-ott-chat-form{display:flex; gap:8px; padding:12px; border-top:1px solid var(--bbb-line); background:rgba(0,0,0,.25);}
+.bbb-ott-chat-form input{
+  flex:1 1 auto; min-width:0; padding:11px 13px; border-radius:10px; font-size:13px; color:#fff; outline:none;
+  background:rgba(255,255,255,.06); border:1px solid var(--bbb-line); font-family:'Hind Siliguri','Poppins',sans-serif;
+}
+.bbb-ott-chat-form input:focus{border-color:rgba(229,9,20,.6); box-shadow:0 0 0 3px rgba(229,9,20,.18);}
+.bbb-ott-chat-form button{
+  padding:0 18px; border:0; border-radius:10px; font-size:13px; font-weight:700; color:#fff;
+  background:var(--bbb-red); box-shadow:0 6px 18px rgba(229,9,20,.4); transition:.2s;
+}
+.bbb-ott-chat-form button:hover{background:#ff1f2b;}
+
+/* ---------- Details ---------- */
+.bbb-ott-details{
+  margin-top:28px; padding:24px; border-radius:18px; background:var(--bbb-card); border:1px solid var(--bbb-line);
+  box-shadow:0 18px 50px rgba(0,0,0,.45);
+}
+.bbb-ott-details h1{margin:0 0 10px; font-size:clamp(20px,3vw,32px); font-weight:800; line-height:1.2;}
+.bbb-ott-details h1 em{font-style:normal; color:var(--bbb-gold);}
+.bbb-ott-meta{display:flex; flex-wrap:wrap; gap:6px 12px; align-items:center; font-size:13px; color:var(--bbb-muted); margin-bottom:16px;}
+.bbb-ott-meta .bbb-ott-rating{color:var(--bbb-gold); font-weight:700;}
+.bbb-ott-meta .bbb-ott-dot{opacity:.5;}
+.bbb-ott-meta .bbb-ott-age{padding:2px 8px; border:1px solid rgba(255,255,255,.3); border-radius:5px; color:#fff; font-size:11px; font-weight:600;}
+.bbb-ott-syn{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+.bbb-ott-syn p{margin:0; font-size:14px; color:#cfd0dc;}
+.bbb-ott-syn .bbb-ott-bn{font-size:15.5px; line-height:1.75;}
+.bbb-ott-tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
+.bbb-ott-tag{font-size:11px; padding:5px 10px; border-radius:999px; background:rgba(157,77,255,.12); color:#d4b8ff; border:1px solid rgba(157,77,255,.3);}
+
+/* ---------- Highlights ---------- */
+.bbb-ott-rowhead{display:flex; align-items:end; justify-content:space-between; gap:10px; margin:30px 0 12px;}
+.bbb-ott-rowhead h2{margin:0; font-size:clamp(17px,2.2vw,22px); font-weight:700;}
+.bbb-ott-rowhead h2::before{content:""; display:inline-block; width:4px; height:.9em; margin-right:10px; vertical-align:-1px; background:var(--bbb-red); border-radius:2px; box-shadow:0 0 12px var(--bbb-red);}
+.bbb-ott-rowhead span{font-size:12px; color:var(--bbb-muted);}
+.bbb-ott-rail{display:flex; gap:16px; overflow-x:auto; padding:6px 2px 16px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;}
+.bbb-ott-rail::-webkit-scrollbar{height:6px;}
+.bbb-ott-rail::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14); border-radius:6px;}
+.bbb-ott-card{
+  flex:0 0 clamp(230px,26vw,300px); scroll-snap-align:start; padding:0; text-align:left; color:var(--bbb-text);
+  border-radius:14px; overflow:hidden; background:var(--bbb-card); border:1px solid var(--bbb-line);
+  box-shadow:0 12px 30px rgba(0,0,0,.45); transition:transform .25s, box-shadow .25s, border-color .25s;
+}
+.bbb-ott-card:hover,.bbb-ott-card:focus-visible{transform:translateY(-5px) scale(1.02); border-color:rgba(229,9,20,.55); box-shadow:0 18px 40px rgba(0,0,0,.6), 0 0 26px rgba(229,9,20,.25); outline:none;}
+.bbb-ott-card.is-playing{border-color:var(--bbb-gold); box-shadow:0 0 0 1px var(--bbb-gold), 0 0 26px rgba(255,204,0,.25);}
+.bbb-ott-thumb{position:relative; aspect-ratio:16/9; display:flex; align-items:flex-end; padding:12px; overflow:hidden;}
+.bbb-ott-thumb::after{content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.85), transparent 60%);}
+.bbb-ott-thumb-ico{position:absolute; top:50%; left:50%; transform:translate(-50%,-55%); font-size:46px; opacity:.9; filter:drop-shadow(0 4px 12px rgba(0,0,0,.6)); z-index:1; transition:transform .3s;}
+.bbb-ott-card:hover .bbb-ott-thumb-ico{transform:translate(-50%,-55%) scale(1.12);}
+.bbb-ott-thumb-play{position:absolute; inset:0; display:grid; place-items:center; z-index:2; opacity:0; transition:opacity .25s;}
+.bbb-ott-thumb-play i{width:52px; height:52px; border-radius:50%; background:rgba(229,9,20,.92); display:grid; place-items:center; font-style:normal; font-size:20px; box-shadow:0 0 24px rgba(229,9,20,.6);}
+.bbb-ott-card:hover .bbb-ott-thumb-play{opacity:1;}
+.bbb-ott-thumb-label{position:relative; z-index:2; font-size:10px; font-weight:800; letter-spacing:.08em; padding:3px 8px; border-radius:5px; background:rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.2);}
+.bbb-ott-thumb-dur{position:absolute; right:10px; bottom:12px; z-index:2; font-size:11px; font-weight:600; padding:2px 7px; border-radius:5px; background:rgba(0,0,0,.7);}
+.bbb-ott-t1{background:radial-gradient(circle at 30% 30%, #ffcc00 0%, transparent 45%), linear-gradient(135deg,#7a0a10,#2a0a3d);}
+.bbb-ott-t2{background:radial-gradient(circle at 70% 30%, #e50914 0%, transparent 45%), linear-gradient(135deg,#3b0a0a,#120b1f);}
+.bbb-ott-t3{background:radial-gradient(circle at 40% 35%, #9d4dff 0%, transparent 48%), linear-gradient(135deg,#1b1240,#0b0c10);}
+.bbb-ott-t4{background:radial-gradient(circle at 60% 35%, #ff6a00 0%, transparent 45%), linear-gradient(135deg,#4a0710,#0b0c10);}
+.bbb-ott-card-info{padding:12px 14px 14px;}
+.bbb-ott-card-info h3{margin:0; font-size:14px; font-weight:700;}
+.bbb-ott-card-info p{margin:3px 0 0; font-size:12.5px; color:var(--bbb-muted); font-family:'Hind Siliguri','Poppins',sans-serif;}
+
+.bbb-ott-foot{margin-top:26px; text-align:center; font-size:11px; color:#5f6175;}
+
+/* toast */
+.bbb-ott-toast{
+  position:absolute; left:50%; top:18px; transform:translate(-50%,-30px); opacity:0; z-index:50; pointer-events:none;
+  padding:10px 18px; border-radius:10px; font-size:13px; font-weight:600; background:rgba(20,21,31,.95);
+  border:1px solid rgba(255,204,0,.4); box-shadow:0 12px 30px rgba(0,0,0,.6); transition:.3s;
+}
+.bbb-ott-toast.is-show{opacity:1; transform:translate(-50%,0);}
+
+/* ---------- Responsive ---------- */
+@media (max-width:980px){
+  .bbb-ott-theater{grid-template-columns:1fr;}
+  .bbb-ott-chat{max-height:460px; height:460px;}
+  .bbb-ott-syn{grid-template-columns:1fr;}
+}
+@media (max-width:600px){
+  .bbb-ott-root{border-radius:0; padding:12px 10px 30px;}
+  .bbb-ott-header{padding:12px; justify-content:center; text-align:center;}
+  .bbb-ott-brand,.bbb-ott-pills{justify-content:center;}
+  .bbb-ott-srv{flex:1 1 calc(50% - 10px); font-size:12px; padding:10px;}
+  .bbb-ott-srv--reload{flex:1 1 100%;}
+  .bbb-ott-details{padding:18px;}
+  .bbb-ott-helper{justify-content:center; text-align:center;}
+}
+@media (prefers-reduced-motion:reduce){
+  .bbb-ott-root *{animation:none !important; transition:none !important;}
+}
+</style>
+
+  <div class="bbb-ott-toast" id="bbb-ott-toast" role="status" aria-live="polite"></div>
+
+  <!-- ===== Header ===== -->
+  <header class="bbb-ott-header">
+    <div class="bbb-ott-brand">
+      <div class="bbb-ott-logo">BIGG BOSS BANGLA<span>OTT • LIVE HOUSE</span></div>
+      <span class="bbb-ott-live"><i></i>LIVE NOW</span>
+    </div>
+    <div class="bbb-ott-pills">
+      <span class="bbb-ott-pill bbb-ott-pill--gold">1080p FULL HD</span>
+      <span class="bbb-ott-pill">60 FPS</span>
+      <span class="bbb-ott-pill bbb-ott-pill--purple">24/7 UNCUT</span>
+      <span class="bbb-ott-viewers" title="Live viewers">👁 <b id="bbb-ott-viewcount">14.2K</b> Watching</span>
+    </div>
+  </header>
+
+  <!-- ===== Theater: Player + Chat ===== -->
+  <section class="bbb-ott-theater">
+    <div class="bbb-ott-playercol">
+      <div class="bbb-ott-player" id="bbb-ott-player">
+        <span class="bbb-ott-nowtag" id="bbb-ott-nowtag">▶ Server 1 • Main Live HD</span>
+
+        <!--
+          ============================================================
+          ▼▼▼  PASTE YOUR MAIN LIVE STREAM EMBED LINK BELOW  ▼▼▼
+          Replace the src="" value with your embed URL, e.g.:
+            YouTube Live : https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1
+            YouTube Chan.: https://www.youtube.com/embed/live_stream?channel=CHANNEL_ID&autoplay=1&mute=1
+            Facebook Live: https://www.facebook.com/plugins/video.php?href=ENCODED_VIDEO_URL&autoplay=1
+            M3U8 / other : any iframe-able player page URL (e.g. an HLS web player page)
+          TIP: Also paste the same link into Server 1's data-src below
+               so the server buttons keep working.
+          ============================================================
+        -->
+        <iframe
+          id="bbb-ott-frame"
+          src=""
+          title="Bigg Boss Bangla Live Player"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin"
+          loading="eager"></iframe>
+
+        <div class="bbb-ott-overlay" id="bbb-ott-overlay">
+          <div class="bbb-ott-overlay-eye">👁</div>
+          <h3 id="bbb-ott-ov-title">Stream link not added yet</h3>
+          <p id="bbb-ott-ov-text">Paste a YouTube Live, Facebook Live or iframe embed link into the player <code>src</code> and server buttons to start streaming.</p>
+        </div>
+      </div>
+
+      <!-- Unmute / refresh helper bar -->
+      <div class="bbb-ott-helper">
+        <span>🔇 Autoplay starts muted — <b>tap the player & press 🔊 to unmute.</b> Buffering? Hit Reload or switch servers.</span>
+        <div class="bbb-ott-helper-btns">
+          <button type="button" class="bbb-ott-mini" id="bbb-ott-fs">⛶ Fullscreen</button>
+          <button type="button" class="bbb-ott-mini" id="bbb-ott-newtab">↗ New Tab</button>
+        </div>
+      </div>
+
+      <!-- ===== Multi-Server & Quality Switcher =====
+           Paste each server's embed link into its data-src attribute. -->
+      <div class="bbb-ott-servers" role="toolbar" aria-label="Stream servers">
+        <button type="button" class="bbb-ott-srv is-active"
+          data-src=""
+          data-name="Server 1 • Main Live HD">▶ Server 1<small>Main Live HD</small></button>
+          <!-- ▲ Server 1 link goes in data-src="" above -->
+
+        <button type="button" class="bbb-ott-srv"
+          data-src=""
+          data-name="Server 2 • Backup Fast">⚡ Server 2<small>Backup Fast</small></button>
+          <!-- ▲ Server 2 (backup) link goes in data-src="" above -->
+
+        <button type="button" class="bbb-ott-srv"
+          data-src=""
+          data-name="Server 3 • Low Data">📱 Server 3<small>Low Data / Mobile</small></button>
+          <!-- ▲ Server 3 (low data / mobile) link goes in data-src="" above -->
+
+        <button type="button" class="bbb-ott-srv bbb-ott-srv--reload" id="bbb-ott-reload">🔄 Reload<small>Fix buffering</small></button>
+      </div>
+    </div>
+
+    <!-- Live Fan Chat -->
+    <aside class="bbb-ott-chat" aria-label="Live Fan Chat">
+      <div class="bbb-ott-chat-head">
+        <h2>💬 Live Fan Chat</h2>
+        <span><b id="bbb-ott-chatcount">2.3K</b> in chat</span>
+      </div>
+      <div class="bbb-ott-chat-list" id="bbb-ott-chat-list" aria-live="polite"></div>
+      <form class="bbb-ott-chat-form" id="bbb-ott-chat-form" autocomplete="off">
+        <input type="text" id="bbb-ott-chat-input" maxlength="200" placeholder="আপনার মতামত লিখুন… Say something!" aria-label="Chat message" />
+        <button type="submit">Send</button>
+      </form>
+    </aside>
+  </section>
+
+  <!-- ===== Show Details ===== -->
+  <section class="bbb-ott-details">
+    <h1>Bigg Boss Bangla — <em>Grand Live Telecast</em> &amp; Uncut House Feed</h1>
+    <div class="bbb-ott-meta">
+      <span class="bbb-ott-rating">★ 9.4 Rating</span><span class="bbb-ott-dot">•</span>
+      <span>Reality TV</span><span class="bbb-ott-dot">•</span>
+      <span>Bengali</span><span class="bbb-ott-dot">•</span>
+      <span>24/7 Live Feed</span><span class="bbb-ott-dot">•</span>
+      <span class="bbb-ott-age">U/A 16+</span>
+    </div>
+    <div class="bbb-ott-syn">
+      <p class="bbb-ott-bn">একটা বাড়ি, অসংখ্য ক্যামেরা আর বাইরের দুনিয়ার সঙ্গে কোনো যোগাযোগ নেই। বিগ বস বাংলার ঘরে প্রতিটা মুহূর্তে বদলে যায় বন্ধুত্ব, জোট আর শত্রুতা। নমিনেশনের টানটান উত্তেজনা, ক্যাপ্টেন্সি টাস্কের লড়াই, মাঝরাতের রান্নাঘরের ঝগড়া — আর সপ্তাহ শেষে <b>উইকেন্ড কা বার</b>-এ হোস্টের মুখোমুখি হওয়ার পালা। কে টিকে থাকবে, কে বিদায় নেবে? সরাসরি দেখুন, ২৪ ঘণ্টা আনকাট।</p>
+      <p>One house. Dozens of cameras. Zero contact with the outside world. Inside the Bigg Boss Bangla house, friendships turn into rivalries overnight. Watch every nomination twist, every captaincy showdown and every midnight confession unfold live — then catch the host holding the housemates to account in the explosive <b>Weekend Ka Vaar</b>. Who survives the week, and who walks out the door? Stream the uncut house feed 24/7.</p>
+    </div>
+    <div class="bbb-ott-tags">
+      <span class="bbb-ott-tag">#Nominations</span>
+      <span class="bbb-ott-tag">#WeekendKaVaar</span>
+      <span class="bbb-ott-tag">#CaptaincyTask</span>
+      <span class="bbb-ott-tag">#UncutFeed</span>
+      <span class="bbb-ott-tag">#BiggBossBangla</span>
+    </div>
+  </section>
+
+  <!-- ===== Highlights Row =====
+       Paste each clip's embed link into its card's data-src attribute. -->
+  <div class="bbb-ott-rowhead">
+    <h2>Recent Highlights &amp; Uncut Clips</h2>
+    <span>Scroll → • Click to play</span>
+  </div>
+  <div class="bbb-ott-rail" id="bbb-ott-rail">
+    <button type="button" class="bbb-ott-card" data-src="" data-name="Day 1 • Grand Premiere">
+      <div class="bbb-ott-thumb bbb-ott-t1">
+        <span class="bbb-ott-thumb-ico">🎉</span>
+        <span class="bbb-ott-thumb-play"><i>▶</i></span>
+        <span class="bbb-ott-thumb-label">DAY 1</span><span class="bbb-ott-thumb-dur">1:42:10</span>
+      </div>
+      <div class="bbb-ott-card-info"><h3>Day 1 Grand Premiere</h3><p>গ্র্যান্ড প্রিমিয়ার — সব প্রতিযোগীর প্রবেশ</p></div>
+    </button>
+    <button type="button" class="bbb-ott-card" data-src="" data-name="Captaincy Task Fight">
+      <div class="bbb-ott-thumb bbb-ott-t2">
+        <span class="bbb-ott-thumb-ico">👑</span>
+        <span class="bbb-ott-thumb-play"><i>▶</i></span>
+        <span class="bbb-ott-thumb-label">UNCUT</span><span class="bbb-ott-thumb-dur">18:35</span>
+      </div>
+      <div class="bbb-ott-card-info"><h3>Captaincy Task Fight</h3><p>ক্যাপ্টেন্সি টাস্কে তুমুল লড়াই</p></div>
+    </button>
+    <button type="button" class="bbb-ott-card" data-src="" data-name="Midnight Kitchen Drama">
+      <div class="bbb-ott-thumb bbb-ott-t3">
+        <span class="bbb-ott-thumb-ico">🍳</span>
+        <span class="bbb-ott-thumb-play"><i>▶</i></span>
+        <span class="bbb-ott-thumb-label">HOUSE FEED</span><span class="bbb-ott-thumb-dur">12:08</span>
+      </div>
+      <div class="bbb-ott-card-info"><h3>Midnight Kitchen Drama</h3><p>মাঝরাতে রান্নাঘরে ঝগড়া</p></div>
+    </button>
+    <button type="button" class="bbb-ott-card" data-src="" data-name="Elimination Special">
+      <div class="bbb-ott-thumb bbb-ott-t4">
+        <span class="bbb-ott-thumb-ico">🚪</span>
+        <span class="bbb-ott-thumb-play"><i>▶</i></span>
+        <span class="bbb-ott-thumb-label">SPECIAL</span><span class="bbb-ott-thumb-dur">45:20</span>
+      </div>
+      <div class="bbb-ott-card-info"><h3>Elimination Special</h3><p>এলিমিনেশন স্পেশাল — কে বিদায় নিল?</p></div>
+    </button>
+  </div>
+
+  <div class="bbb-ott-foot">Fan-made watch page • Embed only streams you are permitted to share.</div>
+
+<script>
+(function(){
+  "use strict";
+  var root = document.getElementById("bbb-ott-root");
+  if (!root || root.getAttribute("data-bbb-init")) return;
+  root.setAttribute("data-bbb-init","1");
+
+  function $(sel){ return root.querySelector(sel); }
+  function $$(sel){ return Array.prototype.slice.call(root.querySelectorAll(sel)); }
+
+  var frame    = $("#bbb-ott-frame");
+  var overlay  = $("#bbb-ott-overlay");
+  var ovTitle  = $("#bbb-ott-ov-title");
+  var ovText   = $("#bbb-ott-ov-text");
+  var nowTag   = $("#bbb-ott-nowtag");
+  var toastEl  = $("#bbb-ott-toast");
+  var servers  = $$(".bbb-ott-srv[data-src]");
+  var cards    = $$(".bbb-ott-card");
+  var toastT;
+
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("is-show");
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ toastEl.classList.remove("is-show"); }, 2200);
+  }
+
+  function isValid(u){ return !!u && /^(https?:)?\/\//i.test(u.trim()); }
+
+  function showEmpty(name){
+    overlay.hidden = false;
+    overlay.classList.remove("bbb-ott-overlay--loading");
+    ovTitle.textContent = name + " — link not added yet";
+    ovText.textContent = "Paste an embed URL into this button's data-src attribute to enable it.";
+  }
+
+  /* Load a URL into the player */
+  function load(url, name){
+    nowTag.textContent = "▶ " + name;
+    if (!isValid(url)) { frame.removeAttribute("src"); showEmpty(name); return false; }
+    overlay.hidden = false;
+    overlay.classList.add("bbb-ott-overlay--loading");
+    ovTitle.textContent = "Connecting to " + name + "…";
+    ovText.textContent = "সংযোগ করা হচ্ছে, একটু অপেক্ষা করুন…";
+    frame.src = url.trim();
+    return true;
+  }
+
+  frame.addEventListener("load", function(){
+    if (frame.getAttribute("src")) { overlay.hidden = true; overlay.classList.remove("bbb-ott-overlay--loading"); }
+  });
+
+  /* Initial state: if the iframe src was pasted directly, use it for Server 1 too */
+  (function init(){
+    var direct = frame.getAttribute("src");
+    if (isValid(direct)) {
+      if (!isValid(servers[0].getAttribute("data-src"))) servers[0].setAttribute("data-src", direct);
+      overlay.hidden = false;
+      overlay.classList.add("bbb-ott-overlay--loading");
+      ovTitle.textContent = "Connecting to live feed…";
+      ovText.textContent = "সংযোগ করা হচ্ছে…";
+    } else {
+      var s1 = servers[0].getAttribute("data-src");
+      if (isValid(s1)) load(s1, servers[0].getAttribute("data-name"));
+    }
+  })();
+
+  function setActive(btn){
+    servers.forEach(function(b){ b.classList.toggle("is-active", b === btn); });
+    cards.forEach(function(c){ c.classList.toggle("is-playing", c === btn); });
+  }
+
+  servers.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      setActive(btn);
+      var ok = load(btn.getAttribute("data-src"), btn.getAttribute("data-name"));
+      toast(ok ? "Switched to " + btn.getAttribute("data-name") : "No link set for " + btn.getAttribute("data-name"));
+    });
+  });
+
+  cards.forEach(function(card){
+    card.addEventListener("click", function(){
+      setActive(card);
+      var ok = load(card.getAttribute("data-src"), card.getAttribute("data-name"));
+      toast(ok ? "Now playing: " + card.getAttribute("data-name") : "Clip link not added yet");
+      var p = $("#bbb-ott-player");
+      if (p.scrollIntoView) p.scrollIntoView({behavior:"smooth", block:"center"});
+    });
+  });
+
+  $("#bbb-ott-reload").addEventListener("click", function(){
+    var cur = frame.getAttribute("src");
+    if (!cur) { toast("Nothing to reload — add a stream link first"); return; }
+    frame.removeAttribute("src");
+    setTimeout(function(){ load(cur, nowTag.textContent.replace(/^▶\s*/, "")); }, 120);
+    toast("🔄 Reloading player…");
+  });
+
+  $("#bbb-ott-fs").addEventListener("click", function(){
+    var p = $("#bbb-ott-player");
+    var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
+    if (fn) fn.call(p); else toast("Fullscreen not supported on this device");
+  });
+
+  $("#bbb-ott-newtab").addEventListener("click", function(){
+    var cur = frame.getAttribute("src");
+    if (cur) window.open(cur, "_blank", "noopener"); else toast("No stream link added yet");
+  });
+
+  /* ---------- Viewer counter ---------- */
+  var viewEl = $("#bbb-ott-viewcount"), chatCountEl = $("#bbb-ott-chatcount");
+  var viewers = 14200;
+  function fmt(n){ return n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,"") + "K" : String(n); }
+  setInterval(function(){
+    viewers += Math.round((Math.random() - 0.45) * 180);
+    if (viewers < 12500) viewers = 12500 + Math.round(Math.random()*300);
+    if (viewers > 19800) viewers = 19500;
+    viewEl.textContent = fmt(viewers);
+    chatCountEl.textContent = fmt(Math.round(viewers * 0.16));
+  }, 3000);
+
+  /* ---------- Live chat ---------- */
+  var list  = $("#bbb-ott-chat-list");
+  var form  = $("#bbb-ott-chat-form");
+  var input = $("#bbb-ott-chat-input");
+  var colors = ["#e50914","#9d4dff","#ff8a00","#00b894","#0984e3","#e84393","#c9a227","#6c5ce7"];
+  var names  = ["Rupam_K","Priya❤️","SouravFan","Mou_Kolkata","Arjun007","TumpaDi","Riya.B","Debu_Dada","Ananya✨","Rahul_Bong","Sneha_88","BB_Lover"];
+  var lines  = [
+    "আজকের নমিনেশন টাস্কটা জাস্ট আগুন 🔥",
+    "ক্যাপ্টেন হওয়ার জন্য ও একদম deserve করে!",
+    "Weekend Ka Vaar e host ke ki bolbe? Can't wait 😱",
+    "মাঝরাতের রান্নাঘরের ঝগড়াটা দেখলে? 😂",
+    "Team Rupa all the way! 💪",
+    "এই সপ্তাহে কে বেরোবে বলো তো?",
+    "Uncut feed is so much better than the TV edit",
+    "ও মা, এটা কি হল! 😳",
+    "Vote for your favourite housemate guys 🗳️",
+    "Best season of Bigg Boss Bangla till now 👏",
+    "ক্যাপ্টেন্সি টাস্কে আজ পুরো মারাত্মক খেলা হয়েছে",
+    "Who else is watching from Dhaka? 🇧🇩",
+    "Kolkata theke dekhchi ❤️",
+    "Ei alliance ta beshi din tikbe na 😏",
+    "Bigg Boss er voice ta shunlei goosebumps 🎙️"
+  ];
+
+  function rand(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+  function addMsg(name, text, me){
+    var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+    var row = document.createElement("div");
+    row.className = "bbb-ott-msg" + (me ? " bbb-ott-msg--me" : "");
+    var av = document.createElement("div");
+    av.className = "bbb-ott-av";
+    av.style.background = me ? "linear-gradient(135deg,#ffcc00,#e50914)" : rand(colors);
+    av.textContent = name.charAt(0).toUpperCase();
+    var body = document.createElement("div");
+    body.className = "bbb-ott-msg-body";
+    var b = document.createElement("b");
+    b.textContent = name;
+    b.style.color = me ? "" : "#b9bad0";
+    body.appendChild(b);
+    if (me) { var tag = document.createElement("span"); tag.className = "bbb-ott-badge-me"; tag.textContent = "YOU"; body.appendChild(tag); }
+    var p = document.createElement("p");
+    p.textContent = text;   // textContent keeps user input safe (no HTML injection)
+    body.appendChild(p);
+    row.appendChild(av); row.appendChild(body);
+    list.appendChild(row);
+    while (list.children.length > 80) list.removeChild(list.firstChild);
+    if (me || nearBottom) list.scrollTop = list.scrollHeight;
+  }
+
+  for (var i = 0; i < 7; i++) addMsg(rand(names), lines[i], false);
+
+  (function loop(){
+    setTimeout(function(){ addMsg(rand(names), rand(lines), false); loop(); }, 2200 + Math.random()*2600);
+  })();
+
+  var myName = "Fan" + Math.floor(100 + Math.random()*900);
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = input.value.replace(/\s+/g," ").trim();
+    if (!v) { input.focus(); return; }
+    addMsg(myName, v, true);
+    input.value = "";
+    input.focus();
+  });
+})();
+</script>
+</div>
+<!-- ================================================================== -->
+<!-- ===== BIGG BOSS BANGLA OTT — COPY TO HERE ======================== -->
+<!-- ================================================================== -->
+
+</body>
+</html>
