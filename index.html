@@ -761,6 +761,12 @@
   frame.addEventListener("load", function(){
     if (frame.getAttribute("src")) { overlay.hidden = true; overlay.classList.remove("bbb-ott-overlay--loading"); }
   });
+  /* Fallback: the iframe can finish loading before this script runs,
+     so the load event may never fire afterwards — never leave the
+     "Connecting…" overlay stuck on a playing video. */
+  setTimeout(function(){
+    if (frame.getAttribute("src")) { overlay.hidden = true; overlay.classList.remove("bbb-ott-overlay--loading"); }
+  }, 7000);
 
   /* Initial state: if the iframe src was pasted directly, use it for Server 1 too */
   (function init(){
