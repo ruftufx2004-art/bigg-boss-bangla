@@ -245,6 +245,17 @@
 .bbb-ott-epcard img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
 .bbb-ott-epcard span{display:block;padding:8px 10px 0;font-size:11px;font-weight:800;color:var(--bbb-gold);letter-spacing:.06em;}
 .bbb-ott-epcard b{display:block;padding:2px 10px 10px;font-size:13px;line-height:1.35;}
+.bbb-ott-poll{margin-top:28px;padding:22px;border-radius:18px;background:var(--bbb-card);border:1px solid var(--bbb-line);box-shadow:0 18px 50px rgba(0,0,0,.45);}
+.bbb-ott-poll h2{margin:0 0 4px;font-size:clamp(18px,2.4vw,24px);}
+.bbb-ott-poll p{margin:0 0 14px;font-size:13px;color:var(--bbb-muted);}
+.bbb-ott-poll-opt{display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:8px;border-radius:10px;border:1px solid var(--bbb-line);background:rgba(255,255,255,.05);color:var(--bbb-text);font-size:14px;cursor:pointer;position:relative;overflow:hidden;font-family:'Hind Siliguri','Poppins',sans-serif;}
+.bbb-ott-poll-opt i{position:absolute;inset:0;background:linear-gradient(90deg,rgba(229,9,20,.35),rgba(157,77,255,.25));width:0%;transition:width .8s cubic-bezier(.22,1,.36,1);}
+.bbb-ott-poll-opt{transition:transform .6s cubic-bezier(.22,1,.36,1), border-color .3s, opacity .3s;}
+.bbb-ott-poll-opt span,.bbb-ott-poll-opt b{position:relative;z-index:1;}
+.bbb-ott-poll-opt b{float:right;color:var(--bbb-gold);}
+.bbb-ott-poll-opt:disabled{cursor:default;}
+.bbb-ott-poll-opt.bbb-ott-voted{border-color:var(--bbb-gold);}
+.bbb-ott-poll-total{font-size:12px;color:var(--bbb-muted);margin-top:6px;}
 .bbb-ott-epad{display:none; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 @media (max-width:980px){ .bbb-ott-epad{display:flex;} }
 
@@ -326,7 +337,7 @@
         -->
         <iframe
           id="bbb-ott-frame"
-          src=""
+          src="https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3"
           title="Bigg Boss Bangla Live Player"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowfullscreen
@@ -353,18 +364,18 @@
            Paste each server's embed link into its data-src attribute. -->
       <div class="bbb-ott-servers" role="toolbar" aria-label="Stream servers">
         <button type="button" class="bbb-ott-srv is-active"
-          data-src=""
-          data-name="Server 1 • Main Live HD">▶ Server 1<small>Main Live HD</small></button>
+          data-src="https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3"
+          data-name="Server 1 • Latest Episode">▶ Server 1<small>Latest Episode</small></button>
           <!-- ▲ Server 1 link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv"
-          data-src=""
-          data-name="Server 2 • Backup Fast">⚡ Server 2<small>Backup Fast</small></button>
+          data-src="https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3"
+          data-name="Server 2 • Episode 78">⚡ Server 2<small>Episode 78</small></button>
           <!-- ▲ Server 2 (backup) link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv"
-          data-src=""
-          data-name="Server 3 • Low Data">📱 Server 3<small>Low Data / Mobile</small></button>
+          data-src="https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3"
+          data-name="Server 3 • Episode 77">📱 Server 3<small>Episode 77</small></button>
           <!-- ▲ Server 3 (low data / mobile) link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv bbb-ott-srv--reload" id="bbb-ott-reload">🔄 Reload<small>Fix buffering</small></button>
@@ -413,6 +424,14 @@
 <script type="text/javascript" src="https://bancadeltempoidea.org/22/cfc15cc6fb4dd4278572d183b4e169e4"></script>
   </div>
 
+
+  <!-- ===== Vote Poll: Who will win? (real votes via Cloudflare KV, 1 vote per device) ===== -->
+  <section class="bbb-ott-poll" id="bbb-ott-poll">
+    <h2>🗳️ ভোট দিন — কে জিতবে Bigg Boss Bangla Season 3?</h2>
+    <p>একটি ডিভাইস থেকে মাত্র ১টি ভোট দেওয়া যাবে। আসল ভোটের ফলাফল নিচে দেখা যাবে।</p>
+    <div id="bbb-ott-poll-list"><p>ভোট লোড হচ্ছে…</p></div>
+    <div class="bbb-ott-poll-total" id="bbb-ott-poll-total"></div>
+  </section>
 
   <!-- ===== Episodes: Star Jalsha Official YouTube ===== -->
   <div class="bbb-ott-rowhead"><h2>All Episodes — Star Jalsha Official</h2><span>Episode 1–79 • Click to watch</span></div>
@@ -930,6 +949,55 @@
     input.value = "";
     input.focus();
   });
+
+  /* ---------- Vote Poll (real shared votes, 1 per device) ---------- */
+  var pollList = $("#bbb-ott-poll-list");
+  var pollTotal = $("#bbb-ott-poll-total");
+  var pollNames = ["Monami Ghosh","Bharat Kaul","Durnibar Saha","Sohini Paul","Niranjan Mondal (Laughtersane)","Nandini Dutta","Srijla Guha","Dipendu Biswas","Tanushree Roy Das","Sayak Chakraborty","Joyita Chatterjee","Alexandra Taylor","Jhilam Gupta","Sonamoni Saha","Rajveer Dey"];
+  var deviceId = localStorage.getItem("bbb-poll-device");
+  if (!deviceId) { deviceId = "d" + Date.now().toString(36) + Math.random().toString(36).slice(2,10); localStorage.setItem("bbb-poll-device", deviceId); }
+  var pollNodes = {};
+  function pollRender(data){
+    var total = data.total || 0;
+    // Ranked: most votes on top, then serial by vote count (fluid — nodes are reused, bars animate)
+    var ranked = pollNames.slice().sort(function(a, b){
+      var na = (data.counts && data.counts[a]) || 0;
+      var nb = (data.counts && data.counts[b]) || 0;
+      return nb - na || pollNames.indexOf(a) - pollNames.indexOf(b);
+    });
+    ranked.forEach(function(name){
+      var n = (data.counts && data.counts[name]) || 0;
+      var pct = total ? Math.round(n * 100 / total) : 0;
+      var btn = pollNodes[name];
+      if (!btn) {
+        btn = document.createElement("button");
+        btn.type = "button";
+        var bar = document.createElement("i");
+        var nm = document.createElement("span");
+        var pc = document.createElement("b");
+        btn.appendChild(bar); btn.appendChild(nm); btn.appendChild(pc);
+        btn.addEventListener("click", function(){ pollVote(name); });
+        pollNodes[name] = btn;
+      }
+      btn.className = "bbb-ott-poll-opt" + (data.voted === name ? " bbb-ott-voted" : "");
+      btn.disabled = !!data.voted;
+      btn.children[0].style.width = pct + "%";
+      btn.children[1].textContent = name + (data.voted === name ? " ✓ আপনার ভোট" : "");
+      btn.children[2].textContent = pct + "% (" + n + ")";
+      pollList.appendChild(btn);
+    });
+    pollTotal.textContent = total ? ("মোট ভোট: " + total + " • সবার ভোট সবার কাছে দৃশ্যমান • একটি ডিভাইস থেকে ১টি ভোট") : "এখনো কোনো ভোট পড়েনি — প্রথম ভোটটি দিন!";
+  }
+  function pollLoad(){
+    fetch("/api/poll?device=" + encodeURIComponent(deviceId)).then(function(r){ return r.json(); }).then(pollRender).catch(function(){
+      pollList.textContent = "ভোট গণনা এখনো চালু হয়নি — শীঘ্রই আসছে।";
+    });
+  }
+  function pollVote(name){
+    fetch("/api/poll", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: deviceId, choice: name})})
+      .then(function(r){ return r.json(); }).then(pollRender).catch(pollLoad);
+  }
+  if (pollList) pollLoad();
 })();
 </script>
 </div>
