@@ -1,0 +1,26 @@
+name: Extract site zip
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'bigg-boss-site.zip'
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract site zip and commit
+        run: |
+          set -e
+          test -f bigg-boss-site.zip
+          unzip -o bigg-boss-site.zip
+          rm -f bigg-boss-site.zip
+          rm -rf .github
+          git config user.name "ruftufx2004-art"
+          git config user.email "ruftufx2004-art@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Poll: only 9 current housemates"
+          git push
