@@ -1,12 +1,16 @@
 // Cloudflare Pages Function: real shared poll votes, 1 vote per device.
 // Requires a KV namespace bound as POLL_KV in the Pages project settings.
-const NAMES = ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das","Ranieeta Dash"];
+const FALLBACK = ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das","Ranieeta Dash"];
+async function loadNames(kv) {
+  try { const raw = await kv.get("cfg:pollNames"); if (raw) { const a = JSON.parse(raw); if (Array.isArray(a) && a.length) return a; } } catch (e) {}
+  return FALLBACK;
+}
 
 function json(data, status) {
   return new Response(JSON.stringify(data), { status: status || 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
 }
 
-async function readCounts(kv) {
+async function readCounts(kv, NAMES) {
   const counts = {};
   let total = 0;
   for (const n of NAMES) {
@@ -23,7 +27,8 @@ export async function onRequest(context) {
   if (request.method === "GET") {
     const url = new URL(request.url);
     const device = url.searchParams.get("device") || "";
-    const data = await readCounts(kv);
+    const NAMES = await loadNames(kv);
+    const data = await readCounts(kv, NAMES);
     if (device) data.voted = (await kv.get("voted:" + device)) || null;
     return json(data);
   }
@@ -33,8 +38,9 @@ export async function onRequest(context) {
     const device = String(body.device || "").slice(0, 64);
     const choice = String(body.choice || "");
     if (!device || !NAMES.includes(choice)) return json({ error: "invalid vote" }, 400);
+    const NAMES = await loadNames(kv);
     if (await kv.get("voted:" + device)) {
-      const data = await readCounts(kv);
+      const data = await readCounts(kv, NAMES);
       data.voted = await kv.get("voted:" + device);
       return json(data);
     }
@@ -42,7 +48,7 @@ export async function onRequest(context) {
     const cur = parseInt((await kv.get(key)) || "0", 10) || 0;
     await kv.put(key, String(cur + 1));
     await kv.put("voted:" + device, choice);
-    const data = await readCounts(kv);
+    const data = await readCounts(kv, NAMES);
     data.voted = choice;
     return json(data);
   }

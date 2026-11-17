@@ -1003,7 +1003,16 @@
     fetch("/api/poll", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: deviceId, choice: name})})
       .then(function(r){ return r.json(); }).then(pollRender).catch(pollLoad);
   }
-  if (pollList) pollLoad();
+  /* Site config from Admin Panel (live links + poll names); falls back to built-in values */
+  function applyConfig(cfg){
+    if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(cfg.live, "Server 1 • Latest Episode");
+    if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", cfg.s2);
+    if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", cfg.s3);
+    if (cfg && cfg.pollNames && cfg.pollNames.length) pollNames = cfg.pollNames;
+  }
+  if (pollList) {
+    fetch("/api/config").then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); pollLoad(); }).catch(function(){ pollLoad(); });
+  }
 })();
 </script>
 </div>

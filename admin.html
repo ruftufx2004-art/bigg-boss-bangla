@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Bigg Boss Bangla</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0b10;--card:#17171f;--line:rgba(255,255,255,.08);--text:#f5f5f7;--muted:#9a9aab;--red:#e50914;--gold:#f5c518;--green:#22c55e;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Hind Siliguri','Poppins',sans-serif;padding:20px}
+  .wrap{max-width:640px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 4px} h1 span{color:var(--gold)}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  .card h2{font-size:16px;margin:0 0 12px}
+  label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}
+  input,textarea{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:#0f0f16;color:var(--text);font-size:14px;font-family:inherit}
+  textarea{min-height:150px;resize:vertical}
+  button{padding:11px 18px;border:0;border-radius:10px;background:var(--red);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:14px}
+  button.ghost{background:#26262f}
+  button:disabled{opacity:.5;cursor:default}
+  #msg{margin-top:12px;font-size:14px;min-height:20px}
+  #msg.ok{color:var(--green)} #msg.err{color:var(--red)}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  #panel{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>👁️ Bigg Boss Bangla <span>Admin Panel</span></h1>
+  <p class="sub">LIVE লিংক, ভোট পোল আর পাসওয়ার্ড — এখান থেকে বদলানো যাবে।</p>
+
+  <div class="card" id="loginCard">
+    <h2>🔐 লগইন</h2>
+    <label>অ্যাডমিন পাসওয়ার্ড</label>
+    <input type="password" id="pw" placeholder="পাসওয়ার্ড লিখুন" autocomplete="current-password">
+    <button id="loginBtn">ঢুকুন</button>
+    <div id="msg"></div>
+  </div>
+
+  <div id="panel">
+    <div class="card">
+      <h2>📺 LIVE NOW প্লেয়ার</h2>
+      <label>Server 1 — Main Live (YouTube ভিডিও লিংক বা Embed লিংক)</label>
+      <input type="text" id="live" placeholder="https://www.youtube.com/watch?v=...">
+      <p class="hint">YouTube-এর সাধারণ watch লিংক দিলেও চলবে, নিজে থেকে Embed বানিয়ে নেবে।</p>
+      <label>Server 2 — Backup</label>
+      <input type="text" id="s2">
+      <label>Server 3 — Low Data / Mobile</label>
+      <input type="text" id="s3">
+    </div>
+
+    <div class="card">
+      <h2>🗳️ ভোট পোল — কে জিতবে?</h2>
+      <label>ঘরে থাকা প্রতিযোগীদের নাম (প্রতি লাইনে একজন)</label>
+      <textarea id="names"></textarea>
+      <button class="ghost" id="resetBtn" type="button">🗑️ সব ভোট রিসেট করুন (০ করে দিন)</button>
+    </div>
+
+    <div class="card">
+      <h2>🔑 পাসওয়ার্ড বদলান</h2>
+      <label>নতুন পাসওয়ার্ড (খালি রাখলে বদলাবে না)</label>
+      <input type="text" id="newPw" placeholder="নতুন পাসওয়ার্ড">
+    </div>
+
+    <button id="saveBtn">💾 সেভ করুন</button>
+    <div id="msg2"></div>
+    <p class="hint"><a href="/" style="color:var(--gold)">← সাইটে ফিরে যান</a></p>
+  </div>
+</div>
+<script>
+var pw = "";
+function msg(t, ok){ var m=document.getElementById("msg2")||document.getElementById("msg"); m.textContent=t; m.className=ok?"ok":"err"; }
+function toEmbed(u){
+  u=(u||"").trim(); if(!u) return "";
+  var m=u.match(/[?&]v=([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[1]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
+  m=u.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[1]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
+  m=u.match(/embed\/([A-Za-z0-9_-]{6,})/); if(m) return u;
+  return u;
+}
+function loadConfig(){
+  fetch("/api/config").then(function(r){return r.json();}).then(function(c){
+    document.getElementById("live").value=c.live||"";
+    document.getElementById("s2").value=c.s2||"";
+    document.getElementById("s3").value=c.s3||"";
+    document.getElementById("names").value=(c.pollNames||[]).join("\n");
+  });
+}
+document.getElementById("loginBtn").addEventListener("click", function(){
+  pw=document.getElementById("pw").value;
+  fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})})
+    .then(function(r){ if(!r.ok) throw new Error("wrong"); return r.json(); })
+    .then(function(){
+      sessionStorage.setItem("bbb-admin","1");
+      document.getElementById("loginCard").style.display="none";
+      document.getElementById("panel").style.display="block";
+      loadConfig();
+    })
+    .catch(function(){ document.getElementById("msg").textContent="❌ ভুল পাসওয়ার্ড"; document.getElementById("msg").className="err"; });
+});
+document.getElementById("pw").addEventListener("keydown", function(e){ if(e.key==="Enter") document.getElementById("loginBtn").click(); });
+document.getElementById("saveBtn").addEventListener("click", function(){
+  var body={password:pw, live:toEmbed(document.getElementById("live").value), s2:toEmbed(document.getElementById("s2").value), s3:toEmbed(document.getElementById("s3").value),
+    pollNames:document.getElementById("names").value.split("\n").map(function(x){return x.trim();}).filter(Boolean)};
+  var np=document.getElementById("newPw").value.trim(); if(np) body.newPassword=np;
+  msg("সেভ হচ্ছে…", true);
+  fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){ if(!r.ok) throw new Error("err"); return r.json(); })
+    .then(function(){ msg("✅ সেভ হয়েছে! সাইটে গিয়ে দেখুন।", true); if(np){ pw=np; document.getElementById("newPw").value=""; } })
+    .catch(function(){ msg("❌ সেভ হয়নি — পাসওয়ার্ড ঠিক আছে তো?", false); });
+});
+document.getElementById("resetBtn").addEventListener("click", function(){
+  if(!confirm("সব ভোট ০ করে দেবো?")) return;
+  fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw, resetPoll:true})})
+    .then(function(r){ if(!r.ok) throw new Error("err"); return r.json(); })
+    .then(function(){ msg("✅ সব ভোট রিসেট হয়েছে।", true); })
+    .catch(function(){ msg("❌ রিসেট হয়নি।", false); });
+});
+</script>
+</body>
+</html>
