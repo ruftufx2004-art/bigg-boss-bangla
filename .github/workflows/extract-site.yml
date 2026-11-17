@@ -1,0 +1,44 @@
+name: Extract site zip
+
+on:
+  push:
+    paths:
+      - 'bigg-boss-site.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract site files from zip
+        run: |
+          unzip -o bigg-boss-site.zip
+          rm -f bigg-boss-site.zip
+          rm -rf __MACOSX
+          if [ ! -f index.html ]; then
+            for d in */; do
+              if [ -f "$d/index.html" ]; then
+                mv "$d"* ./
+                rmdir "$d"
+                break
+              fi
+            done
+          fi
+          ls -la
+          test -f index.html
+          test -f episodes/ep-1.html
+          test -f episodes/ep-79.html
+          echo "Episode pages: $(ls episodes | wc -l)"
+      - name: Commit extracted site
+        run: |
+          rm -rf .github
+          git config user.name "Samiya Arzue"
+          git config user.email "ruftufx2004@gmail.com"
+          git add -A
+          git status --short
+          git commit -m "Add 79 episode pages with Star Jalsha YouTube embeds"
+          git push
