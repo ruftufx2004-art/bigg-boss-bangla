@@ -146,6 +146,9 @@
 .bbb-ott-chat-list{flex:1 1 auto; min-height:280px; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:10px; scroll-behavior:smooth;}
 .bbb-ott-chat-list::-webkit-scrollbar{width:6px;}
 .bbb-ott-chat-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12); border-radius:6px;}
+.bbb-ott-chat-ad{display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6px 0 2px; min-height:56px; overflow:hidden;}
+.bbb-ott-chat-ad small{font-size:8px; letter-spacing:.15em; color:#5f6175; margin-bottom:2px;}
+.bbb-ott-chat-ad .bbb-ott-ad{margin:0;}
 .bbb-ott-msg{display:flex; gap:9px; align-items:flex-start; animation:bbbOttIn .35s ease;}
 @keyframes bbbOttIn{from{opacity:0; transform:translateY(8px);}to{opacity:1; transform:none;}}
 .bbb-ott-av{flex:0 0 30px; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff;}
@@ -800,6 +803,26 @@
 
   function rand(a){ return a[Math.floor(Math.random()*a.length)]; }
 
+  var bbbOttChatMsgCount = 0;
+  function bbbOttInsertChatAd(){
+    var ad = document.createElement("div");
+    ad.className = "bbb-ott-chat-ad";
+    var lab = document.createElement("small");
+    lab.textContent = "ADVERTISEMENT";
+    ad.appendChild(lab);
+    var box = document.createElement("div");
+    box.className = "bbb-ott-ad bbb-ott-ad-320";
+    var cfg = document.createElement("script");
+    cfg.type = "text/javascript";
+    cfg.text = "atOptions={'key':'a7bd3f7ad17b0aedbbf12d313ec2980d','format':'iframe','height':50,'width':320,'params':{}};";
+    var src = document.createElement("script");
+    src.type = "text/javascript";
+    src.src = "https://bancadeltempoidea.org/22/a7bd3f7ad17b0aedbbf12d313ec2980d";
+    box.appendChild(cfg); box.appendChild(src);
+    ad.appendChild(box);
+    list.appendChild(ad);
+  }
+
   function addMsg(name, text, me){
     var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
     var row = document.createElement("div");
@@ -820,6 +843,8 @@
     body.appendChild(p);
     row.appendChild(av); row.appendChild(body);
     list.appendChild(row);
+    bbbOttChatMsgCount++;
+    if (bbbOttChatMsgCount % 6 === 0) bbbOttInsertChatAd();
     while (list.children.length > 80) list.removeChild(list.firstChild);
     if (me || nearBottom) list.scrollTop = list.scrollHeight;
   }
