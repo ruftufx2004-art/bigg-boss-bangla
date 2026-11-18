@@ -956,6 +956,14 @@
   var livePlayer = null, liveApiReady = false, liveReady = false, liveSyncTimer = null;
   function isYT(u){ return !!u && /youtube(-nocookie)?\.com\/embed\//i.test(u); }
   function ytApiUrl(u){
+    if (!u) return u;
+    /* A raw YouTube page link (watch / live / shorts / youtu.be) is not an
+       embed URL — the player would treat it as a website and YouTube
+       refuses to frame it. Convert it to a nocookie embed URL first. */
+    if (/youtu\.?be/i.test(u)) {
+      var m = u.match(/(?:[?&]v=|youtu\.be\/|\/(?:live|shorts)\/)([A-Za-z0-9_-]{6,})/);
+      if (m) u = "https://www.youtube-nocookie.com/embed/" + m[1] + "?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
+    }
     if (!isYT(u)) return u;
     return /enablejsapi=1/.test(u) ? u : (u + (u.indexOf("?") >= 0 ? "&" : "?") + "enablejsapi=1");
   }
