@@ -1,0 +1,59 @@
+name: Extract site zip
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify zip contents
+        run: |
+          set -e
+          test -f bigg-boss-site-5.zip
+          echo "--- zip listing ---"
+          unzip -l bigg-boss-site-5.zip
+          echo "--- required files ---"
+          unzip -l bigg-boss-site-5.zip | grep -q "admin.html"
+          unzip -l bigg-boss-site-5.zip | grep -q "index.html"
+          unzip -l bigg-boss-site-5.zip | grep -q "functions/api/config.js"
+          echo "--- required markers ---"
+          unzip -p bigg-boss-site-5.zip "*admin.html" | grep -q "frameZoom"
+          unzip -p bigg-boss-site-5.zip "*admin.html" | grep -q "zoomInBtn"
+          unzip -p bigg-boss-site-5.zip "*admin.html" | grep -q "zoomOutBtn"
+          unzip -p bigg-boss-site-5.zip "*index.html" | grep -q "frameCfg.zoom"
+          unzip -p bigg-boss-site-5.zip "*index.html" | grep -q "cfg.frameZoom"
+          unzip -p bigg-boss-site-5.zip "*index.html" | grep -q "pointer-events:auto"
+          unzip -p bigg-boss-site-5.zip "*config.js" | grep -q "frameZoom"
+          unzip -p bigg-boss-site-5.zip "*config.js" | grep -q "cfg:frameZoom"
+          echo "Verification passed."
+
+      - name: Extract zip and remove zip and workflow
+        run: |
+          set -e
+          unzip -o bigg-boss-site-5.zip
+          rm -f bigg-boss-site-5.zip
+          if [ ! -f admin.html ]; then
+            d=$(find . -maxdepth 3 -name admin.html -not -path "./.git/*" | head -n 1 | xargs dirname)
+            echo "Site files found in subfolder: $d"
+            cp -a "$d"/. .
+            rm -rf "$d"
+          fi
+          rm -f .github/workflows/extract-site.yml
+          ls -la
+
+      - name: Commit extracted site
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Website frame: interactive + site-wide zoom"
+          git push
