@@ -1,0 +1,35 @@
+name: Extract site zip (one-time)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unzip site bundle
+        run: |
+          test -f bigg-boss-site-3.zip
+          unzip -o bigg-boss-site-3.zip
+      - name: Verify extracted site
+        run: |
+          unzip -l bigg-boss-site-3.zip
+          test -f index.html
+          test -f admin.html
+          test -d functions
+          grep -F -q 'function fillConfig' admin.html
+          grep -F -q 'fillConfig(c)' admin.html
+          echo "OK: admin.html contains function fillConfig and save handler calls fillConfig(c)"
+      - name: Remove zip and one-time workflow, then commit
+        run: |
+          rm -f bigg-boss-site-3.zip .github/workflows/extract-site.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git diff --cached --quiet || git commit -m "Admin panel: show saved values immediately after save (no stale re-fetch)"
+          git push
