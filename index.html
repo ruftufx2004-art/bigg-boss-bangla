@@ -419,7 +419,6 @@
       <!-- Website frame mode: shows a cropped part of any website as the live feed -->
       <div class="bbb-ott-webframe" id="bbb-ott-webframe" hidden>
         <iframe id="bbb-ott-webiframe" title="Website live feed" scrolling="no"></iframe>
-        <div class="bbb-ott-webnote">এই ওয়েবসাইট এমবেড করতে না দিলে ফ্রেম খালি দেখাবে — <a id="bbb-ott-weblink" href="https://shop.bihishaan.com/" target="_blank" rel="noopener">নতুন ট্যাবে খুলুন ↗</a></div>
       </div>
 
       <!-- Player controls (YouTube IFrame API) -->
@@ -828,7 +827,6 @@
   var servers  = $$(".bbb-ott-srv[data-src]");
   var webframe = $("#bbb-ott-webframe");
   var webiframe = $("#bbb-ott-webiframe");
-  var weblink  = $("#bbb-ott-weblink");
   var controls = $("#bbb-ott-controls");
   var helper   = $(".bbb-ott-helper");
   var frameCfg = { top: 0, height: 560 };
@@ -864,7 +862,6 @@
     $("#bbb-ott-player").style.display = "none";
     if (controls) controls.style.display = "none";
     if (helper) helper.style.display = "none";
-    weblink.href = url;
     applyFrameGeometry();
     webiframe.src = url;
   }
