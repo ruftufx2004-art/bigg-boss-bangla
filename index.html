@@ -1487,7 +1487,7 @@
     if (cfg && cfg.pollPhotos) pollPhotos = cfg.pollPhotos;
   }
   if (pollList) {
-    fetch("/api/config").then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); pollLoad(); }).catch(function(){ pollLoad(); });
+    fetch("/api/config",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); pollLoad(); }).catch(function(){ pollLoad(); });
   }
 })();
 </script>

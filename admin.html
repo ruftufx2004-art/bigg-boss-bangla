@@ -207,16 +207,17 @@ function loadFramePreview(){
     document.getElementById("framePreviewWrap").style.display="none";
   }
 }
+function fillConfig(c){
+  document.getElementById("live").value=c.live||"";
+  document.getElementById("s2").value=c.s2||"";
+  document.getElementById("s3").value=c.s3||"";
+  document.getElementById("names").value=(c.pollNames||[]).join("\n");
+  document.getElementById("frameTop").value=(c.frameTop!=null?c.frameTop:0);
+  document.getElementById("frameHeight").value=(c.frameHeight!=null?c.frameHeight:560);
+  loadFramePreview();
+}
 function loadConfig(){
-  fetch("/api/config").then(function(r){return r.json();}).then(function(c){
-    document.getElementById("live").value=c.live||"";
-    document.getElementById("s2").value=c.s2||"";
-    document.getElementById("s3").value=c.s3||"";
-    document.getElementById("names").value=(c.pollNames||[]).join("\n");
-    document.getElementById("frameTop").value=(c.frameTop!=null?c.frameTop:0);
-    document.getElementById("frameHeight").value=(c.frameHeight!=null?c.frameHeight:560);
-    loadFramePreview();
-  });
+  fetch("/api/config",{cache:"no-store"}).then(function(r){return r.json();}).then(fillConfig);
 }
 function enterPanel(){
   sessionStorage.setItem("bbb-admin","1");
@@ -255,7 +256,7 @@ document.getElementById("saveBtn").addEventListener("click", function(){
   msg("সেভ হচ্ছে…", true);
   fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
     .then(function(r){ if(!r.ok) throw new Error("err"); return r.json(); })
-    .then(function(){ msg("✅ সেভ হয়েছে! সাইটে গিয়ে দেখুন।", true); if(np){ pw=np; document.getElementById("newPw").value=""; } if(at){ document.getElementById("adToken").value=""; loadAdsterra(); } loadConfig(); })
+    .then(function(c){ msg("✅ সেভ হয়েছে! সাইটে গিয়ে দেখুন।", true); if(np){ pw=np; document.getElementById("newPw").value=""; } if(at){ document.getElementById("adToken").value=""; loadAdsterra(); } fillConfig(c); })
     .catch(function(){ msg("❌ সেভ হয়নি — পাসওয়ার্ড ঠিক আছে তো?", false); });
 });
 document.getElementById("statRefresh").addEventListener("click", function(e){ e.preventDefault(); loadInstallStats(); });
