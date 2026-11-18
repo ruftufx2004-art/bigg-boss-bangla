@@ -49,6 +49,7 @@
   filter:drop-shadow(0 0 14px rgba(229,9,20,.35));
 }
 .bbb-ott-logo span{display:block; font-size:.42em; letter-spacing:.42em; color:var(--bbb-muted); -webkit-text-fill-color:var(--bbb-muted); margin-top:4px; font-weight:600;}
+.bbb-ott-logo img{height:52px;width:auto;border-radius:8px;display:block;box-shadow:0 4px 18px rgba(0,0,0,.5);}
 .bbb-ott-live{
   display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border-radius:999px;
   background:var(--bbb-red); color:#fff; font-size:12px; font-weight:800; letter-spacing:.08em;
@@ -253,6 +254,7 @@
 .bbb-ott-poll-opt{transition:transform .6s cubic-bezier(.22,1,.36,1), border-color .3s, opacity .3s;}
 .bbb-ott-poll-opt span,.bbb-ott-poll-opt b{position:relative;z-index:1;}
 .bbb-ott-poll-opt b{float:right;color:var(--bbb-gold);}
+.bbb-ott-poll-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:10px;border:2px solid var(--bbb-gold);}
 .bbb-ott-poll-opt:disabled{cursor:default;}
 .bbb-ott-poll-opt.bbb-ott-voted{border-color:var(--bbb-gold);}
 .bbb-ott-poll-total{font-size:12px;color:var(--bbb-muted);margin-top:6px;}
@@ -292,7 +294,7 @@
   <!-- ===== Header ===== -->
   <header class="bbb-ott-header">
     <div class="bbb-ott-brand">
-      <div class="bbb-ott-logo">BIGG BOSS BANGLA<span>OTT • LIVE HOUSE</span></div>
+      <div class="bbb-ott-logo"><img src="https://thumb.wikimedia.org/wikipedia/en/thumb/4/4a/Bigg_Boss_Bangla_season_3.jpg/330px-Bigg_Boss_Bangla_season_3.jpg" alt="Bigg Boss Bangla Season 3" loading="eager"><span>OTT • LIVE HOUSE</span></div>
       <span class="bbb-ott-live"><i></i>LIVE NOW</span>
     </div>
     <div class="bbb-ott-pills">
@@ -960,6 +962,7 @@
   var pollList = $("#bbb-ott-poll-list");
   var pollTotal = $("#bbb-ott-poll-total");
   var pollNames = ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das","Ranieeta Dash"];
+  var pollPhotos = {"Monami Ghosh": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-4603.jpg", "Durnibar Saha": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-927.jpg", "Niranjan Mondal (Laughtersane)": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-1237.jpg", "Tanushree Roy Das": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-2519.jpg", "Srijla Guha": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-3976.jpg", "Rajveer Dey": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111195628-9939.jpg", "Jeetu Kamal": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111195840-8371.jpg", "Sourav Das": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111184132-5879.jpg", "Ranieeta Dash": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111184423-4386.jpg"};
   var deviceId = localStorage.getItem("bbb-poll-device");
   if (!deviceId) { deviceId = "d" + Date.now().toString(36) + Math.random().toString(36).slice(2,10); localStorage.setItem("bbb-poll-device", deviceId); }
   var pollNodes = {};
@@ -979,17 +982,21 @@
         btn = document.createElement("button");
         btn.type = "button";
         var bar = document.createElement("i");
+        var pic = document.createElement("img");
+        pic.className = "bbb-ott-poll-pic"; pic.alt = name; pic.loading = "lazy";
+        pic.onerror = function(){ this.style.display = "none"; };
         var nm = document.createElement("span");
         var pc = document.createElement("b");
-        btn.appendChild(bar); btn.appendChild(nm); btn.appendChild(pc);
+        btn.appendChild(bar); btn.appendChild(pic); btn.appendChild(nm); btn.appendChild(pc);
         btn.addEventListener("click", function(){ pollVote(name); });
         pollNodes[name] = btn;
       }
       btn.className = "bbb-ott-poll-opt" + (data.voted === name ? " bbb-ott-voted" : "");
       btn.disabled = !!data.voted;
       btn.children[0].style.width = pct + "%";
-      btn.children[1].textContent = name + (data.voted === name ? " ✓ আপনার ভোট" : "");
-      btn.children[2].textContent = pct + "% (" + n + ")";
+      if (pollPhotos[name]) btn.children[1].src = pollPhotos[name]; else btn.children[1].style.display = "none";
+      btn.children[2].textContent = name + (data.voted === name ? " ✓ আপনার ভোট" : "");
+      btn.children[3].textContent = pct + "% (" + n + ")";
       pollList.appendChild(btn);
     });
     pollTotal.textContent = total ? ("মোট ভোট: " + total + " • সবার ভোট সবার কাছে দৃশ্যমান • একটি ডিভাইস থেকে ১টি ভোট") : "এখনো কোনো ভোট পড়েনি — প্রথম ভোটটি দিন!";
@@ -1009,6 +1016,7 @@
     if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", cfg.s2);
     if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", cfg.s3);
     if (cfg && cfg.pollNames && cfg.pollNames.length) pollNames = cfg.pollNames;
+    if (cfg && cfg.pollPhotos) pollPhotos = cfg.pollPhotos;
   }
   if (pollList) {
     fetch("/api/config").then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); pollLoad(); }).catch(function(){ pollLoad(); });

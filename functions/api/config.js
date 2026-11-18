@@ -5,7 +5,8 @@ const DEFAULTS = {
   live: "https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3",
   s2: "https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3",
   s3: "https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3",
-  pollNames: ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das","Ranieeta Dash"]
+  pollNames: ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das","Ranieeta Dash"],
+  pollPhotos: {"Monami Ghosh": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-4603.jpg", "Durnibar Saha": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-927.jpg", "Niranjan Mondal (Laughtersane)": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-1237.jpg", "Tanushree Roy Das": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-2519.jpg", "Srijla Guha": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-3976.jpg", "Rajveer Dey": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111195628-9939.jpg", "Jeetu Kamal": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111195840-8371.jpg", "Sourav Das": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111184132-5879.jpg", "Ranieeta Dash": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111184423-4386.jpg"}
 };
 const DEFAULT_PASSWORD = "biggboss2026";
 
@@ -18,6 +19,8 @@ async function readConfig(kv) {
     const v = await kv.get("cfg:" + k);
     if (v) cfg[k] = v;
   }
+  const photos = await kv.get("cfg:pollPhotos");
+  if (photos) { try { const o = JSON.parse(photos); if (o && typeof o === "object") cfg.pollPhotos = o; } catch (e) {} }
   const names = await kv.get("cfg:pollNames");
   if (names) { try { const a = JSON.parse(names); if (Array.isArray(a) && a.length) cfg.pollNames = a; } catch (e) {} }
   return cfg;
