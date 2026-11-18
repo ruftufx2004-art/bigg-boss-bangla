@@ -282,8 +282,14 @@
 .bbb-ott-epad{display:none; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 @media (max-width:980px){ .bbb-ott-epad{display:flex;} }
 
+/* header app-download button — hidden inside the installed app */
+.bbb-ott-appbtn{padding:7px 13px;border-radius:20px;font-size:12px;font-weight:800;color:#111;background:var(--bbb-gold);border:0;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(255,204,0,.35);}
+.bbb-ott-appbtn:hover{filter:brightness(1.1);}
+@media (display-mode: standalone){ .bbb-ott-appbtn{display:none !important;} }
+
 /* PWA install popup */
 .bbb-ott-pwa{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.65);padding:16px;}
+.bbb-ott-pwa[hidden]{display:none;}
 .bbb-ott-pwa-card{width:100%;max-width:420px;background:#14141c;border:1px solid rgba(255,204,0,.45);border-radius:18px;padding:22px 20px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.7);animation:bbbOttPop .3s ease;}
 @keyframes bbbOttPop{from{opacity:0;transform:translateY(16px) scale(.97);}to{opacity:1;transform:none;}}
 .bbb-ott-pwa-card img{width:84px;height:84px;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.6);margin-bottom:12px;}
@@ -346,6 +352,7 @@
       <span class="bbb-ott-pill">60 FPS</span>
       <span class="bbb-ott-pill bbb-ott-pill--purple">24/7 UNCUT</span>
       <span class="bbb-ott-viewers" title="Live viewers">👁 <b id="bbb-ott-viewcount">14.2K</b> Watching</span>
+      <button type="button" class="bbb-ott-appbtn" id="bbb-ott-appbtn" title="অ্যাপ ডাউনলোড করো">📲 অ্যাপ ডাউনলোড</button>
     </div>
   </header>
 
@@ -1002,6 +1009,21 @@
     deferredPwaPrompt = e;
     if (!pwaShowable()) return;
     setTimeout(function(){ if (pwaPopup) pwaPopup.hidden = false; }, 2500);
+  });
+  var pwaAppBtn = $("#bbb-ott-appbtn");
+  if (pwaAppBtn) pwaAppBtn.addEventListener("click", function(){
+    try { fetch("/api/install-stats", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: pwaDevice, action: "header"})}).catch(function(){}); } catch (e) {}
+    if (!deferredPwaPrompt) {
+      if (pwaShowable() && pwaPopup) pwaPopup.hidden = false;
+      else toast("তোমার ব্রাউজারে অ্যাপ ইনস্টল সাপোর্ট করছে না");
+      return;
+    }
+    deferredPwaPrompt.prompt();
+    deferredPwaPrompt.userChoice.then(function(res){
+      pwaReport(res.outcome === "accepted" ? "installed" : "cancelled");
+      if (res.outcome === "accepted") toast("✅ অ্যাপ ইনস্টল হচ্ছে — হোম স্ক্রিনে দেখো!");
+    }).catch(function(){});
+    deferredPwaPrompt = null;
   });
   var pwaInstallBtn = $("#bbb-ott-pwa-install");
   if (pwaInstallBtn) pwaInstallBtn.addEventListener("click", function(){

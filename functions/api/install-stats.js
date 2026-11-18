@@ -9,7 +9,8 @@ function json(data, status) {
 async function readCounts(kv) {
   const installed = parseInt((await kv.get("install:installed")) || "0", 10) || 0;
   const cancelled = parseInt((await kv.get("install:cancelled")) || "0", 10) || 0;
-  return { installed, cancelled };
+  const headerClicks = parseInt((await kv.get("install:headerClicks")) || "0", 10) || 0;
+  return { installed, cancelled, headerClicks };
 }
 
 export async function onRequest(context) {
@@ -22,7 +23,14 @@ export async function onRequest(context) {
     try { body = await request.json(); } catch (e) { return json({ error: "bad json" }, 400); }
     const device = String(body.device || "").slice(0, 64);
     const action = String(body.action || "");
-    if (!device || (action !== "installed" && action !== "cancelled")) return json({ error: "invalid" }, 400);
+    if (!device || (action !== "installed" && action !== "cancelled" && action !== "header")) return json({ error: "invalid" }, 400);
+    if (action === "header") {
+      if (await kv.get("install:header:" + device)) return json(await readCounts(kv));
+      const c = await readCounts(kv);
+      await kv.put("install:headerClicks", String(c.headerClicks + 1));
+      await kv.put("install:header:" + device, "1");
+      return json(await readCounts(kv));
+    }
     const prev = await kv.get("install:device:" + device);
     if (prev === action) return json(await readCounts(kv));
     const counts = await readCounts(kv);

@@ -68,6 +68,7 @@
       <div class="stats">
         <div class="stat"><b class="ok" id="statInstalled">—</b><span>✅ ইনস্টল করেছে</span></div>
         <div class="stat"><b class="bad" id="statCancelled">—</b><span>❌ ক্যান্সেল করেছে</span></div>
+        <div class="stat"><b style="color:var(--gold)" id="statHeader">—</b><span>📲 হেডার থেকে ডাউনলোড</span></div>
       </div>
       <p class="hint">প্রতি ১০ সেকেন্ডে নিজে থেকে আপডেট হয়। <a href="#" id="statRefresh" style="color:var(--gold)">এখনই রিফ্রেশ করুন</a></p>
     </div>
@@ -97,6 +98,7 @@ function loadInstallStats(){
   fetch("/api/install-stats").then(function(r){return r.json();}).then(function(d){
     document.getElementById("statInstalled").textContent=d.installed!=null?d.installed:"—";
     document.getElementById("statCancelled").textContent=d.cancelled!=null?d.cancelled:"—";
+    document.getElementById("statHeader").textContent=d.headerClicks!=null?d.headerClicks:"—";
   }).catch(function(){});
 }
 function loadConfig(){
