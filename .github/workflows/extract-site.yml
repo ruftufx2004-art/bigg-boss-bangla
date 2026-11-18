@@ -1,0 +1,34 @@
+name: Extract site zip (one-time)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify zip contents before extracting
+        run: |
+          test -f bigg-boss-site.zip
+          unzip -l bigg-boss-site.zip
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'bbb-ott-pwa[hidden]' || { echo 'MISSING bbb-ott-pwa[hidden] in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'bbb-ott-appbtn' || { echo 'MISSING bbb-ott-appbtn in index.html'; exit 1; }
+          echo 'Verified: index.html contains both required strings'
+      - name: Extract and clean up
+        run: |
+          unzip -o bigg-boss-site.zip
+          rm -f bigg-boss-site.zip
+          rm -f .github/workflows/extract-site.yml
+          git status --short
+      - name: Commit extracted site
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && echo 'No changes to commit' && exit 0
+          git commit -m 'PWA fix: popup hides after Install/Cancel + header App Download button'
+          git push
