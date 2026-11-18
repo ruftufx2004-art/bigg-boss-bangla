@@ -1,0 +1,58 @@
+name: Extract site zip
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify zip contents
+        run: |
+          set -e
+          test -f bigg-boss-site-4.zip
+          echo "--- zip listing ---"
+          unzip -l bigg-boss-site-4.zip
+          echo "--- required files ---"
+          unzip -l bigg-boss-site-4.zip | grep -q "admin.html"
+          unzip -l bigg-boss-site-4.zip | grep -q "index.html"
+          unzip -l bigg-boss-site-4.zip | grep -q "functions/api/config.js"
+          echo "--- required markers ---"
+          unzip -p bigg-boss-site-4.zip "*admin.html" | grep -q "srvTgl"
+          unzip -p bigg-boss-site-4.zip "*admin.html" | grep -q "tglS1"
+          unzip -p bigg-boss-site-4.zip "*admin.html" | grep -q "srvPreviewWrap2"
+          unzip -p bigg-boss-site-4.zip "*admin.html" | grep -q "srvPreviewWrap3"
+          unzip -p bigg-boss-site-4.zip "*index.html" | grep -q 'data-srv="s1"'
+          unzip -p bigg-boss-site-4.zip "*index.html" | grep -q "cfg.serversOn"
+          unzip -p bigg-boss-site-4.zip "*config.js" | grep -q "serversOn"
+          echo "Verification passed."
+
+      - name: Extract zip and remove zip and workflow
+        run: |
+          set -e
+          unzip -o bigg-boss-site-4.zip
+          rm -f bigg-boss-site-4.zip
+          if [ ! -f admin.html ]; then
+            d=$(find . -maxdepth 3 -name admin.html -not -path "./.git/*" | head -n 1 | xargs dirname)
+            echo "Site files found in subfolder: $d"
+            cp -a "$d"/. .
+            rm -rf "$d"
+          fi
+          rm -f .github/workflows/extract-site.yml
+          ls -la
+
+      - name: Commit extracted site
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Admin panel: Server 2/3 previews + per-server ON/OFF toggles"
+          git push
