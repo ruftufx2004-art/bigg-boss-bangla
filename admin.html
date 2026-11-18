@@ -192,19 +192,32 @@ function loadConfig(){
     document.getElementById("frameHeight").value=(c.frameHeight!=null?c.frameHeight:560);
   });
 }
+function enterPanel(){
+  sessionStorage.setItem("bbb-admin","1");
+  sessionStorage.setItem("bbb-admin-pw",pw);
+  document.getElementById("loginCard").style.display="none";
+  document.getElementById("panel").style.display="block";
+  loadConfig(); loadInstallStats(); setInterval(loadInstallStats, 10000);
+  loadStats(); loadAdsterra(); setInterval(function(){ loadStats(); loadAdsterra(); }, 30000);
+}
 document.getElementById("loginBtn").addEventListener("click", function(){
   pw=document.getElementById("pw").value;
   fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})})
     .then(function(r){ if(!r.ok) throw new Error("wrong"); return r.json(); })
-    .then(function(){
-      sessionStorage.setItem("bbb-admin","1");
-      document.getElementById("loginCard").style.display="none";
-      document.getElementById("panel").style.display="block";
-      loadConfig(); loadInstallStats(); setInterval(loadInstallStats, 10000);
-      loadStats(); loadAdsterra(); setInterval(function(){ loadStats(); loadAdsterra(); }, 30000);
-    })
+    .then(function(){ enterPanel(); })
     .catch(function(){ document.getElementById("msg").textContent="❌ ভুল পাসওয়ার্ড"; document.getElementById("msg").className="err"; });
 });
+// Refresh করলেও লগইন থাকবে — আগের লগইনটা sessionStorage থেকে ফিরিয়ে আনা হয়
+(function(){
+  var savedPw=sessionStorage.getItem("bbb-admin-pw");
+  if(sessionStorage.getItem("bbb-admin")==="1" && savedPw){
+    pw=savedPw;
+    fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})})
+      .then(function(r){ if(!r.ok) throw new Error("wrong"); return r.json(); })
+      .then(function(){ enterPanel(); })
+      .catch(function(){ sessionStorage.removeItem("bbb-admin"); sessionStorage.removeItem("bbb-admin-pw"); });
+  }
+})();
 document.getElementById("pw").addEventListener("keydown", function(e){ if(e.key==="Enter") document.getElementById("loginBtn").click(); });
 document.getElementById("saveBtn").addEventListener("click", function(){
   var body={password:pw, live:toEmbed(document.getElementById("live").value), s2:toEmbed(document.getElementById("s2").value), s3:toEmbed(document.getElementById("s3").value),
