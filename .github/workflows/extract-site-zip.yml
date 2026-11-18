@@ -1,0 +1,57 @@
+name: One-time extract site zip
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'bigg-boss-site.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Verify zip contents before extracting
+        run: |
+          python3 - <<'PY'
+          import json, sys, zipfile
+          required = ["manifest.json", "sw.js", "icons/icon-512.png", "functions/api/install-stats.js", "index.html"]
+          with zipfile.ZipFile("bigg-boss-site.zip") as z:
+              names = z.namelist()
+              print("\n".join(names))
+              missing = [f for f in required if f not in names]
+              if missing:
+                  print(f"Missing required files: {missing}")
+                  sys.exit(1)
+              manifest = json.loads(z.read("manifest.json").decode("utf-8"))
+              print(f"manifest name={manifest.get('name')!r} short_name={manifest.get('short_name')!r}")
+              if manifest.get("name") != "24X 7 Live" or manifest.get("short_name") != "24X 7 Live":
+                  print("manifest.json name/short_name is not '24X 7 Live'")
+                  sys.exit(1)
+              html = z.read("index.html").decode("utf-8", "ignore")
+              if "bbb-ott-pwa" not in html:
+                  print("index.html in zip does not contain bbb-ott-pwa")
+                  sys.exit(1)
+          print("Zip verification passed")
+          PY
+      - name: Extract zip
+        run: |
+          unzip -o bigg-boss-site.zip
+          ls -l manifest.json sw.js icons/icon-512.png functions/api/install-stats.js index.html
+          grep -q "bbb-ott-pwa" index.html
+          grep -q "24X 7 Live" manifest.json
+      - name: Commit extracted files and remove zip and workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f bigg-boss-site.zip
+          rm -f .github/workflows/extract-site-zip.yml
+          git add -A
+          git status --short
+          git commit -m "PWA: install popup + install/cancel stats in admin"
+          git push
