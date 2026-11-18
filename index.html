@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Bigg Boss Bangla — Live 24/7 Uncut House Feed</title>
 <meta name="description" content="Watch Bigg Boss Bangla live — grand telecast, 24/7 uncut house feed, live fan chat and highlights." />
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#0a0a0a" />
+<link rel="apple-touch-icon" href="/icons/icon-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <style>html,body{margin:0;padding:0;background:#0b0c10;}</style>
 </head>
 <body>
@@ -276,6 +282,17 @@
 .bbb-ott-epad{display:none; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 @media (max-width:980px){ .bbb-ott-epad{display:flex;} }
 
+/* PWA install popup */
+.bbb-ott-pwa{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.65);padding:16px;}
+.bbb-ott-pwa-card{width:100%;max-width:420px;background:#14141c;border:1px solid rgba(255,204,0,.45);border-radius:18px;padding:22px 20px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.7);animation:bbbOttPop .3s ease;}
+@keyframes bbbOttPop{from{opacity:0;transform:translateY(16px) scale(.97);}to{opacity:1;transform:none;}}
+.bbb-ott-pwa-card img{width:84px;height:84px;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.6);margin-bottom:12px;}
+.bbb-ott-pwa-card h3{margin:0 0 6px;font-size:19px;color:#fff;}
+.bbb-ott-pwa-card p{margin:0 0 16px;font-size:13px;color:var(--bbb-muted);line-height:1.5;}
+.bbb-ott-pwa-btns{display:flex;gap:10px;}
+.bbb-ott-pwa-install{flex:1;padding:12px;border:0;border-radius:11px;background:var(--bbb-gold);color:#111;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;}
+.bbb-ott-pwa-cancel{flex:1;padding:12px;border-radius:11px;background:rgba(255,255,255,.08);border:1px solid var(--bbb-line);color:var(--bbb-text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+
 /* toast */
 .bbb-ott-toast{
   position:absolute; left:50%; top:18px; transform:translate(-50%,-30px); opacity:0; z-index:50; pointer-events:none;
@@ -305,6 +322,18 @@
 </style>
 
   <div class="bbb-ott-toast" id="bbb-ott-toast" role="status" aria-live="polite"></div>
+  <!-- PWA install popup (shown once to new visitors, only when the browser allows install) -->
+  <div class="bbb-ott-pwa" id="bbb-ott-pwa" hidden>
+    <div class="bbb-ott-pwa-card">
+      <img src="/icons/icon-192.png" alt="Bigg Boss Bangla অ্যাপ আইকন">
+      <h3>বিগ বস দেখতে চাই? অ্যাপ ডাউনলোড করো</h3>
+      <p>Bigg Boss Bangla Season 3 — লাইভ, সব এপিসোড আর ভোট পোল, এখন তোমার ফোনের হোম স্ক্রিনে এক ট্যাপেই।</p>
+      <div class="bbb-ott-pwa-btns">
+        <button type="button" class="bbb-ott-pwa-install" id="bbb-ott-pwa-install">📲 ইনস্টল করো</button>
+        <button type="button" class="bbb-ott-pwa-cancel" id="bbb-ott-pwa-cancel">ক্যান্সেল</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ===== Header ===== -->
   <header class="bbb-ott-header">
@@ -938,6 +967,57 @@
     var wide = t.classList.toggle("bbb-ott-theater--wide");
     this.textContent = wide ? "🎬 Cinema mode (chat show)" : "🎬 Cinema mode (chat hide)";
     setMenu.hidden = true;
+  });
+
+  /* ---------- PWA: install popup + install/cancel stats ---------- */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function(){ navigator.serviceWorker.register("/sw.js").catch(function(){}); });
+  }
+  var pwaPopup = $("#bbb-ott-pwa");
+  var pwaDevice = (function(){
+    try {
+      var d = localStorage.getItem("bbb-pwa-device");
+      if (!d) { d = "pwa-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10); localStorage.setItem("bbb-pwa-device", d); }
+      return d;
+    } catch (e) { return "pwa-anon"; }
+  })();
+  function pwaReport(action){
+    try { fetch("/api/install-stats", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: pwaDevice, action: action})}).catch(function(){}); } catch (e) {}
+  }
+  function pwaDecided(){
+    try { localStorage.setItem("bbb-pwa-decided", String(Date.now())); } catch (e) {}
+  }
+  function pwaShowable(){
+    if (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) return false;
+    if (window.navigator.standalone) return false;
+    try {
+      var decided = parseInt(localStorage.getItem("bbb-pwa-decided") || "0", 10);
+      if (decided && Date.now() - decided < 7 * 24 * 60 * 60 * 1000) return false; // ask again after 7 days
+    } catch (e) {}
+    return true;
+  }
+  var deferredPwaPrompt = null;
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault();
+    deferredPwaPrompt = e;
+    if (!pwaShowable()) return;
+    setTimeout(function(){ if (pwaPopup) pwaPopup.hidden = false; }, 2500);
+  });
+  var pwaInstallBtn = $("#bbb-ott-pwa-install");
+  if (pwaInstallBtn) pwaInstallBtn.addEventListener("click", function(){
+    pwaPopup.hidden = true; pwaDecided();
+    if (!deferredPwaPrompt) { toast("তোমার ব্রাউজারে অ্যাপ ইনস্টল সাপোর্ট করছে না"); return; }
+    deferredPwaPrompt.prompt();
+    deferredPwaPrompt.userChoice.then(function(res){
+      pwaReport(res.outcome === "accepted" ? "installed" : "cancelled");
+      if (res.outcome === "accepted") toast("✅ অ্যাপ ইনস্টল হচ্ছে — হোম স্ক্রিনে দেখো!");
+    }).catch(function(){});
+    deferredPwaPrompt = null;
+  });
+  var pwaCancelBtn = $("#bbb-ott-pwa-cancel");
+  if (pwaCancelBtn) pwaCancelBtn.addEventListener("click", function(){
+    pwaPopup.hidden = true; pwaDecided();
+    pwaReport("cancelled");
   });
 
   /* ---------- Viewer counter ---------- */
