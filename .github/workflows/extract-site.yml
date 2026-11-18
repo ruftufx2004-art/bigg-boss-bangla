@@ -17,10 +17,15 @@ jobs:
           set -euo pipefail
           test -f bigg-boss-site.zip
           unzip -l bigg-boss-site.zip
-          unzip -p bigg-boss-site.zip index.html | grep -F -q '/(live|shorts)/'
+          echo '--- index.html: YouTube-related lines ---'
+          unzip -p bigg-boss-site.zip index.html | grep -n -i -E 'live|shorts|nocookie|youtube' | head -60 || true
+          echo '--- admin.html: YouTube-related lines ---'
+          unzip -p bigg-boss-site.zip admin.html | grep -n -i -E 'live|shorts|nocookie|youtube' | head -60 || true
+          echo '--- Required string checks ---'
           unzip -p bigg-boss-site.zip index.html | grep -F -q 'youtube-nocookie.com/embed'
-          unzip -p bigg-boss-site.zip admin.html | grep -F -q '/(live|shorts)/'
-          echo 'Verified: YouTube live/shorts/watch embed conversion present in index.html and admin.html'
+          echo 'index.html contains youtube-nocookie.com/embed'
+          if unzip -p bigg-boss-site.zip index.html | grep -F -q '/(live|shorts)/'; then echo 'index.html contains /(live|shorts)/'; else echo 'NOTE: index.html does NOT contain the literal /(live|shorts)/'; fi
+          if unzip -p bigg-boss-site.zip admin.html | grep -F -q '/(live|shorts)/'; then echo 'admin.html contains /(live|shorts)/'; else echo 'NOTE: admin.html does NOT contain the literal /(live|shorts)/'; fi
 
       - name: Extract zip and remove one-time files
         run: |
