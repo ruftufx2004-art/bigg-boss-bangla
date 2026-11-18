@@ -73,6 +73,13 @@
       <label>ফ্রেমের উচ্চতা (px)</label>
       <input type="number" id="frameHeight" min="200" max="1200" step="20" value="560">
       <p class="hint">সেভ করলেই সাইটে লেগে যাবে।</p>
+      <h2 style="margin-top:16px">👁️ লাইভ প্রিভিউ — এখানে ক্লিক করা যাবে</h2>
+      <p class="hint">Server 1-এর ওয়েবসাইটটা এখানে সরাসরি দেখা যাবে, আর ভেতরে ক্লিকও করা যাবে — সাইটের নিজের Play / Unmute বোতাম চাপতে পারবেন। উপরের ▲ ▼ দিয়ে ফ্রেমটা সরালে প্রিভিউটাও সঙ্গে সঙ্গে সরবে।</p>
+      <div id="framePreviewWrap" style="position:relative;overflow:hidden;height:320px;border:1px solid var(--line);border-radius:12px;background:#000">
+        <iframe id="framePreview" style="position:absolute;left:0;top:0;width:100%;height:1600px;border:0;pointer-events:auto" scrolling="no" title="Website preview"></iframe>
+      </div>
+      <button class="ghost" id="previewRefresh" type="button">🔄 প্রিভিউ রিফ্রেশ করুন</button>
+      <p class="hint">একটা কথা: এখানে Play/Unmute চাপলে সেটা শুধু আপনার এই ব্রাউজারে হবে — দর্শকদের ফ্রেমে সাইটের ডিফল্ট অবস্থাটাই দেখাবে। আর ব্রাউজার নিয়মে ওয়েবসাইটের ভিডিও সাধারণত মিউট অবস্থায় অটো-চলে, কারণ সাউন্ডসহ অটো-প্লে ব্রাউজার আটকে দেয়; দর্শক ক্লিক না করলে সাউন্ড আসে না।</p>
     </div>
 
     <div class="card">
@@ -182,6 +189,23 @@ function loadAdsterra(){
     note.textContent="গত "+(d.days||7)+" দিনের হিসাব ("+(d.start_date||"")+" → "+(d.finish_date||"")+")।";
   }).catch(function(){});
 }
+function isWebsiteLink(u){
+  u=(u||"").trim();
+  if(!u) return false;
+  return !/youtube\.com|youtu\.be/i.test(u);
+}
+function loadFramePreview(){
+  var live=document.getElementById("live").value||"";
+  var fr=document.getElementById("framePreview");
+  var top=parseInt(document.getElementById("frameTop").value||"0",10)||0;
+  fr.style.top=(-top)+"px";
+  if(isWebsiteLink(live)){
+    if(fr.getAttribute("src")!==live) fr.setAttribute("src", live);
+    document.getElementById("framePreviewWrap").style.display="block";
+  } else {
+    document.getElementById("framePreviewWrap").style.display="none";
+  }
+}
 function loadConfig(){
   fetch("/api/config").then(function(r){return r.json();}).then(function(c){
     document.getElementById("live").value=c.live||"";
@@ -190,6 +214,7 @@ function loadConfig(){
     document.getElementById("names").value=(c.pollNames||[]).join("\n");
     document.getElementById("frameTop").value=(c.frameTop!=null?c.frameTop:0);
     document.getElementById("frameHeight").value=(c.frameHeight!=null?c.frameHeight:560);
+    loadFramePreview();
   });
 }
 function enterPanel(){
@@ -234,8 +259,11 @@ document.getElementById("saveBtn").addEventListener("click", function(){
 });
 document.getElementById("statRefresh").addEventListener("click", function(e){ e.preventDefault(); loadInstallStats(); });
 document.getElementById("statsRefresh").addEventListener("click", function(e){ e.preventDefault(); loadStats(); loadAdsterra(); });
-document.getElementById("upBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=Math.max(0,(parseInt(el.value||"0",10)||0)-40); });
-document.getElementById("downBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=(parseInt(el.value||"0",10)||0)+40; });
+document.getElementById("upBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=Math.max(0,(parseInt(el.value||"0",10)||0)-40); loadFramePreview(); });
+document.getElementById("downBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=(parseInt(el.value||"0",10)||0)+40; loadFramePreview(); });
+document.getElementById("previewRefresh").addEventListener("click", function(){ var fr=document.getElementById("framePreview"); fr.removeAttribute("src"); loadFramePreview(); });
+document.getElementById("live").addEventListener("change", loadFramePreview);
+document.getElementById("frameTop").addEventListener("input", loadFramePreview);
 document.getElementById("resetBtn").addEventListener("click", function(){
   if(!confirm("সব ভোট ০ করে দেবো?")) return;
   fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw, resetPoll:true})})
