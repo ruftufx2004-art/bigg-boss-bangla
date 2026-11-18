@@ -26,6 +26,12 @@ function json(data, status) {
 function sbConfigured(env) {
   return !!(env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY);
 }
+// AbortSignal.timeout is not available in every Workers runtime version —
+// guard it so a missing API can never break the Supabase call itself.
+function timeoutSignal(ms) {
+  try { if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") return AbortSignal.timeout(ms); } catch (e) {}
+  return undefined;
+}
 function sbHeaders(env) {
   return { "apikey": env.SUPABASE_SERVICE_KEY, "Authorization": "Bearer " + env.SUPABASE_SERVICE_KEY, "Accept": "application/json" };
 }
@@ -35,23 +41,22 @@ function sbRowUrl(env) {
 // Read the live row from Supabase. Returns the row object or null on any failure.
 async function sbGet(env) {
   try {
-    const res = await fetch(sbRowUrl(env) + "&select=live,s2,s3,frame_top,frame_height,frame_zoom,servers_on", { headers: sbHeaders(env), signal: AbortSignal.timeout(5000) });
+    const res = await fetch(sbRowUrl(env) + "&select=live,s2,s3,frame_top,frame_height,frame_zoom,servers_on", { headers: sbHeaders(env), signal: timeoutSignal(5000) });
     if (!res.ok) return null;
     const rows = await res.json();
     if (Array.isArray(rows) && rows.length) return rows[0];
     return null;
   } catch (e) { return null; }
 }
-// Write live fields to Supabase (snake_case columns). Throws on failure.
+// Write live fields to Supabase (snake_case columns). Returns the Response;
+// the caller decides what a non-2xx status means. Network errors throw.
 async function sbPatch(env, fields) {
-  const res = await fetch(sbRowUrl(env), {
+  return fetch(sbRowUrl(env), {
     method: "PATCH",
     headers: { ...sbHeaders(env), "Content-Type": "application/json", "Prefer": "return=representation" },
     body: JSON.stringify(fields),
-    signal: AbortSignal.timeout(8000)
+    signal: timeoutSignal(8000)
   });
-  if (!res.ok) throw new Error("supabase patch failed: " + res.status);
-  return res.json();
 }
 function clampLive(cfg) {
   cfg.frameTop = Math.max(0, Math.floor(cfg.frameTop) || 0);
@@ -123,8 +128,10 @@ export async function onRequest(context) {
     if (body.serversOn && typeof body.serversOn === "object") liveFields.servers_on = { s1: body.serversOn.s1 !== false, s2: body.serversOn.s2 !== false, s3: body.serversOn.s3 !== false };
     if (Object.keys(liveFields).length) {
       if (sbConfigured(env)) {
-        try { await sbPatch(env, liveFields); }
-        catch (e) { return json({ error: "live save failed" }, 500); }
+        let pr;
+        try { pr = await sbPatch(env, liveFields); }
+        catch (e) { return json({ error: "live save failed", sbStatus: 0 }, 500); }
+        if (!pr.ok) return json({ error: "live save failed", sbStatus: pr.status }, 500);
       } else {
         if (liveFields.live !== undefined) await kv.put("cfg:live", liveFields.live);
         if (liveFields.s2 !== undefined) await kv.put("cfg:s2", liveFields.s2);
