@@ -7,6 +7,9 @@
 // Poll names/photos, the Adsterra token and the admin password stay in KV,
 // as do votes, chat and stats. If Supabase is not configured, live settings
 // fall back to the old KV keys (cfg:live etc.), so the site keeps working.
+// Deploy marker 2026-11-18 20:30 — forces a fresh Pages deployment from
+// GitHub so the Function re-binds the current SUPABASE_SERVICE_KEY env var
+// (dashboard "Retry deployment" redeploys did not pick the new value up).
 const DEFAULTS = {
   live: "https://shop.bihishaan.com/",
   frameTop: 0,
