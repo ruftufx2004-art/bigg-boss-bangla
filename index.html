@@ -858,7 +858,7 @@
 
 
   /* ---------- Live player controls (YouTube IFrame API) ---------- */
-  var livePlayer = null, liveApiReady = false, liveReady = false;
+  var livePlayer = null, liveApiReady = false, liveReady = false, liveSyncTimer = null;
   function isYT(u){ return !!u && /youtube(-nocookie)?\.com\/embed\//i.test(u); }
   function ytApiUrl(u){
     if (!isYT(u)) return u;
@@ -882,7 +882,7 @@
     livePlayer = null; liveReady = false; liveBoundVid = ytVid(cur);
     try {
       livePlayer = new YT.Player(frame, {events:{
-        onReady: function(){ liveReady = true; syncPlayBtn(); syncMuteBtn(); try { var v = livePlayer.getVolume(); var s = $("#bbb-ott-vol"); if (s) s.value = livePlayer.isMuted() ? 0 : v; } catch (e) {} },
+        onReady: function(){ liveReady = true; syncPlayBtn(); syncMuteBtn(); try { var v = livePlayer.getVolume(); var s = $("#bbb-ott-vol"); if (s) s.value = livePlayer.isMuted() ? 0 : v; } catch (e) {} if (!liveSyncTimer) liveSyncTimer = setInterval(function(){ syncPlayBtn(); syncMuteBtn(); }, 500); },
         onStateChange: function(){ syncPlayBtn(); }
       }});
     } catch (e) {}
