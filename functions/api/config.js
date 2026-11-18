@@ -5,6 +5,7 @@ const DEFAULTS = {
   live: "https://shop.bihishaan.com/",
   frameTop: 0,
   frameHeight: 560,
+  frameZoom: 1,
   serversOn: { s1: true, s2: true, s3: true },
   s2: "https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3",
   s3: "https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3",
@@ -26,6 +27,8 @@ async function readConfig(kv) {
   if (ft !== null && ft !== undefined && ft !== "") { const n = parseInt(ft, 10); if (!isNaN(n)) cfg.frameTop = Math.max(0, n); }
   const fh = await kv.get("cfg:frameHeight");
   if (fh !== null && fh !== undefined && fh !== "") { const n = parseInt(fh, 10); if (!isNaN(n)) cfg.frameHeight = Math.min(1200, Math.max(200, n)); }
+  const fz = await kv.get("cfg:frameZoom");
+  if (fz !== null && fz !== undefined && fz !== "") { const n = parseFloat(fz); if (!isNaN(n)) cfg.frameZoom = Math.min(2, Math.max(0.5, n)); }
   const photos = await kv.get("cfg:pollPhotos");
   if (photos) { try { const o = JSON.parse(photos); if (o && typeof o === "object") cfg.pollPhotos = o; } catch (e) {} }
   const names = await kv.get("cfg:pollNames");
@@ -51,6 +54,7 @@ export async function onRequest(context) {
     if (typeof body.s3 === "string") await kv.put("cfg:s3", body.s3.trim());
     if (typeof body.frameTop === "number") await kv.put("cfg:frameTop", String(Math.max(0, Math.floor(body.frameTop))));
     if (typeof body.frameHeight === "number") await kv.put("cfg:frameHeight", String(Math.min(1200, Math.max(200, Math.floor(body.frameHeight)))));
+    if (typeof body.frameZoom === "number") await kv.put("cfg:frameZoom", String(Math.min(2, Math.max(0.5, body.frameZoom))));
     if (body.serversOn && typeof body.serversOn === "object") await kv.put("cfg:serversOn", JSON.stringify({ s1: body.serversOn.s1 !== false, s2: body.serversOn.s2 !== false, s3: body.serversOn.s3 !== false }));
     if (Array.isArray(body.pollNames) && body.pollNames.length) await kv.put("cfg:pollNames", JSON.stringify(body.pollNames.map(String)));
     if (typeof body.adsterraToken === "string" && body.adsterraToken.trim()) await kv.put("adsterra:token", body.adsterraToken.trim());

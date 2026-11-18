@@ -83,6 +83,14 @@
       </div>
       <label>ফ্রেমের উচ্চতা (px)</label>
       <input type="number" id="frameHeight" min="200" max="1200" step="20" value="560">
+      <label>জুম — ফ্রেমের ভেতরের সাইটটা বড়/ছোট করুন</label>
+      <div class="row">
+        <button class="ghost" id="zoomOutBtn" type="button">➖ ছোট</button>
+        <input type="number" id="frameZoom" min="0.5" max="2" step="0.25" value="1">
+        <button class="ghost" id="zoomInBtn" type="button">➕ বড়</button>
+        <span id="zoomLabel" style="white-space:nowrap">100%</span>
+      </div>
+      <p class="hint">জুম বদলালে লাইভ উইন্ডোতেও সেই জুমটাই থাকবে — সেভ করলেই সবার কাছে লেগে যাবে।</p>
       <p class="hint">সেভ করলেই সাইটে লেগে যাবে।</p>
       <h2 style="margin-top:16px">👁️ লাইভ প্রিভিউ — এখানে ক্লিক করা যাবে</h2>
       <p class="hint">Server 1-এর ওয়েবসাইটটা এখানে সরাসরি দেখা যাবে, আর ভেতরে ক্লিকও করা যাবে — সাইটের নিজের Play / Unmute বোতাম চাপতে পারবেন। উপরের ▲ ▼ দিয়ে ফ্রেমটা সরালে প্রিভিউটাও সঙ্গে সঙ্গে সরবে।</p>
@@ -211,6 +219,10 @@ function loadFramePreview(){
   var fr=document.getElementById("framePreview");
   var top=parseInt(document.getElementById("frameTop").value||"0",10)||0;
   fr.style.top=(-top)+"px";
+  var zm=parseFloat(document.getElementById("frameZoom").value||"1")||1;
+  zm=Math.min(2,Math.max(0.5,zm));
+  fr.style.zoom=zm;
+  document.getElementById("zoomLabel").textContent=Math.round(zm*100)+"%";
   if(isWebsiteLink(live)){
     if(fr.getAttribute("src")!==live) fr.setAttribute("src", live);
     document.getElementById("framePreviewWrap").style.display="block";
@@ -234,7 +246,9 @@ function loadServerPreview(n){
   var url=toEmbed(raw);
   if(isWebsiteLink(url)){
     var top=parseInt(document.getElementById("frameTop").value||"0",10)||0;
-    fr.style.height="1600px"; fr.style.top=(-top)+"px";
+    var zm=parseFloat(document.getElementById("frameZoom").value||"1")||1;
+    zm=Math.min(2,Math.max(0.5,zm));
+    fr.style.height="1600px"; fr.style.top=(-top)+"px"; fr.style.zoom=zm;
     if(fr.getAttribute("src")!==url) fr.setAttribute("src", url);
   } else {
     var pv=url.replace("autoplay=1","autoplay=0").replace("mute=1","mute=0");
@@ -250,6 +264,7 @@ function fillConfig(c){
   document.getElementById("names").value=(c.pollNames||[]).join("\n");
   document.getElementById("frameTop").value=(c.frameTop!=null?c.frameTop:0);
   document.getElementById("frameHeight").value=(c.frameHeight!=null?c.frameHeight:560);
+  document.getElementById("frameZoom").value=(c.frameZoom!=null?c.frameZoom:1);
   if(c.serversOn){ serversOn={s1:c.serversOn.s1!==false,s2:c.serversOn.s2!==false,s3:c.serversOn.s3!==false}; ["s1","s2","s3"].forEach(function(k){ setTgl(k, serversOn[k]); }); }
   loadFramePreview(); loadServerPreview(2); loadServerPreview(3);
 }
@@ -287,6 +302,7 @@ document.getElementById("saveBtn").addEventListener("click", function(){
   var body={password:pw, live:toEmbed(document.getElementById("live").value), s2:toEmbed(document.getElementById("s2").value), s3:toEmbed(document.getElementById("s3").value),
     frameTop:parseInt(document.getElementById("frameTop").value||"0",10)||0,
     frameHeight:parseInt(document.getElementById("frameHeight").value||"560",10)||560,
+    frameZoom:Math.min(2,Math.max(0.5,parseFloat(document.getElementById("frameZoom").value||"1")||1)),
     serversOn:serversOn,
     pollNames:document.getElementById("names").value.split("\n").map(function(x){return x.trim();}).filter(Boolean)};
   var np=document.getElementById("newPw").value.trim(); if(np) body.newPassword=np;
@@ -301,6 +317,10 @@ document.getElementById("statRefresh").addEventListener("click", function(e){ e.
 document.getElementById("statsRefresh").addEventListener("click", function(e){ e.preventDefault(); loadStats(); loadAdsterra(); });
 document.getElementById("upBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=Math.max(0,(parseInt(el.value||"0",10)||0)-40); loadFramePreview(); });
 document.getElementById("downBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=(parseInt(el.value||"0",10)||0)+40; loadFramePreview(); });
+function setZoom(d){ var el=document.getElementById("frameZoom"); var v=(parseFloat(el.value||"1")||1)+d; v=Math.min(2,Math.max(0.5,Math.round(v*4)/4)); el.value=v; loadFramePreview(); loadServerPreview(2); loadServerPreview(3); }
+document.getElementById("zoomOutBtn").addEventListener("click", function(){ setZoom(-0.25); });
+document.getElementById("zoomInBtn").addEventListener("click", function(){ setZoom(0.25); });
+document.getElementById("frameZoom").addEventListener("input", function(){ loadFramePreview(); loadServerPreview(2); loadServerPreview(3); });
 document.getElementById("previewRefresh").addEventListener("click", function(){ var fr=document.getElementById("framePreview"); fr.removeAttribute("src"); loadFramePreview(); });
 document.getElementById("live").addEventListener("change", loadFramePreview);
 document.getElementById("frameTop").addEventListener("input", function(){ loadFramePreview(); loadServerPreview(2); loadServerPreview(3); });
