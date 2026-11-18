@@ -88,6 +88,12 @@
 }
 @supports not (aspect-ratio:16/9){ .bbb-ott-player{height:0; padding-top:56.25%;} }
 .bbb-ott-player iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:block;}
+/* website frame mode: cropped, non-interactive embed of any site */
+.bbb-ott-webframe{position:relative;width:100%;overflow:hidden;background:#000;display:none;}
+.bbb-ott-webframe.is-on{display:block;}
+.bbb-ott-webframe iframe{position:absolute;left:0;width:100%;border:0;pointer-events:none;}
+.bbb-ott-webnote{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);color:#fff;text-align:center;padding:9px 10px;font-size:13px;z-index:2;}
+.bbb-ott-webnote a{color:#ffd24a;font-weight:700;}
 .bbb-ott-overlay{
   position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:10px; text-align:center; padding:20px; z-index:2;
@@ -396,7 +402,7 @@
         -->
         <iframe
           id="bbb-ott-frame"
-          src="https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
+          src="https://shop.bihishaan.com/"
           title="Bigg Boss Bangla Live Player"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowfullscreen
@@ -408,6 +414,12 @@
           <h3 id="bbb-ott-ov-title">Stream link not added yet</h3>
           <p id="bbb-ott-ov-text">Paste a YouTube Live, Facebook Live or iframe embed link into the player <code>src</code> and server buttons to start streaming.</p>
         </div>
+      </div>
+
+      <!-- Website frame mode: shows a cropped part of any website as the live feed -->
+      <div class="bbb-ott-webframe" id="bbb-ott-webframe" hidden>
+        <iframe id="bbb-ott-webiframe" title="Website live feed" scrolling="no"></iframe>
+        <div class="bbb-ott-webnote">এই ওয়েবসাইট এমবেড করতে না দিলে ফ্রেম খালি দেখাবে — <a id="bbb-ott-weblink" href="https://shop.bihishaan.com/" target="_blank" rel="noopener">নতুন ট্যাবে খুলুন ↗</a></div>
       </div>
 
       <!-- Player controls (YouTube IFrame API) -->
@@ -448,18 +460,18 @@
            Paste each server's embed link into its data-src attribute. -->
       <div class="bbb-ott-servers" role="toolbar" aria-label="Stream servers">
         <button type="button" class="bbb-ott-srv is-active"
-          data-src="https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
-          data-name="Server 1 • Latest Episode">▶ Server 1<small>Latest Episode</small></button>
+          data-src="https://shop.bihishaan.com/"
+          data-name="Server 1">▶ Server 1</button>
           <!-- ▲ Server 1 link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv"
           data-src="https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
-          data-name="Server 2 • Episode 78">⚡ Server 2<small>Episode 78</small></button>
+          data-name="Server 2">⚡ Server 2</button>
           <!-- ▲ Server 2 (backup) link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv"
           data-src="https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
-          data-name="Server 3 • Episode 77">📱 Server 3<small>Episode 77</small></button>
+          data-name="Server 3">📱 Server 3</button>
           <!-- ▲ Server 3 (low data / mobile) link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv bbb-ott-srv--reload" id="bbb-ott-reload">🔄 Reload<small>Fix buffering</small></button>
@@ -814,6 +826,12 @@
   var nowTag   = $("#bbb-ott-nowtag");
   var toastEl  = $("#bbb-ott-toast");
   var servers  = $$(".bbb-ott-srv[data-src]");
+  var webframe = $("#bbb-ott-webframe");
+  var webiframe = $("#bbb-ott-webiframe");
+  var weblink  = $("#bbb-ott-weblink");
+  var controls = $("#bbb-ott-controls");
+  var helper   = $(".bbb-ott-helper");
+  var frameCfg = { top: 0, height: 560 };
   var cards    = $$(".bbb-ott-card");
   var toastT;
 
@@ -833,10 +851,37 @@
     ovText.textContent = "Paste an embed URL into this button's data-src attribute to enable it.";
   }
 
+  /* A plain website (not a YouTube/Facebook video) goes to the cropped frame */
+  function isWebsite(u){ return isValid(u) && !isYT(u) && !/facebook\.com\/plugins\/video\.php/i.test(u); }
+  function applyFrameGeometry(){
+    if (!webframe) return;
+    webframe.style.height = frameCfg.height + "px";
+    webiframe.style.height = "1600px";
+    webiframe.style.top = (-frameCfg.top) + "px";
+  }
+  function showWeb(url){
+    webframe.hidden = false; webframe.classList.add("is-on");
+    $("#bbb-ott-player").style.display = "none";
+    if (controls) controls.style.display = "none";
+    if (helper) helper.style.display = "none";
+    weblink.href = url;
+    applyFrameGeometry();
+    webiframe.src = url;
+  }
+  function showVideo(){
+    webframe.hidden = true; webframe.classList.remove("is-on");
+    $("#bbb-ott-player").style.display = "";
+    if (controls) controls.style.display = "";
+    if (helper) helper.style.display = "";
+    webiframe.removeAttribute("src");
+  }
+
   /* Load a URL into the player */
   function load(url, name){
     nowTag.textContent = "▶ " + name;
-    if (!isValid(url)) { frame.removeAttribute("src"); showEmpty(name); return false; }
+    if (!isValid(url)) { showVideo(); frame.removeAttribute("src"); showEmpty(name); return false; }
+    if (isWebsite(url)) { showWeb(url.trim()); overlay.hidden = true; return true; }
+    showVideo();
     overlay.hidden = false;
     overlay.classList.add("bbb-ott-overlay--loading");
     ovTitle.textContent = "Connecting to " + name + "…";
@@ -860,6 +905,7 @@
     var direct = frame.getAttribute("src");
     if (isValid(direct)) {
       if (!isValid(servers[0].getAttribute("data-src"))) servers[0].setAttribute("data-src", direct);
+      if (isWebsite(direct)) { load(direct, "Server 1"); return; }
       overlay.hidden = false;
       overlay.classList.add("bbb-ott-overlay--loading");
       ovTitle.textContent = "Connecting to live feed…";
@@ -894,6 +940,13 @@
   });
 
   $("#bbb-ott-reload").addEventListener("click", function(){
+    if (webframe && !webframe.hidden) {
+      var w = webiframe.getAttribute("src");
+      if (!w) { toast("Nothing to reload — add a stream link first"); return; }
+      webiframe.removeAttribute("src");
+      setTimeout(function(){ webiframe.src = w; }, 120);
+      toast("🔄 Reloading player…"); return;
+    }
     var cur = frame.getAttribute("src");
     if (!cur) { toast("Nothing to reload — add a stream link first"); return; }
     frame.removeAttribute("src");
@@ -1256,7 +1309,10 @@
   }
   /* Site config from Admin Panel (live links + poll names); falls back to built-in values */
   function applyConfig(cfg){
-    if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Server 1 • Latest Episode");
+    if (cfg && typeof cfg.frameTop === "number") frameCfg.top = Math.max(0, cfg.frameTop);
+    if (cfg && typeof cfg.frameHeight === "number") frameCfg.height = Math.min(1200, Math.max(200, cfg.frameHeight));
+    if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Server 1");
+    if (webframe && !webframe.hidden) applyFrameGeometry();
     if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", ytApiUrl(cfg.s2));
     if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", ytApiUrl(cfg.s3));
     if (cfg && cfg.pollNames && cfg.pollNames.length) pollNames = cfg.pollNames;
