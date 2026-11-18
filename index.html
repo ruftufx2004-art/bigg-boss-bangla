@@ -107,6 +107,10 @@
 }
 .bbb-ott-overlay h3{margin:6px 0 0; font-size:clamp(15px,2vw,20px); font-weight:700;}
 .bbb-ott-overlay p{margin:0; color:var(--bbb-muted); font-size:13px; max-width:420px;}
+/* Click shield over the live player: viewers can watch but cannot click
+   through to YouTube (title, channel, logo). Play/Pause/Mute etc. keep
+   working from the control bar below via the YouTube API. */
+.bbb-ott-shield{position:absolute; inset:0; z-index:3; background:transparent; cursor:default;}
 .bbb-ott-overlay--loading .bbb-ott-overlay-eye{animation:bbbOttSpin 1.2s linear infinite; border-color:var(--bbb-red) transparent var(--bbb-gold) transparent;}
 @keyframes bbbOttSpin{to{transform:rotate(360deg);}}
 .bbb-ott-nowtag{
@@ -210,6 +214,23 @@
   background:var(--bbb-red); box-shadow:0 6px 18px rgba(229,9,20,.4); transition:.2s;
 }
 .bbb-ott-chat-form button:hover{background:#ff1f2b;}
+.bbb-ott-chat-form{flex-wrap:wrap;}
+.bbb-ott-chat-form input#bbb-ott-chat-name{flex:0 1 120px; min-width:90px; padding:11px 10px;}
+.bbb-ott-chat-empty{color:var(--bbb-muted); font-size:13px; text-align:center; padding:26px 10px;}
+.bbb-ott-msg-time{font-size:10px; color:#7c7d90; margin-left:6px; font-weight:400;}
+.bbb-ott-replies{margin:8px 0 0 39px; display:flex; flex-direction:column; gap:10px;}
+.bbb-ott-msg--reply .bbb-ott-av{flex-basis:24px; width:24px; height:24px; font-size:10px;}
+.bbb-ott-msg-actions .bbb-ott-reacted{color:#ffcc00;}
+.bbb-ott-react-chips{display:flex; flex-wrap:wrap; gap:4px; margin-top:5px;}
+.bbb-ott-react-chips span{font-size:11px; padding:1px 7px; border-radius:10px; background:rgba(255,255,255,.07); color:#dcdce6;}
+.bbb-ott-react-picker{display:none; gap:2px; padding:4px; border-radius:20px; background:#1e1e2a; border:1px solid var(--bbb-line); box-shadow:0 8px 24px rgba(0,0,0,.6);}
+.bbb-ott-react-picker.is-on{display:flex;}
+.bbb-ott-react-picker button{font-size:17px; padding:2px 6px; border-radius:50%;}
+.bbb-ott-react-picker button:hover{transform:scale(1.25);}
+.bbb-ott-reply-form{display:none; gap:6px; margin-top:8px;}
+.bbb-ott-reply-form.is-on{display:flex;}
+.bbb-ott-reply-form input{flex:1 1 auto; min-width:0; padding:8px 10px; border-radius:8px; font-size:12px; color:#fff; outline:none; background:rgba(255,255,255,.06); border:1px solid var(--bbb-line); font-family:'Hind Siliguri','Poppins',sans-serif;}
+.bbb-ott-reply-form button{padding:0 12px; border:0; border-radius:8px; font-size:12px; font-weight:700; color:#fff; background:var(--bbb-red); cursor:pointer;}
 
 /* ---------- Details ---------- */
 .bbb-ott-details{
@@ -363,7 +384,7 @@
       <span class="bbb-ott-pill bbb-ott-pill--gold">1080p FULL HD</span>
       <span class="bbb-ott-pill">60 FPS</span>
       <span class="bbb-ott-pill bbb-ott-pill--purple">24/7 UNCUT</span>
-      <span class="bbb-ott-viewers" title="Live viewers">👁 <b id="bbb-ott-viewcount">14.2K</b> Watching</span>
+      <span class="bbb-ott-viewers" title="Live viewers">👁 <b id="bbb-ott-viewcount">—</b> Watching</span>
       <button type="button" class="bbb-ott-appbtn" id="bbb-ott-appbtn" title="অ্যাপ ডাউনলোড করো">📲 অ্যাপ ডাউনলোড</button>
     </div>
   </header>
@@ -414,6 +435,7 @@
           <h3 id="bbb-ott-ov-title">Stream link not added yet</h3>
           <p id="bbb-ott-ov-text">Paste a YouTube Live, Facebook Live or iframe embed link into the player <code>src</code> and server buttons to start streaming.</p>
         </div>
+        <div class="bbb-ott-shield" id="bbb-ott-shield"></div>
       </div>
 
       <!-- Website frame mode: shows a cropped part of any website as the live feed -->
@@ -435,6 +457,7 @@
           <option value="small">240p</option>
         </select>
         <button type="button" class="bbb-ott-ctl" id="bbb-ott-fullscreen" title="Fullscreen">⛶ Fullscreen</button>
+        <button type="button" class="bbb-ott-ctl" id="bbb-ott-landscape" title="Landscape">🔄 Landscape</button>
         <div class="bbb-ott-settings">
           <button type="button" class="bbb-ott-ctl" id="bbb-ott-settings" title="Settings">⚙ Settings</button>
           <div class="bbb-ott-settings-menu" id="bbb-ott-settings-menu" hidden>
@@ -498,10 +521,11 @@
     <aside class="bbb-ott-chat" aria-label="Live Fan Chat">
       <div class="bbb-ott-chat-head">
         <h2>💬 Live Fan Chat</h2>
-        <span><b id="bbb-ott-chatcount">2.3K</b> in chat</span>
+        <span><b id="bbb-ott-chatcount">—</b> in chat</span>
       </div>
       <div class="bbb-ott-chat-list" id="bbb-ott-chat-list" aria-live="polite"></div>
       <form class="bbb-ott-chat-form" id="bbb-ott-chat-form" autocomplete="off">
+        <input type="text" id="bbb-ott-chat-name" maxlength="20" placeholder="নাম" aria-label="Your name" />
         <input type="text" id="bbb-ott-chat-input" maxlength="200" placeholder="আপনার মতামত লিখুন… Say something!" aria-label="Chat message" />
         <button type="submit">Send</button>
       </form>
@@ -1022,6 +1046,29 @@
     var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
     if (fn) fn.call(p); else toast("Fullscreen not supported on this device");
   });
+  /* Landscape: fullscreen + lock the screen to landscape (Android Chrome).
+     iPhone does not allow orientation lock, so there it just goes
+     fullscreen and the viewer tilts the phone. */
+  $("#bbb-ott-landscape").addEventListener("click", function(){
+    var p = $("#bbb-ott-player");
+    if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen(); return; }
+    var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
+    if (!fn) { toast("Landscape not supported on this device"); return; }
+    function lockLandscape(){
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          var lp = screen.orientation.lock("landscape");
+          if (lp && lp.catch) lp.catch(function(){ toast("ফোনটা কাত করে ধরলেই ল্যান্ডস্কেপ হবে"); });
+        } else { toast("ফোনটা কাত করে ধরলেই ল্যান্ডস্কেপ হবে"); }
+      } catch (e) {}
+    }
+    var req = fn.call(p);
+    if (req && req.then) req.then(lockLandscape).catch(function(){ lockLandscape(); });
+    else setTimeout(lockLandscape, 300);
+  });
+  document.addEventListener("fullscreenchange", function(){
+    try { if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+  });
   $("#bbb-ott-quality").addEventListener("change", function(){
     if (!liveReady || !livePlayer) { toast("Player ready হলে quality বদলাবে"); return; }
     try { livePlayer.setPlaybackQuality(this.value); toast("Quality: " + this.options[this.selectedIndex].text); } catch (e) {}
@@ -1129,45 +1176,45 @@
     pwaReport("cancelled");
   });
 
-  /* ---------- Viewer counter ---------- */
+  /* ---------- Real viewer counter (from /api/stats — no fake numbers) ---------- */
   var viewEl = $("#bbb-ott-viewcount"), chatCountEl = $("#bbb-ott-chatcount");
-  var viewers = 14200;
   function fmt(n){ return n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,"") + "K" : String(n); }
-  setInterval(function(){
-    viewers += Math.round((Math.random() - 0.45) * 180);
-    if (viewers < 12500) viewers = 12500 + Math.round(Math.random()*300);
-    if (viewers > 19800) viewers = 19500;
-    viewEl.textContent = fmt(viewers);
-    chatCountEl.textContent = fmt(Math.round(viewers * 0.16));
-  }, 3000);
+  function loadRealCounts(){
+    fetch("/api/stats").then(function(r){ return r.json(); }).then(function(d){
+      if (d.liveNow != null) viewEl.textContent = fmt(d.liveNow);
+      if (d.chatTotal != null) chatCountEl.textContent = fmt(d.chatTotal);
+    }).catch(function(){});
+  }
+  loadRealCounts(); setInterval(loadRealCounts, 30000);
 
-  /* ---------- Live chat ---------- */
+  /* ---------- Live chat — real shared comments (Facebook style) ---------- */
   var list  = $("#bbb-ott-chat-list");
   var form  = $("#bbb-ott-chat-form");
   var input = $("#bbb-ott-chat-input");
-  var colors = ["#e50914","#9d4dff","#ff8a00","#00b894","#0984e3","#e84393","#c9a227","#6c5ce7"];
-  var names  = ["Rupam_K","Priya❤️","SouravFan","Mou_Kolkata","Arjun007","TumpaDi","Riya.B","Debu_Dada","Ananya✨","Rahul_Bong","Sneha_88","BB_Lover"];
-  var lines  = [
-    "আজকের নমিনেশন টাস্কটা জাস্ট আগুন 🔥",
-    "ক্যাপ্টেন হওয়ার জন্য ও একদম deserve করে!",
-    "Weekend Ka Vaar e host ke ki bolbe? Can't wait 😱",
-    "মাঝরাতের রান্নাঘরের ঝগড়াটা দেখলে? 😂",
-    "Team Rupa all the way! 💪",
-    "এই সপ্তাহে কে বেরোবে বলো তো?",
-    "Uncut feed is so much better than the TV edit",
-    "ও মা, এটা কি হল! 😳",
-    "Vote for your favourite housemate guys 🗳️",
-    "Best season of Bigg Boss Bangla till now 👏",
-    "ক্যাপ্টেন্সি টাস্কে আজ পুরো মারাত্মক খেলা হয়েছে",
-    "Who else is watching from Dhaka? 🇧🇩",
-    "Kolkata theke dekhchi ❤️",
-    "Ei alliance ta beshi din tikbe na 😏",
-    "Bigg Boss er voice ta shunlei goosebumps 🎙️"
-  ];
-
-  function rand(a){ return a[Math.floor(Math.random()*a.length)]; }
+  var nameInput = $("#bbb-ott-chat-name");
+  var CHAT_REACTS = ["👍","❤️","😂","😮","😢","😡"];
+  var chatColors = ["#e50914","#9d4dff","#ff8a00","#00b894","#0984e3","#e84393","#c9a227","#6c5ce7"];
+  function chatColor(name){ var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; return chatColors[h % chatColors.length]; }
+  function chatTime(t){
+    var s = Math.max(0, Math.floor((Date.now() - t) / 1000));
+    if (s < 60) return "এখনই";
+    var m = Math.floor(s / 60); if (m < 60) return m + " মিনিট আগে";
+    var h = Math.floor(m / 60); if (h < 24) return h + " ঘণ্টা আগে";
+    return Math.floor(h / 24) + " দিন আগে";
+  }
+  function myChatName(){
+    var n = (nameInput.value || "").trim();
+    if (n) { try { localStorage.setItem("bbb-chat-name", n); } catch (e) {} return n; }
+    try { return localStorage.getItem("bbb-chat-name") || ""; } catch (e) { return ""; }
+  }
+  try { var savedName = localStorage.getItem("bbb-chat-name"); if (savedName) nameInput.value = savedName; } catch (e) {}
+  var myPostedIds = new Set();
+  try { (JSON.parse(localStorage.getItem("bbb-chat-mine") || "[]")).forEach(function(id){ myPostedIds.add(id); }); } catch (e) {}
+  function saveMyPosted(){ try { localStorage.setItem("bbb-chat-mine", JSON.stringify(Array.from(myPostedIds).slice(-100))); } catch (e) {} }
 
   var bbbOttChatMsgCount = 0;
+  var chatRows = {}, chatData = {}, chatThreads = {};
+  var chatEmpty = null;
   function bbbOttInsertChatAd(){
     var ad = document.createElement("div");
     ad.className = "bbb-ott-chat-ad";
@@ -1186,79 +1233,188 @@
     ad.appendChild(box);
     list.appendChild(ad);
   }
-
-  function addMsg(name, text, me){
-    var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
-    var row = document.createElement("div");
-    row.className = "bbb-ott-msg" + (me ? " bbb-ott-msg--me" : "");
-    var av = document.createElement("div");
-    av.className = "bbb-ott-av";
-    av.style.background = me ? "linear-gradient(135deg,#ffcc00,#e50914)" : rand(colors);
-    av.textContent = name.charAt(0).toUpperCase();
-    var body = document.createElement("div");
-    body.className = "bbb-ott-msg-body";
-    var b = document.createElement("b");
-    b.textContent = name;
-    b.style.color = me ? "" : "#b9bad0";
-    body.appendChild(b);
-    if (me) { var tag = document.createElement("span"); tag.className = "bbb-ott-badge-me"; tag.textContent = "YOU"; body.appendChild(tag); }
-    var p = document.createElement("p");
-    p.textContent = text;   // textContent keeps user input safe (no HTML injection)
-    body.appendChild(p);
+  function showChatEmpty(){
+    if (chatEmpty || Object.keys(chatRows).length) return;
+    chatEmpty = document.createElement("div");
+    chatEmpty.className = "bbb-ott-chat-empty";
+    chatEmpty.textContent = "এখনো কোনো কমেন্ট নেই — প্রথম কমেন্টটি লিখুন!";
+    list.appendChild(chatEmpty);
+  }
+  function hideChatEmpty(){ if (chatEmpty) { chatEmpty.remove(); chatEmpty = null; } }
+  function chatPost(body){
+    return fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)})
+      .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); });
+  }
+  function chatTotals(m){
+    var likes = (m.likes || []).length, total = likes, parts = [];
+    if (likes) parts.push("👍 " + likes);
+    var reacts = m.reacts || {};
+    Object.keys(reacts).forEach(function(em){ var n = reacts[em].length; if (n) { parts.push(em + " " + n); total += n; } });
+    return { total: total, parts: parts };
+  }
+  function myReaction(m){
+    var d = deviceId;
+    if ((m.likes || []).indexOf(d) >= 0) return "👍";
+    var reacts = m.reacts || {};
+    for (var k in reacts) { if (reacts[k].indexOf(d) >= 0) return k; }
+    return "";
+  }
+  function renderChatActions(body, m){
+    var old;
+    while ((old = body.querySelector(".bbb-ott-msg-actions"))) old.remove();
+    while ((old = body.querySelector(".bbb-ott-react-chips"))) old.remove();
+    while ((old = body.querySelector(".bbb-ott-reply-form"))) old.remove();
     var acts = document.createElement("div");
     acts.className = "bbb-ott-msg-actions";
+    var mine = myReaction(m), tot = chatTotals(m);
     var likeBtn = document.createElement("button");
     likeBtn.type = "button";
-    var likeCount = Math.floor(Math.random()*28);
-    likeBtn.textContent = "👍 Like " + likeCount;
+    likeBtn.textContent = (mine || "👍") + " " + tot.total;
+    if (mine) likeBtn.classList.add("bbb-ott-liked");
     likeBtn.addEventListener("click", function(){
-      var liked = likeBtn.classList.toggle("bbb-ott-liked");
-      likeCount += liked ? 1 : -1;
-      likeBtn.textContent = "👍 Like " + likeCount;
+      chatPost({device: deviceId, action: "like", id: m.id}).then(function(d){ chatData[m.id] = d.message; refreshChatMsg(d.message); }).catch(function(){});
     });
     acts.appendChild(likeBtn);
+    var reactBtn = document.createElement("button");
+    reactBtn.type = "button";
+    reactBtn.textContent = "😊";
+    reactBtn.title = "React";
+    acts.appendChild(reactBtn);
+    var picker = document.createElement("span");
+    picker.className = "bbb-ott-react-picker";
+    CHAT_REACTS.forEach(function(em){
+      var rb = document.createElement("button");
+      rb.type = "button"; rb.textContent = em;
+      rb.addEventListener("click", function(){
+        picker.classList.remove("is-on");
+        chatPost({device: deviceId, action: "react", id: m.id, emoji: em}).then(function(d){ chatData[m.id] = d.message; refreshChatMsg(d.message); }).catch(function(){});
+      });
+      picker.appendChild(rb);
+    });
+    acts.appendChild(picker);
+    reactBtn.addEventListener("click", function(){ picker.classList.toggle("is-on"); });
     var replyBtn = document.createElement("button");
     replyBtn.type = "button";
     replyBtn.textContent = "↩ Reply";
     replyBtn.addEventListener("click", function(){
-      input.value = "@" + name + " ";
-      input.focus();
+      var rf = body.querySelector(".bbb-ott-reply-form");
+      rf.classList.toggle("is-on");
+      if (rf.classList.contains("is-on")) rf.querySelector("input").focus();
     });
     acts.appendChild(replyBtn);
-    var reacts = document.createElement("span");
-    reacts.className = "bbb-ott-reacts";
-    ["❤️","🔥","😂"].forEach(function(em){
-      var rb = document.createElement("button");
-      rb.type = "button";
-      rb.textContent = em;
-      rb.addEventListener("click", function(){ rb.classList.toggle("bbb-ott-reacted"); });
-      reacts.appendChild(rb);
-    });
-    acts.appendChild(reacts);
     body.appendChild(acts);
-    row.appendChild(av); row.appendChild(body);
-    list.appendChild(row);
-    bbbOttChatMsgCount++;
-    if (bbbOttChatMsgCount % 6 === 0) bbbOttInsertChatAd();
-    while (list.children.length > 80) list.removeChild(list.firstChild);
-    if (me || nearBottom) list.scrollTop = list.scrollHeight;
+    if (tot.parts.length) {
+      var chips = document.createElement("div");
+      chips.className = "bbb-ott-react-chips";
+      tot.parts.forEach(function(p){ var s = document.createElement("span"); s.textContent = p; chips.appendChild(s); });
+      body.appendChild(chips);
+    }
+    var rf = document.createElement("form");
+    rf.className = "bbb-ott-reply-form";
+    var ri = document.createElement("input");
+    ri.type = "text"; ri.maxLength = 200; ri.placeholder = "Reply লিখুন…";
+    var rb2 = document.createElement("button");
+    rb2.type = "submit"; rb2.textContent = "Reply";
+    rf.appendChild(ri); rf.appendChild(rb2);
+    rf.addEventListener("submit", function(e){
+      e.preventDefault();
+      var v = ri.value.replace(/\s+/g," ").trim();
+      if (!v) return;
+      var nm = myChatName() || "Fan";
+      chatPost({device: deviceId, name: nm, text: v, parent: m.id}).then(function(d){
+        myPostedIds.add(d.message.id); saveMyPosted();
+        renderChatMsg(d.message, true); ri.value = ""; rf.classList.remove("is-on");
+      }).catch(function(){});
+    });
+    body.appendChild(rf);
   }
+  function refreshChatMsg(m){
+    var row = chatRows[m.id];
+    if (!row) return;
+    var body = row.querySelector(".bbb-ott-msg-body");
+    var rf = body.querySelector(".bbb-ott-reply-form");
+    var draft = rf ? rf.querySelector("input").value : "";
+    var wasOpen = rf ? rf.classList.contains("is-on") : false;
+    renderChatActions(body, m);
+    var rf2 = body.querySelector(".bbb-ott-reply-form");
+    if (rf2) { rf2.querySelector("input").value = draft; if (wasOpen) rf2.classList.add("is-on"); }
+  }
+  function topThreadOf(m){
+    var cur = m, guard = 0;
+    while (cur.parent && chatData[cur.parent] && guard++ < 10) cur = chatData[cur.parent];
+    return chatThreads[cur.id] || null;
+  }
+  function renderChatMsg(m, scroll){
+    if (chatRows[m.id]) { chatData[m.id] = m; refreshChatMsg(m); return; }
+    chatData[m.id] = m;
+    hideChatEmpty();
+    var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+    var row = document.createElement("div");
+    row.className = "bbb-ott-msg" + (m.parent ? " bbb-ott-msg--reply" : "");
+    if (myPostedIds.has(m.id)) row.classList.add("bbb-ott-msg--me");
+    row.setAttribute("data-chat-id", m.id);
+    var av = document.createElement("div");
+    av.className = "bbb-ott-av";
+    av.style.background = chatColor(m.name);
+    av.textContent = (m.name || "F").charAt(0).toUpperCase();
+    var body = document.createElement("div");
+    body.className = "bbb-ott-msg-body";
+    var b = document.createElement("b");
+    b.textContent = m.name;
+    body.appendChild(b);
+    if (myPostedIds.has(m.id)) { var tag = document.createElement("span"); tag.className = "bbb-ott-badge-me"; tag.textContent = "YOU"; body.appendChild(tag); }
+    var tm = document.createElement("span");
+    tm.className = "bbb-ott-msg-time";
+    tm.textContent = chatTime(m.t);
+    body.appendChild(tm);
+    var p = document.createElement("p");
+    p.textContent = m.text;   // textContent keeps user input safe (no HTML injection)
+    body.appendChild(p);
+    renderChatActions(body, m);
+    row.appendChild(av); row.appendChild(body);
+    chatRows[m.id] = row;
+    var dest = m.parent ? topThreadOf(m) : null;
+    if (dest) { dest.appendChild(row); }
+    else {
+      var thread = document.createElement("div");
+      thread.className = "bbb-ott-thread";
+      thread.appendChild(row);
+      var replies = document.createElement("div");
+      replies.className = "bbb-ott-replies";
+      thread.appendChild(replies);
+      chatThreads[m.id] = replies;
+      list.appendChild(thread);
+      bbbOttChatMsgCount++;
+      if (bbbOttChatMsgCount % 6 === 0) bbbOttInsertChatAd();
+    }
+    if (scroll && nearBottom) list.scrollTop = list.scrollHeight;
+  }
+  function loadChat(){
+    fetch("/api/chat").then(function(r){ return r.json(); }).then(function(d){
+      if (!d.messages) return;
+      d.messages.forEach(function(m){ renderChatMsg(m, true); });
+      if (!d.messages.length) showChatEmpty();
+    }).catch(function(){});
+  }
+  loadChat(); setInterval(loadChat, 10000);
+  setInterval(function(){
+    Object.keys(chatRows).forEach(function(id){
+      var tm = chatRows[id].querySelector(".bbb-ott-msg-time");
+      if (tm && chatData[id]) tm.textContent = chatTime(chatData[id].t);
+    });
+  }, 60000);
 
-  for (var i = 0; i < 7; i++) addMsg(rand(names), lines[i], false);
-
-  (function loop(){
-    setTimeout(function(){ addMsg(rand(names), rand(lines), false); loop(); }, 2200 + Math.random()*2600);
-  })();
-
-  var myName = "Fan" + Math.floor(100 + Math.random()*900);
   form.addEventListener("submit", function(e){
     e.preventDefault();
     var v = input.value.replace(/\s+/g," ").trim();
     if (!v) { input.focus(); return; }
-    addMsg(myName, v, true);
-    try { fetch("/api/track", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"chat", device:deviceId})}).catch(function(){}); } catch (e) {}
-    input.value = "";
-    input.focus();
+    var nm = myChatName() || "Fan";
+    chatPost({device: deviceId, name: nm, text: v}).then(function(d){
+      myPostedIds.add(d.message.id); saveMyPosted();
+      renderChatMsg(d.message, true);
+      input.value = ""; input.focus();
+      loadRealCounts();
+    }).catch(function(){});
   });
 
   /* ---------- Vote Poll (real shared votes, 1 per device) ---------- */
