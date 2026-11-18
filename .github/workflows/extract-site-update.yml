@@ -1,0 +1,48 @@
+name: Extract site update
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - bigg-boss-site.zip
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify zip contents
+        run: |
+          test -f bigg-boss-site.zip
+          unzip -l bigg-boss-site.zip
+          rm -rf /tmp/verify
+          mkdir -p /tmp/verify
+          unzip -o bigg-boss-site.zip -d /tmp/verify
+          find /tmp/verify -type f | sort
+          INDEX="$(find /tmp/verify -name index.html | head -n 1)"
+          test -n "$INDEX"
+          echo "index.html: $INDEX"
+          grep -F "bbb-ott-poll-pic" "$INDEX"
+          grep -F "330px-Bigg_Boss_Bangla_season_3" "$INDEX"
+          echo "VERIFIED"
+      - name: Extract and commit
+        run: |
+          if [ -f /tmp/verify/index.html ]; then
+            unzip -o bigg-boss-site.zip
+          else
+            TOP="$(ls -1 /tmp/verify | head -n 1)"
+            cp -r "/tmp/verify/$TOP"/. .
+          fi
+          rm -f bigg-boss-site.zip
+          rm -f .github/workflows/extract-site-update.yml
+          git config user.name "ruftufx2004-art"
+          git config user.email "ruftufx2004@gmail.com"
+          git status --short
+          git add -A
+          git diff --cached --stat
+          git commit -m "Poll photos + official Season 3 logo"
+          git push
