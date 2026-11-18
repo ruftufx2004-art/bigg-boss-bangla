@@ -1,0 +1,60 @@
+name: Extract site zip (one-time)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify zip contents before extracting
+        run: |
+          test -f bigg-boss-site.zip
+          unzip -l bigg-boss-site.zip
+          unzip -l bigg-boss-site.zip | grep -q '_headers' || { echo 'MISSING _headers in zip'; exit 1; }
+          unzip -l bigg-boss-site.zip | grep -q 'functions/_middleware.js' || { echo 'MISSING functions/_middleware.js in zip'; exit 1; }
+          unzip -l bigg-boss-site.zip | grep -q 'functions/api/config.js' || { echo 'MISSING functions/api/config.js in zip'; exit 1; }
+          unzip -l bigg-boss-site.zip | grep -q 'functions/api/track.js' || { echo 'MISSING functions/api/track.js in zip'; exit 1; }
+          unzip -l bigg-boss-site.zip | grep -q 'functions/api/stats.js' || { echo 'MISSING functions/api/stats.js in zip'; exit 1; }
+          unzip -l bigg-boss-site.zip | grep -q 'functions/api/adsterra.js' || { echo 'MISSING functions/api/adsterra.js in zip'; exit 1; }
+          unzip -p bigg-boss-site.zip functions/api/adsterra.js | grep -F -q 'api3.adsterratools.com' || { echo 'MISSING api3.adsterratools.com in functions/api/adsterra.js'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'bbb-ott-pwa[hidden]' || { echo 'MISSING bbb-ott-pwa[hidden] in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'noindex' || { echo 'MISSING noindex in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'pwaShow' || { echo 'MISSING pwaShow in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'Add to Home screen' || { echo 'MISSING Add to Home screen in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q '24X7 uncut live' || { echo 'MISSING 24X7 uncut live in index.html'; exit 1; }
+          if unzip -p bigg-boss-site.zip index.html | grep -F -q 'bbb-ott-livebtn'; then echo 'STILL CONTAINS bbb-ott-livebtn in index.html'; exit 1; fi
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'bbb-ott-webframe' || { echo 'MISSING bbb-ott-webframe in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'shop.bihishaan.com' || { echo 'MISSING shop.bihishaan.com in index.html'; exit 1; }
+          if unzip -p bigg-boss-site.zip index.html | grep -F -q 'shajgoj.com'; then echo 'STILL CONTAINS shajgoj.com in index.html'; exit 1; fi
+          unzip -p bigg-boss-site.zip admin.html | grep -F -q 'frameTop' || { echo 'MISSING frameTop in admin.html'; exit 1; }
+          unzip -p bigg-boss-site.zip functions/api/config.js | grep -F -q 'frameHeight' || { echo 'MISSING frameHeight in functions/api/config.js'; exit 1; }
+          unzip -p bigg-boss-site.zip functions/api/config.js | grep -F -q 'shop.bihishaan.com' || { echo 'MISSING shop.bihishaan.com in functions/api/config.js'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'Server 1</button>' || { echo 'MISSING clean Server 1 button in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'Server 2</button>' || { echo 'MISSING clean Server 2 button in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'Server 3</button>' || { echo 'MISSING clean Server 3 button in index.html'; exit 1; }
+          SEQ=$(unzip -p bigg-boss-site.zip index.html | grep -o 'ep-[0-9]\+')
+          FIRST=$(printf '%s\n' "$SEQ" | head -1)
+          LAST=$(printf '%s\n' "$SEQ" | tail -1)
+          test "$FIRST" = 'ep-79' || { echo "First episode ref is $FIRST, expected ep-79"; exit 1; }
+          test "$LAST" = 'ep-1' || { echo "Last episode ref is $LAST, expected ep-1"; exit 1; }
+          for C in IN RU SG; do unzip -p bigg-boss-site.zip functions/_middleware.js | grep -F -q "$C" || { echo "MISSING $C in functions/_middleware.js"; exit 1; }; done
+          echo 'Verified: Adsterra api3 endpoint, reversed grid ep-79..ep-1 and all earlier fixes present'
+      - name: Extract and clean up
+        run: |
+          unzip -o bigg-boss-site.zip
+          rm -f bigg-boss-site.zip
+          rm -f .github/workflows/extract-site.yml
+          git status --short
+      - name: Commit extracted site
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && echo 'No changes to commit' && exit 0
+          git commit -m 'Fix Adsterra API base URL'
+          git push
