@@ -872,10 +872,14 @@
     var b = $("#bbb-ott-mute"); if (!b) return;
     try { b.textContent = (livePlayer && livePlayer.isMuted()) ? "🔇 Mute" : "🔊 Sound"; } catch (e) {}
   }
+  var liveBoundVid = "";
+  function ytVid(u){ var m = u && u.match(/\/embed\/([^?&#]+)/); return m ? m[1] : ""; }
   function bindLivePlayer(){
-    if (!window.YT || !YT.Player || !isYT(frame.getAttribute("src"))) return;
+    var cur = frame.getAttribute("src");
+    if (!window.YT || !YT.Player || !isYT(cur)) return;
+    if (livePlayer && liveBoundVid === ytVid(cur)) return; /* already bound to this video */
     try { if (livePlayer && livePlayer.destroy) livePlayer.destroy(); } catch (e) {}
-    livePlayer = null; liveReady = false;
+    livePlayer = null; liveReady = false; liveBoundVid = ytVid(cur);
     try {
       livePlayer = new YT.Player(frame, {events:{
         onReady: function(){ liveReady = true; syncPlayBtn(); syncMuteBtn(); try { var v = livePlayer.getVolume(); var s = $("#bbb-ott-vol"); if (s) s.value = livePlayer.isMuted() ? 0 : v; } catch (e) {} },
