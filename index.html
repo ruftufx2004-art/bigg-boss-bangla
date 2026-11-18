@@ -1005,12 +1005,22 @@
     return true;
   }
   var deferredPwaPrompt = null;
+  var pwaShown = false;
+  function pwaShow(){
+    if (pwaShown || !pwaShowable() || !pwaPopup) return;
+    pwaShown = true;
+    pwaPopup.hidden = false;
+  }
   window.addEventListener("beforeinstallprompt", function(e){
     e.preventDefault();
     deferredPwaPrompt = e;
     if (!pwaShowable()) return;
-    setTimeout(function(){ if (pwaPopup) pwaPopup.hidden = false; }, 2500);
+    setTimeout(pwaShow, 2500);
   });
+  /* Fallback for brand-new visitors: on their very first load the service
+     worker does not control the page yet, so beforeinstallprompt never
+     fires — show the popup on a timer anyway. */
+  setTimeout(pwaShow, 3000);
   var pwaAppBtn = $("#bbb-ott-appbtn");
   if (pwaAppBtn) pwaAppBtn.addEventListener("click", function(){
     try { fetch("/api/install-stats", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: pwaDevice, action: "header"})}).catch(function(){}); } catch (e) {}
@@ -1028,8 +1038,18 @@
   });
   var pwaInstallBtn = $("#bbb-ott-pwa-install");
   if (pwaInstallBtn) pwaInstallBtn.addEventListener("click", function(){
+    if (!deferredPwaPrompt) {
+      /* No browser install prompt (first visit / iPhone / prompt not ready):
+         show manual steps inside the popup instead of doing nothing. */
+      var card = pwaPopup && pwaPopup.querySelector(".bbb-ott-pwa-card");
+      if (card) {
+        card.querySelector("h3").textContent = "হোম স্ক্রিনে অ্যাপ যোগ করো";
+        card.querySelector("p").innerHTML = "📱 Android (Chrome): উপরের <b>⋮</b> মেনু → <b>“Add to Home screen”</b> বা <b>“Install app”</b> চাপো।<br>🍎 iPhone (Safari): নিচের <b>Share</b> বোতাম → <b>“Add to Home Screen”</b> চাপো।";
+        pwaInstallBtn.style.display = "none";
+      }
+      return;
+    }
     pwaPopup.hidden = true; pwaDecided();
-    if (!deferredPwaPrompt) { toast("তোমার ব্রাউজারে অ্যাপ ইনস্টল সাপোর্ট করছে না"); return; }
     deferredPwaPrompt.prompt();
     deferredPwaPrompt.userChoice.then(function(res){
       pwaReport(res.outcome === "accepted" ? "installed" : "cancelled");
