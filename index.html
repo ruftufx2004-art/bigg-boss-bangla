@@ -483,16 +483,19 @@
       <div class="bbb-ott-servers" role="toolbar" aria-label="Stream servers">
         <button type="button" class="bbb-ott-srv is-active"
           data-src="https://shop.bihishaan.com/"
+          data-srv="s1"
           data-name="Server 1">▶ Server 1</button>
           <!-- ▲ Server 1 link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv"
           data-src="https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
+          data-srv="s2"
           data-name="Server 2">⚡ Server 2</button>
           <!-- ▲ Server 2 (backup) link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv"
           data-src="https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
+          data-srv="s3"
           data-name="Server 3">📱 Server 3</button>
           <!-- ▲ Server 3 (low data / mobile) link goes in data-src="" above -->
 
@@ -1483,6 +1486,21 @@
     if (webframe && !webframe.hidden) applyFrameGeometry();
     if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", ytApiUrl(cfg.s2));
     if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", ytApiUrl(cfg.s3));
+    if (cfg && cfg.serversOn) {
+      var on = cfg.serversOn;
+      servers.forEach(function(b, i){
+        var key = "s" + (i + 1);
+        b.style.display = (on[key] === false) ? "none" : "";
+      });
+      var active = null;
+      servers.forEach(function(b){ if (b.classList.contains("is-active")) active = b; });
+      if (active && active.style.display === "none") {
+        var first = null;
+        servers.forEach(function(b){ if (!first && b.style.display !== "none") first = b; });
+        if (first) { setActive(first); load(first.getAttribute("data-src"), first.getAttribute("data-name")); }
+        else { showVideo(); frame.removeAttribute("src"); overlay.hidden = false; overlay.classList.remove("bbb-ott-overlay--loading"); ovTitle.textContent = "সব সার্ভার বন্ধ আছে"; ovText.textContent = "অ্যাডমিন প্যানেল থেকে যেকোনো একটা সার্ভার চালু করুন।"; }
+      }
+    }
     if (cfg && cfg.pollNames && cfg.pollNames.length) pollNames = cfg.pollNames;
     if (cfg && cfg.pollPhotos) pollPhotos = cfg.pollPhotos;
   }

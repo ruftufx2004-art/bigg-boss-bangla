@@ -33,6 +33,8 @@
   .row{display:flex;gap:8px;align-items:center}
   .row input{flex:1}
   .row button{margin-top:0;padding:10px 14px;white-space:nowrap}
+  button.srvTgl{margin-top:0;padding:10px 12px;white-space:nowrap}
+  button.srvTgl.off{background:#7f1d1d}
 </style>
 </head>
 <body>
@@ -52,12 +54,21 @@
     <div class="card">
       <h2>📺 LIVE NOW প্লেয়ার</h2>
       <label>Server 1 — Main Live (YouTube ভিডিও লিংক বা Embed লিংক)</label>
-      <input type="text" id="live" placeholder="https://www.youtube.com/watch?v=...">
+      <div class="row"><input type="text" id="live" placeholder="https://www.youtube.com/watch?v=..."><button class="ghost srvTgl" id="tglS1" type="button" data-srv="s1">🟢 চালু</button></div>
       <p class="hint">YouTube-এর সাধারণ watch লিংক দিলেও চলবে, নিজে থেকে Embed বানিয়ে নেবে।</p>
       <label>Server 2 — Backup</label>
-      <input type="text" id="s2">
+      <div class="row"><input type="text" id="s2"><button class="ghost srvTgl" id="tglS2" type="button" data-srv="s2">🟢 চালু</button></div>
+      <div id="srvPreviewWrap2" style="position:relative;overflow:hidden;height:320px;border:1px solid var(--line);border-radius:12px;background:#000;display:none;margin-top:8px">
+        <iframe id="srvPreview2" style="position:absolute;left:0;top:0;width:100%;height:100%;border:0;pointer-events:auto" title="Server 2 preview"></iframe>
+      </div>
+      <button class="ghost" id="srvRefresh2" type="button">🔄 Server 2 প্রিভিউ রিফ্রেশ</button>
       <label>Server 3 — Low Data / Mobile</label>
-      <input type="text" id="s3">
+      <div class="row"><input type="text" id="s3"><button class="ghost srvTgl" id="tglS3" type="button" data-srv="s3">🟢 চালু</button></div>
+      <div id="srvPreviewWrap3" style="position:relative;overflow:hidden;height:320px;border:1px solid var(--line);border-radius:12px;background:#000;display:none;margin-top:8px">
+        <iframe id="srvPreview3" style="position:absolute;left:0;top:0;width:100%;height:100%;border:0;pointer-events:auto" title="Server 3 preview"></iframe>
+      </div>
+      <button class="ghost" id="srvRefresh3" type="button">🔄 Server 3 প্রিভিউ রিফ্রেশ</button>
+      <p class="hint">🟢 চালু / 🔴 বন্ধ — বন্ধ সার্ভার সাইটে দেখাবে না, লিংকটা ব্যাকআপ হিসেবে থেকে যাবে। আবার চালু করতে বোতাম চেপে নিচের 💾 সেভ করুন চাপুন।</p>
       <p class="hint">Server 1-এ YouTube লিংক দিলে ভিডিও চলবে, আর কোনো ওয়েবসাইটের লিংক (যেমন shajgoj.com) দিলে সেই সাইটের একটা অংশ ফ্রেমে দেখাবে।</p>
     </div>
 
@@ -207,6 +218,31 @@ function loadFramePreview(){
     document.getElementById("framePreviewWrap").style.display="none";
   }
 }
+var serversOn={s1:true,s2:true,s3:true};
+function setTgl(key, on){
+  var b=document.getElementById("tgl"+key.toUpperCase());
+  if(!b) return;
+  b.textContent=on?"🟢 চালু":"🔴 বন্ধ";
+  b.classList.toggle("off", !on);
+}
+function loadServerPreview(n){
+  var field=document.getElementById(n===2?"s2":"s3");
+  var wrap=document.getElementById("srvPreviewWrap"+n);
+  var fr=document.getElementById("srvPreview"+n);
+  var raw=(field.value||"").trim();
+  if(!raw){ wrap.style.display="none"; fr.removeAttribute("src"); return; }
+  var url=toEmbed(raw);
+  if(isWebsiteLink(url)){
+    var top=parseInt(document.getElementById("frameTop").value||"0",10)||0;
+    fr.style.height="1600px"; fr.style.top=(-top)+"px";
+    if(fr.getAttribute("src")!==url) fr.setAttribute("src", url);
+  } else {
+    var pv=url.replace("autoplay=1","autoplay=0").replace("mute=1","mute=0");
+    fr.style.height="100%"; fr.style.top="0px";
+    if(fr.getAttribute("src")!==pv) fr.setAttribute("src", pv);
+  }
+  wrap.style.display="block";
+}
 function fillConfig(c){
   document.getElementById("live").value=c.live||"";
   document.getElementById("s2").value=c.s2||"";
@@ -214,7 +250,8 @@ function fillConfig(c){
   document.getElementById("names").value=(c.pollNames||[]).join("\n");
   document.getElementById("frameTop").value=(c.frameTop!=null?c.frameTop:0);
   document.getElementById("frameHeight").value=(c.frameHeight!=null?c.frameHeight:560);
-  loadFramePreview();
+  if(c.serversOn){ serversOn={s1:c.serversOn.s1!==false,s2:c.serversOn.s2!==false,s3:c.serversOn.s3!==false}; ["s1","s2","s3"].forEach(function(k){ setTgl(k, serversOn[k]); }); }
+  loadFramePreview(); loadServerPreview(2); loadServerPreview(3);
 }
 function loadConfig(){
   fetch("/api/config",{cache:"no-store"}).then(function(r){return r.json();}).then(fillConfig);
@@ -250,6 +287,7 @@ document.getElementById("saveBtn").addEventListener("click", function(){
   var body={password:pw, live:toEmbed(document.getElementById("live").value), s2:toEmbed(document.getElementById("s2").value), s3:toEmbed(document.getElementById("s3").value),
     frameTop:parseInt(document.getElementById("frameTop").value||"0",10)||0,
     frameHeight:parseInt(document.getElementById("frameHeight").value||"560",10)||560,
+    serversOn:serversOn,
     pollNames:document.getElementById("names").value.split("\n").map(function(x){return x.trim();}).filter(Boolean)};
   var np=document.getElementById("newPw").value.trim(); if(np) body.newPassword=np;
   var at=document.getElementById("adToken").value.trim(); if(at) body.adsterraToken=at;
@@ -265,7 +303,15 @@ document.getElementById("upBtn").addEventListener("click", function(){ var el=do
 document.getElementById("downBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=(parseInt(el.value||"0",10)||0)+40; loadFramePreview(); });
 document.getElementById("previewRefresh").addEventListener("click", function(){ var fr=document.getElementById("framePreview"); fr.removeAttribute("src"); loadFramePreview(); });
 document.getElementById("live").addEventListener("change", loadFramePreview);
-document.getElementById("frameTop").addEventListener("input", loadFramePreview);
+document.getElementById("frameTop").addEventListener("input", function(){ loadFramePreview(); loadServerPreview(2); loadServerPreview(3); });
+["s1","s2","s3"].forEach(function(k){
+  var b=document.getElementById("tgl"+k.toUpperCase());
+  if(b) b.addEventListener("click", function(){ serversOn[k]=!serversOn[k]; setTgl(k, serversOn[k]); });
+});
+document.getElementById("s2").addEventListener("change", function(){ loadServerPreview(2); });
+document.getElementById("s3").addEventListener("change", function(){ loadServerPreview(3); });
+document.getElementById("srvRefresh2").addEventListener("click", function(){ var fr=document.getElementById("srvPreview2"); fr.removeAttribute("src"); loadServerPreview(2); });
+document.getElementById("srvRefresh3").addEventListener("click", function(){ var fr=document.getElementById("srvPreview3"); fr.removeAttribute("src"); loadServerPreview(3); });
 document.getElementById("resetBtn").addEventListener("click", function(){
   if(!confirm("সব ভোট ০ করে দেবো?")) return;
   fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw, resetPoll:true})})
