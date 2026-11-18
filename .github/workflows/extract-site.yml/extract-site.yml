@@ -1,0 +1,46 @@
+name: Extract site zip (one-time)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify zip contents before extracting
+        run: |
+          set -euo pipefail
+          test -f bigg-boss-site-2.zip
+          unzip -l bigg-boss-site-2.zip
+          echo '--- Required string checks (index.html) ---'
+          unzip -p bigg-boss-site-2.zip index.html | grep -F -q 'bbb-ott-shield' || { echo 'ERROR: index.html missing bbb-ott-shield'; exit 1; }
+          unzip -p bigg-boss-site-2.zip index.html | grep -F -q 'bbb-ott-landscape' || { echo 'ERROR: index.html missing bbb-ott-landscape'; exit 1; }
+          unzip -p bigg-boss-site-2.zip index.html | grep -F -q 'Live chat' || { echo 'ERROR: index.html missing Live chat'; exit 1; }
+          if unzip -p bigg-boss-site-2.zip index.html | grep -F -q '14.2K'; then echo 'ERROR: index.html still contains 14.2K'; exit 1; fi
+          if unzip -p bigg-boss-site-2.zip index.html | grep -F -q 'Rupam_K'; then echo 'ERROR: index.html still contains Rupam_K'; exit 1; fi
+          echo '--- Chat files in zip ---'
+          unzip -l bigg-boss-site-2.zip | grep -i chat || true
+      - name: Extract site and remove zip + workflow
+
+        run: |
+          set -euo pipefail
+          unzip -o bigg-boss-site-2.zip
+          rm -f bigg-boss-site-2.zip
+          rm -f .github/workflows/extract-site.yml
+          git status --short
+      - name: Commit extracted site
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && echo 'No changes to commit' && exit 0
+          git commit -m "Real views + real FB-like chat, Landscape button, click shield on live player"
+          git push
+
+# end
+
