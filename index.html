@@ -381,6 +381,7 @@
           <option value="medium">360p</option>
           <option value="small">240p</option>
         </select>
+        <button type="button" class="bbb-ott-ctl" id="bbb-ott-fullscreen" title="Fullscreen">⛶ Fullscreen</button>
         <div class="bbb-ott-settings">
           <button type="button" class="bbb-ott-ctl" id="bbb-ott-settings" title="Settings">⚙ Settings</button>
           <div class="bbb-ott-settings-menu" id="bbb-ott-settings-menu" hidden>
@@ -907,6 +908,12 @@
     var v = +this.value;
     try { livePlayer.setVolume(v); if (v > 0 && livePlayer.isMuted()) livePlayer.unMute(); if (v === 0) livePlayer.mute(); } catch (e) {}
     setTimeout(syncMuteBtn, 100);
+  });
+  $("#bbb-ott-fullscreen").addEventListener("click", function(){
+    var p = $("#bbb-ott-player");
+    if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen(); return; }
+    var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
+    if (fn) fn.call(p); else toast("Fullscreen not supported on this device");
   });
   $("#bbb-ott-quality").addEventListener("change", function(){
     if (!liveReady || !livePlayer) { toast("Player ready হলে quality বদলাবে"); return; }
