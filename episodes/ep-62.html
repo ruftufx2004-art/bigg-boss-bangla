@@ -41,4 +41,7 @@ document.getElementById('bb-play').addEventListener('click', function(){ if(!bbP
 document.getElementById('bb-back').addEventListener('click', function(){ if(bbPlayer) bbPlayer.seekTo(Math.max(0, bbPlayer.getCurrentTime()-10), true); });
 document.getElementById('bb-fwd').addEventListener('click', function(){ if(bbPlayer) bbPlayer.seekTo(bbPlayer.getCurrentTime()+10, true); });
 </script>
+<script>
+(function(){try{var d=localStorage.getItem("bbb-poll-device");if(!d){d="d"+Date.now().toString(36)+Math.random().toString(36).slice(2,10);localStorage.setItem("bbb-poll-device",d);}function t(x){fetch("/api/track",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:x,page:location.pathname,device:d})}).catch(function(){});}t("view");setInterval(function(){t("heartbeat");},30000);}catch(e){}})();
+</script>
 </body></html>

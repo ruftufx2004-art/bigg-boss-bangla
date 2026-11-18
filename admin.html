@@ -93,6 +93,34 @@
     </div>
 
     <div class="card">
+      <h2>📊 সাইট স্ট্যাটিসটিকস — লাইভ</h2>
+      <div class="stats">
+        <div class="stat"><b style="color:var(--gold)" id="stViews">—</b><span>👁️ মোট ভিউ</span></div>
+        <div class="stat"><b class="ok" id="stVisitors">—</b><span>👤 ভিজিটর (২৪ ঘণ্টা)</span></div>
+        <div class="stat"><b style="color:#f87171" id="stLive">—</b><span>🔴 এখন লাইভ দেখছে</span></div>
+        <div class="stat"><b style="color:#60a5fa" id="stChat">—</b><span>💬 মোট কমেন্ট</span></div>
+      </div>
+      <div class="stats" style="margin-top:12px">
+        <div class="stat"><b id="stVotes">—</b><span>🗳️ মোট ভোট</span></div>
+        <div class="stat"><b id="stBw">—</b><span>📶 ব্যান্ডউইথ (আনুমানিক)</span></div>
+        <div class="stat"><b class="ok" id="stHealth">—</b><span>💚 সাইট হেলথ</span></div>
+      </div>
+      <h2 style="margin-top:16px">🔥 কোন পেজে বেশি ভিউ</h2>
+      <div id="topPages" style="font-size:13px;line-height:1.9">—</div>
+      <h2 style="margin-top:16px">💰 Adsterra — অ্যাডের আয়</h2>
+      <div class="stats">
+        <div class="stat"><b id="adImp">—</b><span>👁️ ইমপ্রেশন</span></div>
+        <div class="stat"><b id="adClicks">—</b><span>🖱️ ক্লিক</span></div>
+        <div class="stat"><b id="adRev">—</b><span>💵 আয় ($)</span></div>
+      </div>
+      <p class="hint" id="adNote">গত ৭ দিনের হিসাব।</p>
+      <label>Adsterra API টোকেন (একবার বসালেই হবে — টোকেন কাউকে দেখানো হয় না)</label>
+      <input type="password" id="adToken" placeholder="Adsterra API টোকেন পেস্ট করুন" autocomplete="off">
+      <p class="hint">টোকেন সেভ করতে নিচের 💾 সেভ করুন বোতাম চাপুন।</p>
+      <p class="hint">প্রতি ৩০ সেকেন্ডে নিজে থেকে আপডেট হয়। <a href="#" id="statsRefresh" style="color:var(--gold)">এখনই রিফ্রেশ করুন</a></p>
+    </div>
+
+    <div class="card">
       <h2>🔑 পাসওয়ার্ড বদলান</h2>
       <label>নতুন পাসওয়ার্ড (খালি রাখলে বদলাবে না)</label>
       <input type="text" id="newPw" placeholder="নতুন পাসওয়ার্ড">
@@ -120,6 +148,40 @@ function loadInstallStats(){
     document.getElementById("statHeader").textContent=d.headerClicks!=null?d.headerClicks:"—";
   }).catch(function(){});
 }
+function loadStats(){
+  fetch("/api/stats").then(function(r){return r.json();}).then(function(d){
+    if(!d.ok && !d.totalViews) return;
+    document.getElementById("stViews").textContent=d.totalViews!=null?d.totalViews:"0";
+    document.getElementById("stVisitors").textContent=d.uniqueVisitors!=null?d.uniqueVisitors:"0";
+    document.getElementById("stLive").textContent=d.liveNow!=null?d.liveNow:"0";
+    document.getElementById("stChat").textContent=d.chatTotal!=null?d.chatTotal:"0";
+    document.getElementById("stVotes").textContent=d.pollVotes!=null?d.pollVotes:"0";
+    document.getElementById("stBw").textContent=d.bandwidth?("~"+d.bandwidth.mb+" MB"):"—";
+    document.getElementById("stHealth").textContent=d.kv?"✅ ভালো":"❌ সমস্যা";
+    var tp=document.getElementById("topPages");
+    if(d.topPages && d.topPages.length){
+      tp.innerHTML=d.topPages.map(function(p,i){return (i+1)+". "+p.page+" — <b>"+p.views+"</b> ভিউ";}).join("<br>");
+    } else { tp.textContent="এখনো কোনো ভিউ রেকর্ড হয়নি — সাইটে ভিজিটর এলে এখানে দেখাবে।"; }
+  }).catch(function(){});
+}
+function loadAdsterra(){
+  fetch("/api/adsterra?days=7").then(function(r){return r.json();}).then(function(d){
+    var note=document.getElementById("adNote");
+    if(d.error==="no_token"){ note.textContent="Adsterra টোকেন সেভ করা হয়নি — নিচে টোকেন বসিয়ে সেভ করুন।"; return; }
+    if(d.error){ note.textContent="Adsterra থেকে ডাটা আনতে সমস্যা: "+(d.message||d.error); return; }
+    var items=(d.data && (d.data.items || d.data.data || d.data.stats)) || d.data;
+    var imp=0, clicks=0, rev=0;
+    if(Array.isArray(items)){
+      items.forEach(function(it){ imp+=parseFloat(it.impressions||it.impression||0)||0; clicks+=parseFloat(it.clicks||it.click||0)||0; rev+=parseFloat(it.revenue||it.earnings||it.payout||0)||0; });
+    } else if(items && typeof items==="object"){
+      imp=parseFloat(items.impressions||0)||0; clicks=parseFloat(items.clicks||0)||0; rev=parseFloat(items.revenue||items.earnings||0)||0;
+    }
+    document.getElementById("adImp").textContent=imp.toLocaleString("en-US");
+    document.getElementById("adClicks").textContent=clicks.toLocaleString("en-US");
+    document.getElementById("adRev").textContent="$"+rev.toFixed(2);
+    note.textContent="গত "+(d.days||7)+" দিনের হিসাব ("+(d.start_date||"")+" → "+(d.finish_date||"")+")।";
+  }).catch(function(){});
+}
 function loadConfig(){
   fetch("/api/config").then(function(r){return r.json();}).then(function(c){
     document.getElementById("live").value=c.live||"";
@@ -139,6 +201,7 @@ document.getElementById("loginBtn").addEventListener("click", function(){
       document.getElementById("loginCard").style.display="none";
       document.getElementById("panel").style.display="block";
       loadConfig(); loadInstallStats(); setInterval(loadInstallStats, 10000);
+      loadStats(); loadAdsterra(); setInterval(function(){ loadStats(); loadAdsterra(); }, 30000);
     })
     .catch(function(){ document.getElementById("msg").textContent="❌ ভুল পাসওয়ার্ড"; document.getElementById("msg").className="err"; });
 });
@@ -149,13 +212,15 @@ document.getElementById("saveBtn").addEventListener("click", function(){
     frameHeight:parseInt(document.getElementById("frameHeight").value||"560",10)||560,
     pollNames:document.getElementById("names").value.split("\n").map(function(x){return x.trim();}).filter(Boolean)};
   var np=document.getElementById("newPw").value.trim(); if(np) body.newPassword=np;
+  var at=document.getElementById("adToken").value.trim(); if(at) body.adsterraToken=at;
   msg("সেভ হচ্ছে…", true);
   fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
     .then(function(r){ if(!r.ok) throw new Error("err"); return r.json(); })
-    .then(function(){ msg("✅ সেভ হয়েছে! সাইটে গিয়ে দেখুন।", true); if(np){ pw=np; document.getElementById("newPw").value=""; } })
+    .then(function(){ msg("✅ সেভ হয়েছে! সাইটে গিয়ে দেখুন।", true); if(np){ pw=np; document.getElementById("newPw").value=""; } if(at){ document.getElementById("adToken").value=""; loadAdsterra(); } })
     .catch(function(){ msg("❌ সেভ হয়নি — পাসওয়ার্ড ঠিক আছে তো?", false); });
 });
 document.getElementById("statRefresh").addEventListener("click", function(e){ e.preventDefault(); loadInstallStats(); });
+document.getElementById("statsRefresh").addEventListener("click", function(e){ e.preventDefault(); loadStats(); loadAdsterra(); });
 document.getElementById("upBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=Math.max(0,(parseInt(el.value||"0",10)||0)-40); });
 document.getElementById("downBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=(parseInt(el.value||"0",10)||0)+40; });
 document.getElementById("resetBtn").addEventListener("click", function(){

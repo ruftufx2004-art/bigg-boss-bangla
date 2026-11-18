@@ -29,6 +29,8 @@ async function readConfig(kv) {
   if (photos) { try { const o = JSON.parse(photos); if (o && typeof o === "object") cfg.pollPhotos = o; } catch (e) {} }
   const names = await kv.get("cfg:pollNames");
   if (names) { try { const a = JSON.parse(names); if (Array.isArray(a) && a.length) cfg.pollNames = a; } catch (e) {} }
+  // Adsterra token is never returned — only whether one is saved.
+  cfg.hasAdsterraToken = !!(await kv.get("adsterra:token"));
   return cfg;
 }
 export async function onRequest(context) {
@@ -47,6 +49,7 @@ export async function onRequest(context) {
     if (typeof body.frameTop === "number") await kv.put("cfg:frameTop", String(Math.max(0, Math.floor(body.frameTop))));
     if (typeof body.frameHeight === "number") await kv.put("cfg:frameHeight", String(Math.min(1200, Math.max(200, Math.floor(body.frameHeight)))));
     if (Array.isArray(body.pollNames) && body.pollNames.length) await kv.put("cfg:pollNames", JSON.stringify(body.pollNames.map(String)));
+    if (typeof body.adsterraToken === "string" && body.adsterraToken.trim()) await kv.put("adsterra:token", body.adsterraToken.trim());
     if (typeof body.newPassword === "string" && body.newPassword.length >= 4) await kv.put("admin:password", body.newPassword);
     if (body.resetPoll) {
       const counts = await kv.list({ prefix: "count:" });
