@@ -115,6 +115,21 @@
   background:rgba(255,255,255,.06); border:1px solid var(--bbb-line); transition:.2s;
 }
 .bbb-ott-mini:hover{background:rgba(255,255,255,.12);}
+/* player control bar */
+.bbb-ott-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;border-radius:12px;background:rgba(0,0,0,.45);border:1px solid var(--bbb-line);}
+.bbb-ott-ctl{padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;color:var(--bbb-text);background:rgba(255,255,255,.08);border:1px solid var(--bbb-line);cursor:pointer;transition:.2s;white-space:nowrap;}
+.bbb-ott-ctl:hover{background:rgba(255,204,0,.18);border-color:var(--bbb-gold);}
+.bbb-ott-vol{flex:1 1 90px;min-width:80px;accent-color:var(--bbb-gold);cursor:pointer;}
+.bbb-ott-quality{padding:7px 8px;border-radius:8px;font-size:12px;font-weight:700;color:var(--bbb-text);background:#1a1a1a;border:1px solid var(--bbb-line);cursor:pointer;}
+.bbb-ott-settings{position:relative;}
+.bbb-ott-settings-menu{position:absolute;right:0;bottom:calc(100% + 8px);z-index:20;width:210px;padding:12px;border-radius:12px;background:#141414;border:1px solid var(--bbb-line);box-shadow:0 10px 30px rgba(0,0,0,.6);}
+.bbb-ott-settings-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--bbb-muted);margin-bottom:8px;}
+.bbb-ott-speeds{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.bbb-ott-speeds button{padding:6px 8px;border-radius:7px;font-size:12px;font-weight:600;color:var(--bbb-text);background:rgba(255,255,255,.06);border:1px solid var(--bbb-line);cursor:pointer;}
+.bbb-ott-speeds button.is-on{background:rgba(255,204,0,.2);border-color:var(--bbb-gold);color:var(--bbb-gold);}
+.bbb-ott-cinema{width:100%;margin-top:10px;padding:7px 8px;border-radius:8px;font-size:12px;font-weight:700;color:var(--bbb-text);background:rgba(255,255,255,.06);border:1px solid var(--bbb-line);cursor:pointer;}
+.bbb-ott-theater--wide{grid-template-columns:1fr;}
+.bbb-ott-theater--wide .bbb-ott-chat{display:none;}
 
 /* server toolbar */
 .bbb-ott-servers{
@@ -339,7 +354,7 @@
         -->
         <iframe
           id="bbb-ott-frame"
-          src="https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3"
+          src="https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
           title="Bigg Boss Bangla Live Player"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowfullscreen
@@ -353,30 +368,54 @@
         </div>
       </div>
 
-      <!-- Unmute / refresh helper bar -->
-      <div class="bbb-ott-helper">
-        <span>🔇 Autoplay starts muted — <b>tap the player & press 🔊 to unmute.</b> Buffering? Hit Reload or switch servers.</span>
-        <div class="bbb-ott-helper-btns">
-          <button type="button" class="bbb-ott-mini" id="bbb-ott-fs">⛶ Fullscreen</button>
-          <button type="button" class="bbb-ott-mini" id="bbb-ott-newtab">↗ New Tab</button>
+      <!-- Player controls (YouTube IFrame API) -->
+      <div class="bbb-ott-controls" id="bbb-ott-controls">
+        <button type="button" class="bbb-ott-ctl" id="bbb-ott-play" title="Play / Pause">⏸ Pause</button>
+        <button type="button" class="bbb-ott-ctl" id="bbb-ott-mute" title="Mute / Unmute">🔇 Mute</button>
+        <input type="range" class="bbb-ott-vol" id="bbb-ott-vol" min="0" max="100" value="0" step="1" title="Volume" aria-label="Volume">
+        <select class="bbb-ott-quality" id="bbb-ott-quality" title="Video quality" aria-label="Video quality">
+          <option value="default" selected>Auto quality</option>
+          <option value="hd1080">1080p</option>
+          <option value="hd720">720p</option>
+          <option value="large">480p</option>
+          <option value="medium">360p</option>
+          <option value="small">240p</option>
+        </select>
+        <div class="bbb-ott-settings">
+          <button type="button" class="bbb-ott-ctl" id="bbb-ott-settings" title="Settings">⚙ Settings</button>
+          <div class="bbb-ott-settings-menu" id="bbb-ott-settings-menu" hidden>
+            <div class="bbb-ott-settings-title">Playback speed</div>
+            <div class="bbb-ott-speeds">
+              <button type="button" data-speed="0.5">0.5×</button>
+              <button type="button" data-speed="0.75">0.75×</button>
+              <button type="button" data-speed="1" class="is-on">1× Normal</button>
+              <button type="button" data-speed="1.25">1.25×</button>
+              <button type="button" data-speed="1.5">1.5×</button>
+              <button type="button" data-speed="2">2×</button>
+            </div>
+            <button type="button" class="bbb-ott-cinema" id="bbb-ott-cinema">🎬 Cinema mode (chat hide)</button>
+          </div>
         </div>
+      </div>
+      <div class="bbb-ott-helper">
+        <span>🔇 Autoplay starts muted — <b>press 🔊 to unmute.</b> Buffering? Hit Reload or switch servers.</span>
       </div>
 
       <!-- ===== Multi-Server & Quality Switcher =====
            Paste each server's embed link into its data-src attribute. -->
       <div class="bbb-ott-servers" role="toolbar" aria-label="Stream servers">
         <button type="button" class="bbb-ott-srv is-active"
-          data-src="https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3"
+          data-src="https://www.youtube-nocookie.com/embed/d_sOKhMprNE?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
           data-name="Server 1 • Latest Episode">▶ Server 1<small>Latest Episode</small></button>
           <!-- ▲ Server 1 link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv"
-          data-src="https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3"
+          data-src="https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
           data-name="Server 2 • Episode 78">⚡ Server 2<small>Episode 78</small></button>
           <!-- ▲ Server 2 (backup) link goes in data-src="" above -->
 
         <button type="button" class="bbb-ott-srv"
-          data-src="https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3"
+          data-src="https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
           data-name="Server 3 • Episode 77">📱 Server 3<small>Episode 77</small></button>
           <!-- ▲ Server 3 (low data / mobile) link goes in data-src="" above -->
 
@@ -816,15 +855,78 @@
     toast("🔄 Reloading player…");
   });
 
-  $("#bbb-ott-fs").addEventListener("click", function(){
-    var p = $("#bbb-ott-player");
-    var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
-    if (fn) fn.call(p); else toast("Fullscreen not supported on this device");
-  });
 
-  $("#bbb-ott-newtab").addEventListener("click", function(){
-    var cur = frame.getAttribute("src");
-    if (cur) window.open(cur, "_blank", "noopener"); else toast("No stream link added yet");
+  /* ---------- Live player controls (YouTube IFrame API) ---------- */
+  var livePlayer = null, liveApiReady = false, liveReady = false;
+  function isYT(u){ return !!u && /youtube(-nocookie)?\.com\/embed\//i.test(u); }
+  function ytApiUrl(u){
+    if (!isYT(u)) return u;
+    return /enablejsapi=1/.test(u) ? u : (u + (u.indexOf("?") >= 0 ? "&" : "?") + "enablejsapi=1");
+  }
+  function syncPlayBtn(){
+    var b = $("#bbb-ott-play"); if (!b) return;
+    try { b.textContent = (livePlayer && livePlayer.getPlayerState() === 1) ? "⏸ Pause" : "▶ Play"; } catch (e) {}
+  }
+  function syncMuteBtn(){
+    var b = $("#bbb-ott-mute"); if (!b) return;
+    try { b.textContent = (livePlayer && livePlayer.isMuted()) ? "🔇 Mute" : "🔊 Sound"; } catch (e) {}
+  }
+  function bindLivePlayer(){
+    if (!window.YT || !YT.Player || !isYT(frame.getAttribute("src"))) return;
+    try { if (livePlayer && livePlayer.destroy) livePlayer.destroy(); } catch (e) {}
+    livePlayer = null; liveReady = false;
+    try {
+      livePlayer = new YT.Player(frame, {events:{
+        onReady: function(){ liveReady = true; syncPlayBtn(); syncMuteBtn(); try { var v = livePlayer.getVolume(); var s = $("#bbb-ott-vol"); if (s) s.value = livePlayer.isMuted() ? 0 : v; } catch (e) {} },
+        onStateChange: function(){ syncPlayBtn(); }
+      }});
+    } catch (e) {}
+  }
+  window.onYouTubeIframeAPIReady = function(){ liveApiReady = true; bindLivePlayer(); };
+  (function loadYTApi(){
+    if (window.YT && YT.Player) { liveApiReady = true; bindLivePlayer(); return; }
+    var tag = document.createElement("script"); tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  })();
+  frame.addEventListener("load", function(){ if (liveApiReady) bindLivePlayer(); });
+  $("#bbb-ott-play").addEventListener("click", function(){
+    if (!liveReady || !livePlayer) { toast("Player ready হলে কন্ট্রোল কাজ করবে"); return; }
+    try { if (livePlayer.getPlayerState() === 1) livePlayer.pauseVideo(); else livePlayer.playVideo(); } catch (e) {}
+    setTimeout(syncPlayBtn, 250);
+  });
+  $("#bbb-ott-mute").addEventListener("click", function(){
+    if (!liveReady || !livePlayer) { toast("Player ready হলে কন্ট্রোল কাজ করবে"); return; }
+    try {
+      if (livePlayer.isMuted()) { livePlayer.unMute(); var s = $("#bbb-ott-vol"); livePlayer.setVolume(s && +s.value > 0 ? +s.value : 50); }
+      else livePlayer.mute();
+    } catch (e) {}
+    setTimeout(syncMuteBtn, 150);
+  });
+  $("#bbb-ott-vol").addEventListener("input", function(){
+    if (!liveReady || !livePlayer) return;
+    var v = +this.value;
+    try { livePlayer.setVolume(v); if (v > 0 && livePlayer.isMuted()) livePlayer.unMute(); if (v === 0) livePlayer.mute(); } catch (e) {}
+    setTimeout(syncMuteBtn, 100);
+  });
+  $("#bbb-ott-quality").addEventListener("change", function(){
+    if (!liveReady || !livePlayer) { toast("Player ready হলে quality বদলাবে"); return; }
+    try { livePlayer.setPlaybackQuality(this.value); toast("Quality: " + this.options[this.selectedIndex].text); } catch (e) {}
+  });
+  var setMenu = $("#bbb-ott-settings-menu");
+  $("#bbb-ott-settings").addEventListener("click", function(e){ e.stopPropagation(); setMenu.hidden = !setMenu.hidden; });
+  document.addEventListener("click", function(e){ if (!setMenu.hidden && !setMenu.contains(e.target)) setMenu.hidden = true; });
+  $$(".bbb-ott-speeds button").forEach(function(b){
+    b.addEventListener("click", function(){
+      $$(".bbb-ott-speeds button").forEach(function(x){ x.classList.toggle("is-on", x === b); });
+      if (!liveReady || !livePlayer) { toast("Player ready হলে speed বদলাবে"); return; }
+      try { livePlayer.setPlaybackRate(parseFloat(b.getAttribute("data-speed"))); toast("Speed: " + b.textContent.trim()); } catch (e) {}
+    });
+  });
+  $("#bbb-ott-cinema").addEventListener("click", function(){
+    var t = $(".bbb-ott-theater"); if (!t) return;
+    var wide = t.classList.toggle("bbb-ott-theater--wide");
+    this.textContent = wide ? "🎬 Cinema mode (chat show)" : "🎬 Cinema mode (chat hide)";
+    setMenu.hidden = true;
   });
 
   /* ---------- Viewer counter ---------- */
@@ -1012,9 +1114,9 @@
   }
   /* Site config from Admin Panel (live links + poll names); falls back to built-in values */
   function applyConfig(cfg){
-    if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(cfg.live, "Server 1 • Latest Episode");
-    if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", cfg.s2);
-    if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", cfg.s3);
+    if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Server 1 • Latest Episode");
+    if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", ytApiUrl(cfg.s2));
+    if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", ytApiUrl(cfg.s3));
     if (cfg && cfg.pollNames && cfg.pollNames.length) pollNames = cfg.pollNames;
     if (cfg && cfg.pollPhotos) pollPhotos = cfg.pollPhotos;
   }
