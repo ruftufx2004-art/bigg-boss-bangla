@@ -1,0 +1,46 @@
+name: Extract site zip (one-time)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify zip contents before extracting
+        run: |
+          test -f bigg-boss-site.zip
+          unzip -l bigg-boss-site.zip
+          unzip -l bigg-boss-site.zip | grep -q '_headers' || { echo 'MISSING _headers in zip'; exit 1; }
+          unzip -l bigg-boss-site.zip | grep -q 'functions/_middleware.js' || { echo 'MISSING functions/_middleware.js in zip'; exit 1; }
+          unzip -l bigg-boss-site.zip | grep -q 'functions/api/config.js' || { echo 'MISSING functions/api/config.js in zip'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'bbb-ott-pwa[hidden]' || { echo 'MISSING bbb-ott-pwa[hidden] in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'noindex' || { echo 'MISSING noindex in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'pwaShow' || { echo 'MISSING pwaShow in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'Add to Home screen' || { echo 'MISSING Add to Home screen in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q '24X7 uncut live' || { echo 'MISSING 24X7 uncut live in index.html'; exit 1; }
+          if unzip -p bigg-boss-site.zip index.html | grep -F -q 'bbb-ott-livebtn'; then echo 'STILL CONTAINS bbb-ott-livebtn in index.html'; exit 1; fi
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'bbb-ott-webframe' || { echo 'MISSING bbb-ott-webframe in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip index.html | grep -F -q 'shajgoj.com' || { echo 'MISSING shajgoj.com in index.html'; exit 1; }
+          unzip -p bigg-boss-site.zip admin.html | grep -F -q 'frameTop' || { echo 'MISSING frameTop in admin.html'; exit 1; }
+          unzip -p bigg-boss-site.zip functions/api/config.js | grep -F -q 'frameHeight' || { echo 'MISSING frameHeight in functions/api/config.js'; exit 1; }
+          for C in IN RU SG; do unzip -p bigg-boss-site.zip functions/_middleware.js | grep -F -q "$C" || { echo "MISSING $C in functions/_middleware.js"; exit 1; }; done
+          echo 'Verified: webframe, Shajgoj, admin frameTop, config frameHeight and all earlier fixes present'
+      - name: Extract and clean up
+        run: |
+          unzip -o bigg-boss-site.zip
+          rm -f bigg-boss-site.zip
+          rm -f .github/workflows/extract-site.yml
+          git status --short
+      - name: Commit extracted site
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && echo 'No changes to commit' && exit 0
+          git commit -m 'Website frame: Shajgoj feed + admin up/down controls'
+          git push
