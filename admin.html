@@ -310,7 +310,7 @@ document.getElementById("saveBtn").addEventListener("click", function(){
   msg("সেভ হচ্ছে…", true);
   fetch("/api/config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
     .then(function(r){ if(!r.ok) throw new Error("err"); return r.json(); })
-    .then(function(c){ msg("✅ সেভ হয়েছে! সাইটে গিয়ে দেখুন।", true); if(np){ pw=np; document.getElementById("newPw").value=""; } if(at){ document.getElementById("adToken").value=""; loadAdsterra(); } fillConfig(c); })
+    .then(function(c){ if(c.kvPending && c.kvPending.length){ msg("✅ লাইভ সেটিংস সেভ হয়েছে! তবে ভোটের নাম/টোকেন আজ রাতে সেভ হয়নি — কাল সকাল ৬টার পর আবার সেভ করুন।", true); } else { msg("✅ সেভ হয়েছে! সাইটে গিয়ে দেখুন।", true); } if(np){ pw=np; document.getElementById("newPw").value=""; } if(at){ document.getElementById("adToken").value=""; loadAdsterra(); } fillConfig(c); })
     .catch(function(){ msg("❌ সেভ হয়নি — পাসওয়ার্ড ঠিক আছে তো?", false); });
 });
 document.getElementById("statRefresh").addEventListener("click", function(e){ e.preventDefault(); loadInstallStats(); });
