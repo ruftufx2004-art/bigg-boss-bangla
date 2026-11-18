@@ -18,7 +18,7 @@ export async function onRequest(context) {
   const end = new Date();
   const start = new Date(Date.now() - (days - 1) * 86400000);
   const fmt = (d) => d.toISOString().slice(0, 10);
-  const api = "https://api.adsterra.com/publisher/stats.json?start_date=" + fmt(start) + "&finish_date=" + fmt(end);
+  const api = "https://api3.adsterratools.com/publisher/stats.json?start_date=" + fmt(start) + "&finish_date=" + fmt(end) + "&group_by%5B%5D=date";
   let res;
   try {
     res = await fetch(api, { headers: { "X-API-Key": token, "Accept": "application/json" } });
