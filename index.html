@@ -876,8 +876,9 @@
     ovText.textContent = "Paste an embed URL into this button's data-src attribute to enable it.";
   }
 
-  /* A plain website (not a YouTube/Facebook video) goes to the cropped frame */
-  function isWebsite(u){ return isValid(u) && !isYT(u) && !/facebook\.com\/plugins\/video\.php/i.test(u); }
+  /* A plain website (not a YouTube/Facebook/Rumble video) goes to the cropped frame */
+  function isWebsite(u){ return isValid(u) && !isYT(u) && !/facebook\.com\/plugins\/video\.php/i.test(u) && !isRumble(u); }
+  function isRumble(u){ return !!u && /rumble\.com\/embed\//i.test(u); }
   function applyFrameGeometry(){
     if (!webframe) return;
     webframe.style.height = frameCfg.height + "px";
@@ -907,6 +908,11 @@
     if (!isValid(url)) { showVideo(); frame.removeAttribute("src"); showEmpty(name); return false; }
     if (isWebsite(url)) { showWeb(url.trim()); overlay.hidden = true; return true; }
     showVideo();
+    /* Rumble has its own player controls — hide the click shield and the
+       YouTube-only control bar for it, so viewers can play/pause/unmute.
+       YouTube keeps the shield + control bar. */
+    var sh = $("#bbb-ott-shield"); if (sh) sh.style.display = isYT(url) ? "" : "none";
+    var ctl = $("#bbb-ott-controls"); if (ctl) ctl.style.display = isYT(url) ? "" : "none";
     overlay.hidden = false;
     overlay.classList.add("bbb-ott-overlay--loading");
     ovTitle.textContent = "Connecting to " + name + "…";
