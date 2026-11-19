@@ -1,6 +1,9 @@
 // Bigg Boss Bangla — minimal service worker: cache the shell + icons so the
 // installed app opens fast and works offline for the shell.
-const CACHE = "bbb-v1";
+// Live data (/api/*) is NEVER cached — the player, poll, chat and stats must
+// always read fresh values. (An old version cached /api/config, so the site
+// kept showing old episodes even after the live link was changed.)
+const CACHE = "bbb-v2";
 const SHELL = ["/", "/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", function (e) {
@@ -19,6 +22,7 @@ self.addEventListener("fetch", function (e) {
   if (e.request.method !== "GET") return;
   const url = new URL(e.request.url);
   if (url.origin !== self.location.origin) return; // only our own files
+  if (url.pathname.startsWith("/api/")) return; // live data: network only, never cache
   if (e.request.mode === "navigate") {
     // Pages: network first, fall back to cached shell when offline.
     e.respondWith(fetch(e.request).then(function (r) {

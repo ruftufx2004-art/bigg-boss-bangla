@@ -910,6 +910,7 @@
     webiframe.removeAttribute("src");
   }
 
+  var loadTimer = null; /* hides a stuck "Connecting…" overlay if a video iframe is slow */
   /* Load a URL into the player */
   function load(url, name){
     url = extractSrc(url);
@@ -928,6 +929,8 @@
     ovTitle.textContent = "Connecting to " + name + "…";
     ovText.textContent = "সংযোগ করা হচ্ছে, একটু অপেক্ষা করুন…";
     frame.src = url.trim();
+    if (loadTimer) clearTimeout(loadTimer);
+    loadTimer = setTimeout(function(){ overlay.hidden = true; overlay.classList.remove("bbb-ott-overlay--loading"); }, 7000);
     return true;
   }
 
