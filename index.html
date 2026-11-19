@@ -876,9 +876,17 @@
     ovText.textContent = "Paste an embed URL into this button's data-src attribute to enable it.";
   }
 
-  /* A plain website (not a YouTube/Facebook/Rumble video) goes to the cropped frame */
-  function isWebsite(u){ return isValid(u) && !isYT(u) && !/facebook\.com\/plugins\/video\.php/i.test(u) && !isRumble(u); }
-  function isRumble(u){ return !!u && /rumble\.com\/embed\//i.test(u); }
+  /* Any platform's embed code or link works here — paste a plain link or a
+     full <iframe> snippet, YouTube / Facebook / Rumble / TikTok / anything.
+     An embed URL (it has /embed/ in it) plays in the video player; anything
+     else is treated as a plain website and shown in the cropped frame. */
+  function extractSrc(input){
+    var s = (input || "").trim(); if (!s) return "";
+    var m = s.match(/<iframe[^>]*\ssrc\s*=\s*["']([^"']+)["']/i);
+    return m ? m[1] : s;
+  }
+  function isEmbed(u){ return !!u && (/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u)); }
+  function isWebsite(u){ return isValid(u) && !isEmbed(u); }
   function applyFrameGeometry(){
     if (!webframe) return;
     webframe.style.height = frameCfg.height + "px";
@@ -904,13 +912,15 @@
 
   /* Load a URL into the player */
   function load(url, name){
+    url = extractSrc(url);
     nowTag.textContent = "▶ " + name;
     if (!isValid(url)) { showVideo(); frame.removeAttribute("src"); showEmpty(name); return false; }
     if (isWebsite(url)) { showWeb(url.trim()); overlay.hidden = true; return true; }
     showVideo();
-    /* Rumble has its own player controls — hide the click shield and the
-       YouTube-only control bar for it, so viewers can play/pause/unmute.
-       YouTube keeps the shield + control bar. */
+    /* Every platform has its own player controls — hide the click shield and
+       the YouTube-only control bar for non-YouTube embeds, so viewers can
+       use the platform's own play/pause/unmute. YouTube keeps the shield
+       + control bar. */
     var sh = $("#bbb-ott-shield"); if (sh) sh.style.display = isYT(url) ? "" : "none";
     var ctl = $("#bbb-ott-controls"); if (ctl) ctl.style.display = isYT(url) ? "" : "none";
     overlay.hidden = false;
@@ -1490,6 +1500,9 @@
     if (cfg && typeof cfg.frameTop === "number") frameCfg.top = Math.max(0, cfg.frameTop);
     if (cfg && typeof cfg.frameHeight === "number") frameCfg.height = Math.min(1200, Math.max(200, cfg.frameHeight));
     if (cfg && typeof cfg.frameZoom === "number") frameCfg.zoom = Math.min(2, Math.max(0.5, cfg.frameZoom));
+    if (cfg && cfg.live) cfg.live = extractSrc(cfg.live);
+    if (cfg && cfg.s2) cfg.s2 = extractSrc(cfg.s2);
+    if (cfg && cfg.s3) cfg.s3 = extractSrc(cfg.s3);
     if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Server 1");
     if (webframe && !webframe.hidden) applyFrameGeometry();
     if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", ytApiUrl(cfg.s2));
