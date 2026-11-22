@@ -5,8 +5,10 @@
 // LIVE settings (live, s2, s3, frameTop, frameHeight, frameZoom, serversOn)
 // live in Supabase (table live_config, row id=1) — no KV daily-write limit.
 // Poll names/photos, the Adsterra token and the admin password stay in KV,
-// as do votes, chat and stats. If Supabase is not configured, live settings
-// fall back to the old KV keys (cfg:live etc.), so the site keeps working.
+// as do stats. Votes and chat moved to Supabase 2026-11-22 (tables
+// poll_votes, poll_voters, chat_messages, chat_rate). If Supabase is not
+// configured, live settings fall back to the old KV keys (cfg:live etc.),
+// so the site keeps working.
 // Deploy marker 2026-11-18 20:30 — forces a fresh Pages deployment from
 // GitHub so the Function re-binds the current SUPABASE_SERVICE_KEY env var
 // (dashboard "Retry deployment" redeploys did not pick the new value up).
@@ -155,12 +157,23 @@ export async function onRequest(context) {
     if (typeof body.adsterraToken === "string" && body.adsterraToken.trim()) await kvTry("adsterraToken", () => kv.put("adsterra:token", body.adsterraToken.trim()));
     if (typeof body.newPassword === "string" && body.newPassword.length >= 4) await kvTry("newPassword", () => kv.put("admin:password", body.newPassword));
     if (body.resetPoll) {
-      await kvTry("resetPoll", async () => {
-        const counts = await kv.list({ prefix: "count:" });
-        for (const k of counts.keys) await kv.delete(k.key);
-        const voted = await kv.list({ prefix: "voted:" });
-        for (const k of voted.keys) await kv.delete(k.key);
-      });
+      if (sbConfigured(env)) {
+        // Votes live in Supabase now: zero the counts, delete all voters.
+        await kvTry("resetPoll", async () => {
+          const base = env.SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/";
+          const r1 = await fetch(base + "poll_votes?count=gte.0", { method: "PATCH", headers: { ...sbHeaders(env), "Content-Type": "application/json" }, body: JSON.stringify({ count: 0 }), signal: timeoutSignal(8000) });
+          if (!r1.ok) throw new Error("reset votes " + r1.status);
+          const r2 = await fetch(base + "poll_voters?device=not.is.null", { method: "DELETE", headers: sbHeaders(env), signal: timeoutSignal(8000) });
+          if (!r2.ok) throw new Error("reset voters " + r2.status);
+        });
+      } else {
+        await kvTry("resetPoll", async () => {
+          const counts = await kv.list({ prefix: "count:" });
+          for (const k of counts.keys) await kv.delete(k.key);
+          const voted = await kv.list({ prefix: "voted:" });
+          for (const k of voted.keys) await kv.delete(k.key);
+        });
+      }
     }
     return json({ ...(await readConfig(kv, env)), saved: true, kvPending });
   }
