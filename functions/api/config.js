@@ -11,7 +11,7 @@
 // GitHub so the Function re-binds the current SUPABASE_SERVICE_KEY env var
 // (dashboard "Retry deployment" redeploys did not pick the new value up).
 const DEFAULTS = {
-  live: "https://shop.bihishaan.com/",
+  live: "",
   frameTop: 0,
   frameHeight: 560,
   frameZoom: 1,

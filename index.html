@@ -410,30 +410,23 @@
         <span class="bbb-ott-nowtag" id="bbb-ott-nowtag">▶ Server 1 • Main Live HD</span>
 
         <!--
-          ============================================================
-          ▼▼▼  PASTE YOUR MAIN LIVE STREAM EMBED LINK BELOW  ▼▼▼
-          Replace the src="" value with your embed URL, e.g.:
-            YouTube Live : https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1
-            YouTube Chan.: https://www.youtube.com/embed/live_stream?channel=CHANNEL_ID&autoplay=1&mute=1
-            Facebook Live: https://www.facebook.com/plugins/video.php?href=ENCODED_VIDEO_URL&autoplay=1
-            M3U8 / other : any iframe-able player page URL (e.g. an HLS web player page)
-          TIP: Also paste the same link into Server 1's data-src below
-               so the server buttons keep working.
-          ============================================================
+          NOTE: Do NOT put any URL in this iframe's src. The live link comes
+          from the Admin Panel (/api/config) and is loaded by applyConfig()
+          after the page loads. A hardcoded src here would play FIRST and
+          visitors would see that preview before the real live appears.
         -->
         <iframe
           id="bbb-ott-frame"
-          src="https://shop.bihishaan.com/"
           title="Bigg Boss Bangla Live Player"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowfullscreen
           referrerpolicy="strict-origin-when-cross-origin"
           loading="eager"></iframe>
 
-        <div class="bbb-ott-overlay" id="bbb-ott-overlay">
+        <div class="bbb-ott-overlay bbb-ott-overlay--loading" id="bbb-ott-overlay">
           <div class="bbb-ott-overlay-eye">👁</div>
-          <h3 id="bbb-ott-ov-title">Stream link not added yet</h3>
-          <p id="bbb-ott-ov-text">Paste a YouTube Live, Facebook Live or iframe embed link into the player <code>src</code> and server buttons to start streaming.</p>
+          <h3 id="bbb-ott-ov-title">Connecting to live feed…</h3>
+          <p id="bbb-ott-ov-text">সংযোগ করা হচ্ছে, একটু অপেক্ষা করুন…</p>
         </div>
         <div class="bbb-ott-shield" id="bbb-ott-shield"></div>
       </div>
@@ -482,10 +475,10 @@
            Paste each server's embed link into its data-src attribute. -->
       <div class="bbb-ott-servers" role="toolbar" aria-label="Stream servers">
         <button type="button" class="bbb-ott-srv is-active"
-          data-src="https://shop.bihishaan.com/"
+          data-src=""
           data-srv="s1"
           data-name="Server 1">▶ Server 1</button>
-          <!-- ▲ Server 1 link goes in data-src="" above -->
+          <!-- ▲ Server 1 link comes from /api/config (Admin Panel) — keep data-src empty here -->
 
         <button type="button" class="bbb-ott-srv"
           data-src="https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
@@ -1508,6 +1501,7 @@
     if (cfg && cfg.s3) cfg.s3 = extractSrc(cfg.s3);
     if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Server 1");
     if (webframe && !webframe.hidden) applyFrameGeometry();
+    if (cfg && cfg.live && servers[0]) servers[0].setAttribute("data-src", ytApiUrl(cfg.live));
     if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", ytApiUrl(cfg.s2));
     if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", ytApiUrl(cfg.s3));
     if (cfg && cfg.serversOn) {
@@ -1527,9 +1521,10 @@
     }
     if (cfg && cfg.pollNames && cfg.pollNames.length) pollNames = cfg.pollNames;
     if (cfg && cfg.pollPhotos) pollPhotos = cfg.pollPhotos;
+    if (!frame.getAttribute("src") && !(cfg && cfg.live)) showEmpty("Server 1");
   }
   if (pollList) {
-    fetch("/api/config",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); pollLoad(); }).catch(function(){ pollLoad(); });
+    fetch("/api/config",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); pollLoad(); }).catch(function(){ pollLoad(); if (!frame.getAttribute("src")) { overlay.hidden = false; overlay.classList.remove("bbb-ott-overlay--loading"); ovTitle.textContent = "লাইভ লোড হয়নি"; ovText.textContent = "পেজটা একবার রিফ্রেশ করুন।"; } });
   }
 })();
 </script>
