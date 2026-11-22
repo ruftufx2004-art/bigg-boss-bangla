@@ -1,0 +1,32 @@
+{
+  "background_color": "#0a0a0a",
+  "description": "Bigg Boss Bangla Season 3 — LIVE, সব এপিসোড আর ভোট পোল, এক অ্যাপে।",
+  "display": "standalone",
+  "icons": [
+    {
+      "purpose": "any",
+      "sizes": "192x192",
+      "src": "/icons/icon-192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "512x512",
+      "src": "/icons/icon-512.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "/icons/icon-maskable-512.png",
+      "type": "image/png"
+    }
+  ],
+  "lang": "bn",
+  "name": "24X 7 Live",
+  "orientation": "portrait",
+  "scope": "/",
+  "short_name": "24X 7 Live",
+  "start_url": "/",
+  "theme_color": "#0a0a0a"
+}
