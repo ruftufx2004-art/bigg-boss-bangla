@@ -420,7 +420,7 @@
         <iframe
           id="bbb-ott-frame"
           title="Bigg Boss Bangla Live Player"
-          src="https://ok.ru/videoembed/17758882569855?nochat=1"
+          src="https://ok.ru/videoembed/17758882569855?nochat=1&autoplay=1"
           sandbox="allow-scripts allow-same-origin"
           allow="autoplay; encrypted-media; picture-in-picture"
           referrerpolicy="strict-origin-when-cross-origin"
@@ -899,11 +899,10 @@
     /* Our own player state for non-YouTube embeds (Kick / OK.ru / ...):
        there is no player API, so Play/Pause works by loading /
        unloading the iframe. The embed counts as loaded once load()
-       sets its src. OK.ru is started by the viewer tapping its own ▶
-       in the open player (the shield covers only the top row — see
-       the shield CSS) — its autoplay flag was unreliable and often
-       left a blank frame, so no autoplay reload is used. Kick
-       autoplays. */
+       sets its src. OK.ru autoplays (muted) via ?autoplay=1 (site-33)
+       — the viewer-tap start proved flaky, autoplay is reliable.
+       The shield covers only the top row (see the shield CSS). Kick
+       autoplays too. */
     extUrl = ""; extStarted = false;
     if (isEmbed(url) && !isYT(url)) { extUrl = url.trim(); extStarted = true; }
     if (!isValid(url)) { showVideo(); frame.removeAttribute("src"); return false; }
@@ -1008,13 +1007,13 @@
   function isYT(u){ return !!u && /youtube(-nocookie)?\.com\/embed\//i.test(u); }
   function isKick(u){ return !!u && /player\.kick\.com\//i.test(u); }
   function isOkEmbed(u){ return !!u && /ok\.ru\/videoembed\//i.test(u); }
-  /* NOTE: OK.ru used to be started by reloading the embed with
-     ?autoplay=1, but that flag is unreliable — it often leaves a
-     blank frame with no play button, and the site went black even
-     while the same video played fine directly on OK.ru. OK.ru now
-     loads plain and the viewer starts it by tapping its own ▶ in the
-     open player (the shield covers only the top row — see the shield
-     CSS). No autoplay param is used anywhere. */
+  /* NOTE (site-33): OK.ru now autoplays (muted) with ?autoplay=1. The
+     viewer-tap start proved flaky — the poster's ▶ sometimes never
+     appeared, and sometimes a tap did nothing. Autoplay was verified
+     on the test page (test-embed.html iframe C): the same embed
+     starts on its own within ~30s, muted, no click needed. (The old
+     autoplay warning was from the JS-set-src era; with the src in
+     HTML it works.) The shield still covers only the top row. */
   function ytApiUrl(u){
     if (!u) return u;
     /* An OK.ru watch link (ok.ru/video/<id>) or live-page link
@@ -1022,9 +1021,11 @@
        it as a website. Convert it to the videoembed URL (no chat), so
        pasting any OK.ru link just works. */
     var ok = u.match(/ok\.ru\/video\/(\d+)/i);
-    if (ok) return "https://ok.ru/videoembed/" + ok[1] + "?nochat=1";
+    if (ok) return "https://ok.ru/videoembed/" + ok[1] + "?nochat=1&autoplay=1";
     var okl = u.match(/ok\.ru\/live\/(\d+)/i);
-    if (okl) return "https://ok.ru/videoembed/" + okl[1] + "?nochat=1";
+    if (okl) return "https://ok.ru/videoembed/" + okl[1] + "?nochat=1&autoplay=1";
+    /* A plain OK.ru videoembed link gets autoplay too (site-33). */
+    if (/ok\.ru\/videoembed\//i.test(u) && !/autoplay=/i.test(u)) u = u + (u.indexOf("?") >= 0 ? "&" : "?") + "autoplay=1";
     /* A raw YouTube page link (watch / live / shorts / youtu.be) is not an
        embed URL — the player would treat it as a website and YouTube
        refuses to frame it. Convert it to a nocookie embed URL first. */

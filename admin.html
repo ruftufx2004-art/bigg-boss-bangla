@@ -169,9 +169,10 @@ function extractSrc(input){
 function toEmbed(u){
   u=extractSrc(u); if(!u) return "";
   if(u.indexOf("//")===0) u="https:"+u; /* protocol-relative link (//ok.ru/...) -> https */
-  var m=u.match(/ok\.ru\/video\/(\d+)/i); if(m) return "https://ok.ru/videoembed/"+m[1]+"?nochat=1"; /* OK.ru watch link -> videoembed */
-  m=u.match(/ok\.ru\/live\/(\d+)/i); if(m) return "https://ok.ru/videoembed/"+m[1]+"?nochat=1"; /* OK.ru live-page link -> videoembed */
-  m=u.match(/^\d{8,}$/); if(m) return "https://ok.ru/videoembed/"+m[0]+"?nochat=1"; /* bare OK.ru video ID -> videoembed */
+  var m=u.match(/ok\.ru\/video\/(\d+)/i); if(m) return "https://ok.ru/videoembed/"+m[1]+"?nochat=1&autoplay=1"; /* OK.ru watch link -> videoembed (autoplay, site-33) */
+  m=u.match(/ok\.ru\/live\/(\d+)/i); if(m) return "https://ok.ru/videoembed/"+m[1]+"?nochat=1&autoplay=1"; /* OK.ru live-page link -> videoembed (autoplay, site-33) */
+  m=u.match(/^\d{8,}$/); if(m) return "https://ok.ru/videoembed/"+m[0]+"?nochat=1&autoplay=1"; /* bare OK.ru video ID -> videoembed (autoplay, site-33) */
+  if(/ok\.ru\/videoembed\//i.test(u) && !/autoplay=/i.test(u)) return u+(u.indexOf("?")>=0?"&":"?")+"autoplay=1"; /* OK.ru videoembed link -> add autoplay (site-33) */
   m=u.match(/[?&]v=([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[1]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
   m=u.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[1]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
   m=u.match(/\/(live|shorts)\/([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[2]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
