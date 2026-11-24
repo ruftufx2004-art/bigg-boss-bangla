@@ -110,6 +110,13 @@
     </div>
 
     <div class="card">
+      <h2>💬 লাইভ চ্যাট — Admin নাম</h2>
+      <p class="hint">চ্যাটে <b style="color:var(--gold)">Admin</b> নামটি শুধু আপনার। এই বোতামটি চাপলে এই ডিভাইসটি Admin হিসেবে নিবন্ধিত হবে — এরপর এই ডিভাইস থেকে চ্যাট করলে আপনার নাম Admin দেখাবে। অন্য কেউ Admin নাম নিতে পারবে না; বাকি সবাই একটা করে আলাদা কিউট নাম (Classy, Muse, Oggy…) পাবে। প্রতিটি ডিভাইসে (ফোন / কম্পিউটার) একবার করে করুন।</p>
+      <button class="ghost" id="regAdminBtn" type="button">👑 এই ডিভাইসকে Admin হিসেবে নিবন্ধন করুন</button>
+      <span id="regAdminMsg" class="hint"></span>
+    </div>
+
+    <div class="card">
       <h2>📱 অ্যাপ ইনস্টল — লাইভ</h2>
       <div class="stats">
         <div class="stat"><b class="ok" id="statInstalled">—</b><span>✅ ইনস্টল করেছে</span></div>
@@ -350,6 +357,17 @@ document.getElementById("resetBtn").addEventListener("click", function(){
     .then(function(r){ if(!r.ok) throw new Error("err"); return r.json(); })
     .then(function(){ msg("✅ সব ভোট রিসেট হয়েছে।", true); })
     .catch(function(){ msg("❌ রিসেট হয়নি।", false); });
+});
+document.getElementById("regAdminBtn").addEventListener("click", function(){
+  var el = document.getElementById("regAdminMsg");
+  var dev = null;
+  try { dev = localStorage.getItem("bbb-poll-device"); } catch (e) {}
+  if (!dev) { dev = "d" + Date.now().toString(36) + Math.random().toString(36).slice(2,10); try { localStorage.setItem("bbb-poll-device", dev); } catch (e) {} }
+  el.textContent = "নিবন্ধন হচ্ছে…";
+  fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"setadmin", device:dev, password:pw})})
+    .then(function(r){ if(!r.ok) throw new Error("err"); return r.json(); })
+    .then(function(){ el.textContent = "✅ এই ডিভাইসটি এখন Admin — চ্যাটে আপনার নাম Admin দেখাবে।"; })
+    .catch(function(){ el.textContent = "❌ হয়নি — পাসওয়ার্ড ঠিক আছে তো?"; });
 });
 </script>
 </body>

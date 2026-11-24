@@ -523,7 +523,7 @@
       </div>
       <div class="bbb-ott-chat-list" id="bbb-ott-chat-list" aria-live="polite"></div>
       <form class="bbb-ott-chat-form" id="bbb-ott-chat-form" autocomplete="off">
-        <input type="text" id="bbb-ott-chat-name" maxlength="20" placeholder="নাম" aria-label="Your name" />
+        <input type="text" id="bbb-ott-chat-name" maxlength="20" placeholder="নাম" aria-label="Your name" readonly />
         <input type="text" id="bbb-ott-chat-input" maxlength="200" placeholder="আপনার মতামত লিখুন… Say something!" aria-label="Chat message" />
         <button type="submit">Send</button>
       </form>
@@ -1418,6 +1418,7 @@
       var nm = myChatName() || "Fan";
       chatPost({device: deviceId, name: nm, text: v, parent: m.id}).then(function(d){
         myPostedIds.add(d.message.id); saveMyPosted();
+        if (d.message && d.message.name) { nameInput.value = d.message.name; try { localStorage.setItem("bbb-chat-name", d.message.name); } catch (e) {} }
         renderChatMsg(d.message, true); ri.value = ""; rf.classList.remove("is-on");
       }).catch(function(){});
     });
@@ -1511,6 +1512,8 @@
     var nm = myChatName() || "Fan";
     chatPost({device: deviceId, name: nm, text: v}).then(function(d){
       myPostedIds.add(d.message.id); saveMyPosted();
+      // The server assigns each device one unique cute name — show it in the name box.
+      if (d.message && d.message.name) { nameInput.value = d.message.name; try { localStorage.setItem("bbb-chat-name", d.message.name); } catch (e) {} }
       renderChatMsg(d.message, true);
       input.value = ""; input.focus();
       loadRealCounts();
@@ -1524,6 +1527,14 @@
   var pollPhotos = {"Monami Ghosh": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-4603.jpg", "Durnibar Saha": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-927.jpg", "Niranjan Mondal (Laughtersane)": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-1237.jpg", "Tanushree Roy Das": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-2519.jpg", "Srijla Guha": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-3976.jpg", "Rajveer Dey": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111195628-9939.jpg", "Jeetu Kamal": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111195840-8371.jpg", "Sourav Das": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111184132-5879.jpg", "Ranieeta Dash": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111184423-4386.jpg"};
   var deviceId = localStorage.getItem("bbb-poll-device");
   if (!deviceId) { deviceId = "d" + Date.now().toString(36) + Math.random().toString(36).slice(2,10); localStorage.setItem("bbb-poll-device", deviceId); }
+  // Cute default chat name: the server gives each device one unique cute name.
+  // Fetch the assigned name (if any) so the name box shows it; a brand-new
+  // device gets its name on its first post (lazy — saves KV writes).
+  try {
+    fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"myname", device: deviceId})}).then(function(r){ return r.json(); }).then(function(d){
+      if (d && d.name) { nameInput.value = d.name; try { localStorage.setItem("bbb-chat-name", d.name); } catch (e) {} }
+    }).catch(function(){});
+  } catch (e) {}
   /* ---------- Site stats tracking (Admin Panel) ---------- */
   (function(){
     function track(t){ try { fetch("/api/track", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:t, page:location.pathname, device:deviceId})}).catch(function(){}); } catch (e) {} }

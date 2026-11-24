@@ -13,6 +13,42 @@ function json(data, status) {
   return new Response(JSON.stringify(data), { status: status || 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
 }
 function clean(s) { return String(s || "").replace(/[\u0000-\u001F\u007F]/g, "").trim(); }
+// Cute default chat names — one name per device, never reused while taken.
+// "Admin" is reserved and never in this pool; only Samiya's registered device may use it.
+const CUTE_NAMES = ["Classy","Muse","Oggy","Bani","Mimi","Coco","Lulu","Piku","Tofu","Momo","Kiki","Bubu","Chiku","Golu","Pingu","Simba","Nala","Milo","Luna","Oreo","Biscuit","Choco","Snowy","Chintu","Mintu","Tuni","Piu","Riku","Sona","Mitu","Jolly","Happy","Lucky","Cookie","Brownie","Pebble","Nimbus","Zuzu","Poppy"];
+const DEFAULT_ADMIN_PASSWORD = "biggboss2026";
+async function kvGet(env, key) {
+  try { if (env.POLL_KV) return await env.POLL_KV.get(key); } catch (e) {}
+  return null;
+}
+async function kvPut(env, key, val) {
+  try { if (env.POLL_KV) await env.POLL_KV.put(key, val); } catch (e) {}
+}
+async function kvDel(env, key) {
+  try { if (env.POLL_KV) await env.POLL_KV.delete(key); } catch (e) {}
+}
+async function getDeviceName(env, device) {
+  return await kvGet(env, "chatname:device:" + device);
+}
+// Assign the next free cute name to a device (one name per device, one device per name).
+// Names are assigned lazily on first post, so visitors who never chat cost no KV writes.
+async function assignCuteName(env, device) {
+  var start = 0;
+  for (var i = 0; i < device.length; i++) start = (start * 31 + device.charCodeAt(i)) >>> 0;
+  for (var k = 0; k < CUTE_NAMES.length; k++) {
+    var cand = CUTE_NAMES[(start + k) % CUTE_NAMES.length];
+    var used = await kvGet(env, "chatname:used:" + cand);
+    if (!used) {
+      await kvPut(env, "chatname:used:" + cand, device);
+      await kvPut(env, "chatname:device:" + device, cand);
+      return cand;
+    }
+  }
+  // Pool exhausted — fall back to a numbered name so the chat never blocks.
+  var n2 = CUTE_NAMES[start % CUTE_NAMES.length] + (10 + Math.floor(Math.random() * 90));
+  await kvPut(env, "chatname:device:" + device, n2);
+  return n2;
+}
 function sbConfigured(env) {
   return !!(env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY);
 }
@@ -70,6 +106,22 @@ export async function onRequest(context) {
   try { body = await request.json(); } catch (e) { return json({ error: "bad json" }, 400); }
   const device = clean(body.device).slice(0, 64);
   if (!device) return json({ error: "no device" }, 400);
+  // --- my assigned name (read-only — names are assigned on first post, not here) ---
+  if (body.action === "myname") {
+    var mine = await getDeviceName(env, device);
+    return json({ ok: true, name: mine || null });
+  }
+  // --- register this device as Admin (password-protected, Admin Panel only) ---
+  if (body.action === "setadmin") {
+    if (!env.POLL_KV) return json({ error: "KV not bound yet" }, 500);
+    var pw = (await kvGet(env, "admin:password")) || DEFAULT_ADMIN_PASSWORD;
+    if (clean(body.password) !== pw) return json({ error: "wrong password" }, 403);
+    var old = await getDeviceName(env, device);
+    if (old && old !== "Admin") await kvDel(env, "chatname:used:" + old);
+    await kvPut(env, "chatname:device:" + device, "Admin");
+    await kvPut(env, "chatname:used:Admin", device);
+    return json({ ok: true, name: "Admin" });
+  }
   // --- like / reaction toggle ---
   if (body.action === "like" || body.action === "react") {
     let m;
@@ -100,8 +152,16 @@ export async function onRequest(context) {
   }
   // --- new message / reply ---
   const text = clean(body.text).slice(0, 200);
-  const name = clean(body.name).slice(0, 20) || "Fan";
   if (!text) return json({ error: "empty" }, 400);
+  // Server-authoritative display name: the device's assigned cute name, or
+  // "Admin" only for Samiya's registered device. The name the browser sends
+  // is ignored, so nobody can take another user's name or pretend to be Admin.
+  var name = await getDeviceName(env, device);
+  if (!name) name = await assignCuteName(env, device);
+  if (!name) {
+    name = clean(body.name).slice(0, 20) || "Fan";
+    if (name.toLowerCase() === "admin") name = "Fan"; // KV down: never let anyone claim Admin
+  }
   try {
     const rateRes = await sbReq(env, "chat_rate?device=eq." + encodeURIComponent(device) + "&select=last_ms");
     if (rateRes.ok) {
