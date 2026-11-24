@@ -880,7 +880,6 @@
     webframe.hidden = false; webframe.classList.add("is-on");
     $("#bbb-ott-player").style.display = "none";
     if (controls) controls.style.display = "none";
-    if (helper) helper.style.display = "none";
     applyFrameGeometry();
     webiframe.src = url;
   }
@@ -888,7 +887,6 @@
     webframe.hidden = true; webframe.classList.remove("is-on");
     $("#bbb-ott-player").style.display = "";
     if (controls) controls.style.display = "";
-    if (helper) helper.style.display = "";
     webiframe.removeAttribute("src");
   }
 
