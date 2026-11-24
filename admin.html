@@ -53,7 +53,7 @@
   <div id="panel">
     <div class="card">
       <h2>📺 LIVE NOW প্লেয়ার</h2>
-      <label>Server 1 — Main Live (যেকোনো প্ল্যাটফর্মের Embed লিংক বা কোড — YouTube / Facebook / Rumble / TikTok / Kick)</label>
+      <label>Server 1 — Main Live (যেকোনো প্ল্যাটফর্মের Embed লিংক বা কোড — YouTube / Facebook / Rumble / TikTok / Kick / OK.ru)</label>
       <div class="row"><input type="text" id="live" placeholder="Embed লিংক বা পুরো <iframe> কোড বসাও"><button class="ghost srvTgl" id="tglS1" type="button" data-srv="s1">🟢 চালু</button></div>
       <p class="hint">YouTube-এর সাধারণ watch লিংক দিলেও চলবে, নিজে থেকে Embed বানিয়ে নেবে।</p>
       <label>Server 2 — (যেকোনো প্ল্যাটফর্মের Embed লিংক বা কোড)</label>
@@ -70,7 +70,7 @@
       </div>
       <button class="ghost" id="srvRefresh3" type="button">🔄 Server 3 প্রিভিউ রিফ্রেশ</button>
       <p class="hint">🟢 চালু / 🔴 বন্ধ — বন্ধ সার্ভার সাইটে দেখাবে না, লিংকটা ব্যাকআপ হিসেবে থেকে যাবে। আবার চালু করতে বোতাম চেপে নিচের 💾 সেভ করুন চাপুন।</p>
-      <p class="hint">যেকোনো প্ল্যাটফর্মের embed লিংক বা পুরো &lt;iframe&gt; কোড দিলে ভিডিও চলবে — YouTube, Facebook, Rumble, TikTok, Kick যেকোনোটা। আর কোনো ওয়েবসাইটের লিংক (যেমন shajgoj.com) দিলে সেই সাইটের একটা অংশ ফ্রেমে দেখাবে।</p>
+      <p class="hint">যেকোনো প্ল্যাটফর্মের embed লিংক বা পুরো &lt;iframe&gt; কোড দিলে ভিডিও চলবে — YouTube, Facebook, Rumble, TikTok, Kick, OK.ru যেকোনোটা। আর কোনো ওয়েবসাইটের লিংক (যেমন shajgoj.com) দিলে সেই সাইটের একটা অংশ ফ্রেমে দেখাবে।</p>
     </div>
 
     <div class="card">
@@ -168,6 +168,7 @@ function extractSrc(input){
 }
 function toEmbed(u){
   u=extractSrc(u); if(!u) return "";
+  if(u.indexOf("//")===0) u="https:"+u; /* protocol-relative link (//ok.ru/...) -> https */
   var m=u.match(/[?&]v=([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[1]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
   m=u.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[1]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
   m=u.match(/\/(live|shorts)\/([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[2]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
@@ -218,7 +219,7 @@ function loadAdsterra(){
 function isWebsiteLink(u){
   u=extractSrc(u);
   if(!u) return false;
-  return !(/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u) || /player\.kick\.com\//i.test(u));
+  return !(/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u) || /player\.kick\.com\//i.test(u) || /ok\.ru\/videoembed\//i.test(u));
 }
 function loadFramePreview(){
   var live=document.getElementById("live").value||"";

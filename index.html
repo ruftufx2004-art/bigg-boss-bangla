@@ -874,15 +874,16 @@
 
   /* Any platform's embed code or link works here — paste a plain link or a
      full <iframe> snippet, YouTube / Facebook / Rumble / TikTok / Kick /
-     anything. An embed URL (it has /embed/ in it, or is a Kick player link
-     player.kick.com/...) plays in the video player; anything else is
-     treated as a plain website and shown in the cropped frame. */
+     OK.ru / anything. An embed URL (it has /embed/ in it, or is a Kick
+     player link player.kick.com/... or an OK.ru videoembed link) plays
+     in the video player; anything else is treated as a plain website
+     and shown in the cropped frame. */
   function extractSrc(input){
     var s = (input || "").trim(); if (!s) return "";
     var m = s.match(/<iframe[^>]*\ssrc\s*=\s*["']([^"']+)["']/i);
     return m ? m[1] : s;
   }
-  function isEmbed(u){ return !!u && (/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u) || /player\.kick\.com\//i.test(u)); }
+  function isEmbed(u){ return !!u && (/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u) || /player\.kick\.com\//i.test(u) || /ok\.ru\/videoembed\//i.test(u)); }
   function isWebsite(u){ return isValid(u) && !isEmbed(u); }
   function applyFrameGeometry(){
     if (!webframe) return;
@@ -929,12 +930,12 @@
       ctl.style.display = "";
       $$(".bbb-ott-yt-only").forEach(function(el){ el.style.display = isYT(url) ? "" : "none"; });
     }
-    /* Kick must not be able to take viewers away to kick.com: sandbox the
-       frame (no top navigation, no popups) and turn off the player's own
-       fullscreen, so the only fullscreen is the site's own Fullscreen /
-       Landscape buttons above. YouTube and other embeds keep the
-       unsandboxed frame. */
-    if (isKick(url)) {
+    /* Kick and OK.ru embeds must not be able to take viewers away to
+       their own sites: sandbox the frame (no top navigation, no popups)
+       and turn off the player's own fullscreen, so the only fullscreen
+       is the site's own Fullscreen / Landscape buttons above. YouTube
+       and other embeds keep the unsandboxed frame. */
+    if (isKick(url) || isOkEmbed(url)) {
       frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
       frame.removeAttribute("allowfullscreen");
       frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
@@ -1022,6 +1023,7 @@
   var livePlayer = null, liveApiReady = false, liveReady = false, liveSyncTimer = null;
   function isYT(u){ return !!u && /youtube(-nocookie)?\.com\/embed\//i.test(u); }
   function isKick(u){ return !!u && /player\.kick\.com\//i.test(u); }
+  function isOkEmbed(u){ return !!u && /ok\.ru\/videoembed\//i.test(u); }
   function ytApiUrl(u){
     if (!u) return u;
     /* A raw YouTube page link (watch / live / shorts / youtu.be) is not an
