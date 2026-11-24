@@ -191,7 +191,8 @@
 .bbb-ott-chat-ad .bbb-ott-ad{margin:0;}
 .bbb-ott-msg{display:flex; gap:9px; align-items:flex-start; animation:bbbOttIn .35s ease;}
 @keyframes bbbOttIn{from{opacity:0; transform:translateY(8px);}to{opacity:1; transform:none;}}
-.bbb-ott-av{flex:0 0 30px; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff; border:1px solid rgba(255,255,255,.28); box-shadow:0 2px 8px rgba(0,0,0,.35); text-shadow:0 1px 2px rgba(0,0,0,.35);}
+.bbb-ott-av{flex:0 0 30px; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff; border:1px solid rgba(255,255,255,.28); box-shadow:0 2px 8px rgba(0,0,0,.35); text-shadow:0 1px 2px rgba(0,0,0,.35); position:relative; overflow:hidden;}
+.bbb-ott-av img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:50%;}
 .bbb-ott-msg-body{min-width:0; font-size:13px; font-family:'Hind Siliguri','Poppins',sans-serif;}
 .bbb-ott-msg-body b{font-family:'Poppins',sans-serif; font-size:12px; margin-right:6px;}
 .bbb-ott-msg-body p{margin:1px 0 0; color:#dcdce6; word-wrap:break-word; overflow-wrap:anywhere;}
@@ -1283,9 +1284,10 @@
   var input = $("#bbb-ott-chat-input");
   var nameInput = $("#bbb-ott-chat-name");
   var CHAT_REACTS = ["👍","❤️","😂","😮","😢","😡"];
-  // Individual profile avatar per user: a deterministic gradient + initial letter.
-  // Same username always gets the same avatar (name hash), different users get different gradients.
-  var chatAvatars = [["#f43f5e","#fb923c"],["#f59e0b","#facc15"],["#10b981","#34d399"],["#06b6d4","#22d3ee"],["#3b82f6","#60a5fa"],["#8b5cf6","#c084fc"],["#ec4899","#f472b6"],["#14b8a6","#2dd4bf"],["#f97316","#fb7185"],["#6366f1","#a78bfa"]];
+  // Individual profile avatar per user: a cute cat/dog picture, picked by name hash.
+  // Same username always gets the same animal. Gradient + initial stays underneath as a fallback if the picture fails to load.
+  var chatAvatarImgs = ["https://bigg-boss-bangla.pages.dev/avatars/cat-1.webp","https://bigg-boss-bangla.pages.dev/avatars/cat-2.webp","https://bigg-boss-bangla.pages.dev/avatars/cat-3.webp","https://bigg-boss-bangla.pages.dev/avatars/cat-4.webp","https://bigg-boss-bangla.pages.dev/avatars/dog-1.webp","https://bigg-boss-bangla.pages.dev/avatars/dog-2.webp","https://bigg-boss-bangla.pages.dev/avatars/dog-3.webp","https://bigg-boss-bangla.pages.dev/avatars/dog-4.webp"];
+  function chatAvatarImg(name){ var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; return chatAvatarImgs[h % chatAvatarImgs.length]; }
   function chatColor(name){ var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; var g = chatAvatars[h % chatAvatars.length]; return "linear-gradient(135deg," + g[0] + "," + g[1] + ")"; }
   function chatTime(t){
     var s = Math.max(0, Math.floor((Date.now() - t) / 1000));
@@ -1449,6 +1451,11 @@
     av.className = "bbb-ott-av";
     av.style.background = chatColor(m.name);
     av.textContent = (m.name || "F").charAt(0).toUpperCase();
+    var avImg = document.createElement("img");
+    avImg.src = chatAvatarImg(m.name || "F");
+    avImg.alt = "";
+    avImg.onerror = function(){ avImg.remove(); };
+    av.appendChild(avImg);
     var body = document.createElement("div");
     body.className = "bbb-ott-msg-body";
     var b = document.createElement("b");
