@@ -53,12 +53,12 @@
   <div id="panel">
     <div class="card">
       <h2>📺 LIVE NOW প্লেয়ার</h2>
-      <label>Server 1 — Main Live (যেকোনো প্ল্যাটফর্মের Embed লিংক বা কোড — YouTube / Facebook / Rumble / TikTok)</label>
+      <label>Server 1 — Main Live (যেকোনো প্ল্যাটফর্মের Embed লিংক বা কোড — YouTube / Facebook / Rumble / TikTok / Kick)</label>
       <div class="row"><input type="text" id="live" placeholder="Embed লিংক বা পুরো <iframe> কোড বসাও"><button class="ghost srvTgl" id="tglS1" type="button" data-srv="s1">🟢 চালু</button></div>
       <p class="hint">YouTube-এর সাধারণ watch লিংক দিলেও চলবে, নিজে থেকে Embed বানিয়ে নেবে।</p>
-      <label>Server 2 — YouTube Only (শুধু YouTube ভিডিও)</label>
-      <div class="row"><input type="text" id="s2" placeholder="YouTube লিংক বসাও"><button class="ghost srvTgl" id="tglS2" type="button" data-srv="s2">🟢 চালু</button></div>
-      <p class="hint">Server 2-এ শুধু YouTube ভিডিও চলবে — যেকোনো YouTube লিংক (watch / shorts / live), unlisted ভিডিওও চলবে। অন্য প্ল্যাটফর্ম বা ওয়েবসাইটের লিংক দিলে সেভ হবে না।</p>
+      <label>Server 2 — (যেকোনো প্ল্যাটফর্মের Embed লিংক বা কোড)</label>
+      <div class="row"><input type="text" id="s2" placeholder="Embed লিংক বা পুরো <iframe> কোড বসাও"><button class="ghost srvTgl" id="tglS2" type="button" data-srv="s2">🟢 চালু</button></div>
+      <p class="hint">যেকোনো প্ল্যাটফর্মের embed লিংক বা পুরো &lt;iframe&gt; কোড দিলে ভিডিও চলবে — YouTube, Facebook, Rumble, TikTok, Kick যেকোনোটা।</p>
       <div id="srvPreviewWrap2" style="position:relative;overflow:hidden;height:320px;border:1px solid var(--line);border-radius:12px;background:#000;display:none;margin-top:8px">
         <iframe id="srvPreview2" style="position:absolute;left:0;top:0;width:100%;height:100%;border:0;pointer-events:auto" title="Server 2 preview"></iframe>
       </div>
@@ -70,7 +70,7 @@
       </div>
       <button class="ghost" id="srvRefresh3" type="button">🔄 Server 3 প্রিভিউ রিফ্রেশ</button>
       <p class="hint">🟢 চালু / 🔴 বন্ধ — বন্ধ সার্ভার সাইটে দেখাবে না, লিংকটা ব্যাকআপ হিসেবে থেকে যাবে। আবার চালু করতে বোতাম চেপে নিচের 💾 সেভ করুন চাপুন।</p>
-      <p class="hint">যেকোনো প্ল্যাটফর্মের embed লিংক বা পুরো &lt;iframe&gt; কোড দিলে ভিডিও চলবে — YouTube, Facebook, Rumble, TikTok যেকোনোটা। আর কোনো ওয়েবসাইটের লিংক (যেমন shajgoj.com) দিলে সেই সাইটের একটা অংশ ফ্রেমে দেখাবে।</p>
+      <p class="hint">যেকোনো প্ল্যাটফর্মের embed লিংক বা পুরো &lt;iframe&gt; কোড দিলে ভিডিও চলবে — YouTube, Facebook, Rumble, TikTok, Kick যেকোনোটা। আর কোনো ওয়েবসাইটের লিংক (যেমন shajgoj.com) দিলে সেই সাইটের একটা অংশ ফ্রেমে দেখাবে।</p>
     </div>
 
     <div class="card">
@@ -218,7 +218,7 @@ function loadAdsterra(){
 function isWebsiteLink(u){
   u=extractSrc(u);
   if(!u) return false;
-  return !(/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u));
+  return !(/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u) || /player\.kick\.com\//i.test(u));
 }
 function loadFramePreview(){
   var live=document.getElementById("live").value||"";
@@ -251,7 +251,6 @@ function loadServerPreview(n){
   var raw=(field.value||"").trim();
   if(!raw){ wrap.style.display="none"; fr.removeAttribute("src"); return; }
   var url=toEmbed(raw);
-  if(n===2 && url && !/youtube(-nocookie)?\.com\/embed\//i.test(url)){ wrap.style.display="none"; fr.removeAttribute("src"); return; }
   if(isWebsiteLink(url)){
     var top=parseInt(document.getElementById("frameTop").value||"0",10)||0;
     var zm=parseFloat(document.getElementById("frameZoom").value||"1")||1;
@@ -307,10 +306,6 @@ document.getElementById("loginBtn").addEventListener("click", function(){
 })();
 document.getElementById("pw").addEventListener("keydown", function(e){ if(e.key==="Enter") document.getElementById("loginBtn").click(); });
 document.getElementById("saveBtn").addEventListener("click", function(){
-  /* Server 2 is YouTube-only: refuse to save anything while a non-YouTube
-     link sits in the Server 2 field, and say so plainly. */
-  var s2check=toEmbed(document.getElementById("s2").value);
-  if (s2check && !/youtube(-nocookie)?\.com\/embed\//i.test(s2check)) { msg("❌ Server 2-এ শুধু YouTube লিংক দিন — এখন যা আছে সেটা YouTube না, তাই সেভ হয়নি। Server 2-এ YouTube লিংক বসিয়ে আবার সেভ করুন।", false); return; }
   var body={password:pw, live:toEmbed(document.getElementById("live").value), s2:toEmbed(document.getElementById("s2").value), s3:toEmbed(document.getElementById("s3").value),
     frameTop:parseInt(document.getElementById("frameTop").value||"0",10)||0,
     frameHeight:parseInt(document.getElementById("frameHeight").value||"560",10)||560,

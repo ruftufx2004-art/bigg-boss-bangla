@@ -872,15 +872,16 @@
   }
 
   /* Any platform's embed code or link works here — paste a plain link or a
-     full <iframe> snippet, YouTube / Facebook / Rumble / TikTok / anything.
-     An embed URL (it has /embed/ in it) plays in the video player; anything
-     else is treated as a plain website and shown in the cropped frame. */
+     full <iframe> snippet, YouTube / Facebook / Rumble / TikTok / Kick /
+     anything. An embed URL (it has /embed/ in it, or is a Kick player link
+     player.kick.com/...) plays in the video player; anything else is
+     treated as a plain website and shown in the cropped frame. */
   function extractSrc(input){
     var s = (input || "").trim(); if (!s) return "";
     var m = s.match(/<iframe[^>]*\ssrc\s*=\s*["']([^"']+)["']/i);
     return m ? m[1] : s;
   }
-  function isEmbed(u){ return !!u && (/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u)); }
+  function isEmbed(u){ return !!u && (/\/embed\//i.test(u) || /facebook\.com\/plugins\/video\.php/i.test(u) || /player\.kick\.com\//i.test(u)); }
   function isWebsite(u){ return isValid(u) && !isEmbed(u); }
   function applyFrameGeometry(){
     if (!webframe) return;
@@ -963,19 +964,6 @@
   servers.forEach(function(btn){
     btn.addEventListener("click", function(){
       setActive(btn);
-      /* Server 2 shows YouTube videos ONLY — any YouTube link works,
-         including unlisted videos. Anything else is refused here. */
-      if (btn.getAttribute("data-srv") === "s2") {
-        var u2 = btn.getAttribute("data-src") ? ytApiUrl(extractSrc(btn.getAttribute("data-src"))) : "";
-        if (!isYT(u2)) {
-          showVideo(); frame.removeAttribute("src");
-          overlay.hidden = false; overlay.classList.remove("bbb-ott-overlay--loading");
-          ovTitle.textContent = "Server 2 — শুধু YouTube ভিডিও";
-          ovText.textContent = "Server 2-এ শুধু YouTube ভিডিও চলে — অ্যাডমিন প্যানেল থেকে YouTube লিংক দিন (unlisted ভিডিওও চলবে)।";
-          toast("Server 2-এ শুধু YouTube ভিডিও চলবে");
-          return;
-        }
-      }
       var ok = load(btn.getAttribute("data-src"), btn.getAttribute("data-name"));
       toast(ok ? "Switched to " + btn.getAttribute("data-name") : "No link set for " + btn.getAttribute("data-name"));
     });
@@ -1541,7 +1529,7 @@
     if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Server 1");
     if (webframe && !webframe.hidden) applyFrameGeometry();
     if (cfg && cfg.live && servers[0]) servers[0].setAttribute("data-src", ytApiUrl(cfg.live));
-    if (cfg && cfg.s2 && servers[1]) { var s2u = ytApiUrl(cfg.s2); servers[1].setAttribute("data-src", isYT(s2u) ? s2u : ""); }
+    if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", ytApiUrl(cfg.s2));
     if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", ytApiUrl(cfg.s3));
     if (cfg && cfg.serversOn) {
       var on = cfg.serversOn;
