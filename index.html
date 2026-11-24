@@ -442,6 +442,8 @@
       <!-- Player controls (YouTube IFrame API) -->
       <div class="bbb-ott-controls" id="bbb-ott-controls">
         <button type="button" class="bbb-ott-ctl" id="bbb-ott-play" title="Play / Pause">⏸ Pause</button>
+        <button type="button" class="bbb-ott-ctl" id="bbb-ott-back" title="10 seconds back">⏪ 10s</button>
+        <button type="button" class="bbb-ott-ctl" id="bbb-ott-fwd" title="10 seconds forward">10s ⏩</button>
         <button type="button" class="bbb-ott-ctl" id="bbb-ott-mute" title="Mute / Unmute">🔇 Mute</button>
         <input type="range" class="bbb-ott-vol" id="bbb-ott-vol" min="0" max="100" value="0" step="1" title="Volume" aria-label="Volume">
         <select class="bbb-ott-quality" id="bbb-ott-quality" title="Video quality" aria-label="Video quality">
@@ -999,6 +1001,19 @@
   servers.forEach(function(btn){
     btn.addEventListener("click", function(){
       setActive(btn);
+      /* Server 2 shows YouTube videos ONLY — any YouTube link works,
+         including unlisted videos. Anything else is refused here. */
+      if (btn.getAttribute("data-srv") === "s2") {
+        var u2 = btn.getAttribute("data-src") ? ytApiUrl(extractSrc(btn.getAttribute("data-src"))) : "";
+        if (!isYT(u2)) {
+          showVideo(); frame.removeAttribute("src");
+          overlay.hidden = false; overlay.classList.remove("bbb-ott-overlay--loading");
+          ovTitle.textContent = "Server 2 — শুধু YouTube ভিডিও";
+          ovText.textContent = "Server 2-এ শুধু YouTube ভিডিও চলে — অ্যাডমিন প্যানেল থেকে YouTube লিংক দিন (unlisted ভিডিওও চলবে)।";
+          toast("Server 2-এ শুধু YouTube ভিডিও চলবে");
+          return;
+        }
+      }
       var ok = load(btn.getAttribute("data-src"), btn.getAttribute("data-name"));
       toast(ok ? "Switched to " + btn.getAttribute("data-name") : "No link set for " + btn.getAttribute("data-name"));
     });
@@ -1077,6 +1092,30 @@
   frame.addEventListener("load", function(){ if (liveApiReady) bindLivePlayer(); });
   $("#bbb-ott-play").addEventListener("click", function(){
     if (!liveReady || !livePlayer) { toast("Player ready হলে কন্ট্রোল কাজ করবে"); return; }
+    try { if (livePlayer.getPlayerState() === 1) livePlayer.pauseVideo(); else livePlayer.playVideo(); } catch (e) {}
+    setTimeout(syncPlayBtn, 250);
+  });
+  /* Manual rewind: jump the YouTube video 10 seconds back / forward.
+     Works on live streams too (moves inside the live DVR window). */
+  function seekBy(sec){
+    if (!liveReady || !livePlayer) { toast("Player ready হলে কন্ট্রোল কাজ করবে"); return; }
+    try {
+      var t = livePlayer.getCurrentTime() || 0;
+      var d = livePlayer.getDuration() || 0;
+      var nt = Math.max(0, t + sec);
+      if (d > 0) nt = Math.min(d, nt);
+      livePlayer.seekTo(nt, true);
+    } catch (e) {}
+  }
+  $("#bbb-ott-back").addEventListener("click", function(){ seekBy(-10); });
+  $("#bbb-ott-fwd").addEventListener("click", function(){ seekBy(10); });
+  /* Pressing the video itself pauses / plays through our own player. The
+     click shield stops the press ever reaching YouTube, so it can never
+     open youtube.com — and the YouTube frame cannot be dragged either,
+     because every pointer event lands on the shield, not the frame. */
+  var shieldEl = $("#bbb-ott-shield");
+  if (shieldEl) shieldEl.addEventListener("click", function(){
+    if (!liveReady || !livePlayer) return;
     try { if (livePlayer.getPlayerState() === 1) livePlayer.pauseVideo(); else livePlayer.playVideo(); } catch (e) {}
     setTimeout(syncPlayBtn, 250);
   });
@@ -1545,7 +1584,7 @@
     if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Server 1");
     if (webframe && !webframe.hidden) applyFrameGeometry();
     if (cfg && cfg.live && servers[0]) servers[0].setAttribute("data-src", ytApiUrl(cfg.live));
-    if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", ytApiUrl(cfg.s2));
+    if (cfg && cfg.s2 && servers[1]) { var s2u = ytApiUrl(cfg.s2); servers[1].setAttribute("data-src", isYT(s2u) ? s2u : ""); }
     if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", ytApiUrl(cfg.s3));
     if (cfg && cfg.serversOn) {
       var on = cfg.serversOn;
