@@ -81,6 +81,13 @@
 /* ---------- Theater grid ---------- */
 .bbb-ott-theater{display:grid; grid-template-columns:minmax(0,7fr) minmax(0,3fr); gap:20px; align-items:stretch;}
 .bbb-ott-playercol{min-width:0;}
+/* Fullscreen stage = the whole player column (player + our control bar),
+   so the custom player stays on screen in fullscreen / landscape.
+   The player is sized to fit the screen height, leaving room for the
+   controls below it. */
+.bbb-ott-stage:fullscreen, .bbb-ott-stage:-webkit-full-screen{background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+.bbb-ott-stage:fullscreen .bbb-ott-player, .bbb-ott-stage:-webkit-full-screen .bbb-ott-player{width:min(100%, calc((100vh - 70px) * 16 / 9));}
+.bbb-ott-stage:fullscreen .bbb-ott-controls, .bbb-ott-stage:-webkit-full-screen .bbb-ott-controls{width:100%;}
 .bbb-ott-player{
   position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:#000;
   border:1px solid rgba(255,255,255,.1);
@@ -107,9 +114,11 @@
 }
 .bbb-ott-overlay h3{margin:6px 0 0; font-size:clamp(15px,2vw,20px); font-weight:700;}
 .bbb-ott-overlay p{margin:0; color:var(--bbb-muted); font-size:13px; max-width:420px;}
-/* Click shield over the live player: viewers can watch but cannot click
-   through to YouTube (title, channel, logo). Play/Pause/Mute etc. keep
-   working from the control bar below via the YouTube API. */
+/* Click shield over the live player: it covers EVERY video embed
+   (YouTube, Kick, OK.ru, ...) so no click can ever reach the embedded
+   player — no title, channel, logo or "watch here" link can take a
+   viewer off our site. Play/Pause keep working from OUR control bar
+   below (YouTube via its API, other embeds by loading/unloading). */
 .bbb-ott-shield{position:absolute; inset:0; z-index:3; background:transparent; cursor:default;}
 .bbb-ott-overlay--loading .bbb-ott-overlay-eye{animation:bbbOttSpin 1.2s linear infinite; border-color:var(--bbb-red) transparent var(--bbb-gold) transparent;}
 @keyframes bbbOttSpin{to{transform:rotate(360deg);}}
@@ -405,7 +414,7 @@
 
   <!-- ===== Theater: Player + Chat ===== -->
   <section class="bbb-ott-theater">
-    <div class="bbb-ott-playercol">
+    <div class="bbb-ott-playercol bbb-ott-stage" id="bbb-ott-stage">
       <div class="bbb-ott-player" id="bbb-ott-player">
         <span class="bbb-ott-nowtag" id="bbb-ott-nowtag">▶ Server 1 • Main Live HD</span>
 
@@ -439,7 +448,7 @@
       <!-- Player controls: YouTube buttons (IFrame API) + the site's own
            Fullscreen / Landscape buttons, which work for any embed -->
       <div class="bbb-ott-controls" id="bbb-ott-controls">
-        <button type="button" class="bbb-ott-ctl bbb-ott-yt-only" id="bbb-ott-play" title="Play / Pause">⏸ Pause</button>
+        <button type="button" class="bbb-ott-ctl" id="bbb-ott-play" title="Play / Pause">⏸ Pause</button>
         <button type="button" class="bbb-ott-ctl bbb-ott-yt-only" id="bbb-ott-back" title="10 seconds back">⏪ 10s</button>
         <button type="button" class="bbb-ott-ctl bbb-ott-yt-only" id="bbb-ott-fwd" title="10 seconds forward">10s ⏩</button>
         <button type="button" class="bbb-ott-ctl bbb-ott-yt-only" id="bbb-ott-mute" title="Mute / Unmute">🔇 Mute</button>
@@ -471,7 +480,7 @@
         </div>
       </div>
       <div class="bbb-ott-helper">
-        <span>🔇 Autoplay starts muted — <b>press 🔊 to unmute.</b> Buffering? Hit Reload or switch servers.</span>
+        <span id="bbb-ott-helper-text">🔇 Autoplay starts muted — <b>press 🔊 to unmute.</b> Buffering? Hit Reload or switch servers.</span>
       </div>
 
       <!-- ===== Multi-Server & Quality Switcher =====
@@ -913,15 +922,23 @@
   function load(url, name){
     url = extractSrc(url);
     nowTag.textContent = "▶ " + name;
+    /* Our own player state for non-YouTube embeds (Kick / OK.ru / ...):
+       there is no player API, so Play/Pause works by loading /
+       unloading the iframe. OK.ru never autoplays, so it starts
+       stopped; the rest are assumed to autoplay. */
+    extUrl = ""; extStarted = false;
+    if (isEmbed(url) && !isYT(url)) { extUrl = url.trim(); extStarted = !isOkEmbed(url); }
     if (!isValid(url)) { showVideo(); frame.removeAttribute("src"); showEmpty(name); return false; }
     if (isWebsite(url)) { showWeb(url.trim()); overlay.hidden = true; return true; }
     showVideo();
-    /* Every platform has its own player controls — hide the click shield
-       for non-YouTube embeds, so viewers can use the platform's own
-       play/pause/unmute. YouTube keeps the shield. The control bar below
-       shows all buttons for YouTube, only Fullscreen + Landscape for
-       other embeds. */
-    var sh = $("#bbb-ott-shield"); if (sh) sh.style.display = isYT(url) ? "" : "none";
+    /* The click shield stays over EVERY video embed (YouTube, Kick,
+       OK.ru, ...) — no pointer event ever reaches the embedded player,
+       so nobody can click out to another platform. YouTube keeps its
+       API play/pause via the shield tap; other platforms start from
+       our own Play button below (the shield tap starts OK.ru once).
+       The control bar shows Play + Fullscreen + Landscape for
+       non-YouTube, the full bar for YouTube. */
+    var sh = $("#bbb-ott-shield"); if (sh) sh.style.display = "";
     /* Controls: YouTube gets the full bar; any other video embed (Kick,
        Rumble, ...) gets only the site's own Fullscreen + Landscape
        buttons — the YouTube-only buttons would be dead there. */
@@ -944,6 +961,9 @@
       frame.setAttribute("allowfullscreen", "");
       frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture; fullscreen");
     }
+    var hp = $("#bbb-ott-helper-text");
+    if (hp) hp.textContent = isYT(url) ? "🔇 Autoplay starts muted — press 🔊 to unmute. Buffering? Hit Reload or switch servers." : "▶ Play চাপ দিলে লাইভ শুরু হবে — ভিডিওর উপরে শিল্ড আছে, তাই এখান থেকে বাইরে যাওয়া যাবে না।";
+    syncPlayBtn();
     overlay.hidden = false;
     overlay.classList.add("bbb-ott-overlay--loading");
     ovTitle.textContent = "Connecting to " + name + "…";
@@ -1021,9 +1041,18 @@
 
   /* ---------- Live player controls (YouTube IFrame API) ---------- */
   var livePlayer = null, liveApiReady = false, liveReady = false, liveSyncTimer = null;
+  var extUrl = "", extStarted = false; /* our own Play state for non-YouTube embeds (no player API) */
   function isYT(u){ return !!u && /youtube(-nocookie)?\.com\/embed\//i.test(u); }
   function isKick(u){ return !!u && /player\.kick\.com\//i.test(u); }
   function isOkEmbed(u){ return !!u && /ok\.ru\/videoembed\//i.test(u); }
+  /* OK.ru only starts when the viewer taps Play — add its autoplay flag
+     at that moment (never on the first load: without a tap the browser
+     blocks it and the player goes blank). */
+  function withOkAutoplay(u){
+    if (!isOkEmbed(u)) return u;
+    if (/[?&]autoplay=/.test(u)) return u;
+    return u + (u.indexOf("?") >= 0 ? "&" : "?") + "autoplay=1";
+  }
   function ytApiUrl(u){
     if (!u) return u;
     /* An OK.ru watch link (ok.ru/video/<id>) is not an embed URL — the
@@ -1043,6 +1072,7 @@
   }
   function syncPlayBtn(){
     var b = $("#bbb-ott-play"); if (!b) return;
+    if (extUrl) { b.textContent = extStarted ? "⏸ Pause" : "▶ Play"; return; }
     try { b.textContent = (livePlayer && livePlayer.getPlayerState() === 1) ? "⏸ Pause" : "▶ Play"; } catch (e) {}
   }
   function syncMuteBtn(){
@@ -1072,6 +1102,11 @@
   })();
   frame.addEventListener("load", function(){ if (liveApiReady) bindLivePlayer(); });
   $("#bbb-ott-play").addEventListener("click", function(){
+    if (extUrl) { /* our own player for Kick / OK.ru / ... : no API, so Play loads the stream and Pause unloads it */
+      if (extStarted) { frame.removeAttribute("src"); extStarted = false; }
+      else { frame.src = withOkAutoplay(extUrl); extStarted = true; }
+      syncPlayBtn(); return;
+    }
     if (!liveReady || !livePlayer) { toast("Player ready হলে কন্ট্রোল কাজ করবে"); return; }
     try { if (livePlayer.getPlayerState() === 1) livePlayer.pauseVideo(); else livePlayer.playVideo(); } catch (e) {}
     setTimeout(syncPlayBtn, 250);
@@ -1091,11 +1126,17 @@
   $("#bbb-ott-back").addEventListener("click", function(){ seekBy(-10); });
   $("#bbb-ott-fwd").addEventListener("click", function(){ seekBy(10); });
   /* Pressing the video itself pauses / plays through our own player. The
-     click shield stops the press ever reaching YouTube, so it can never
-     open youtube.com — and the YouTube frame cannot be dragged either,
-     because every pointer event lands on the shield, not the frame. */
+     click shield stops the press ever reaching the embedded player, so it
+     can never open another platform — and the frame cannot be dragged
+     either, because every pointer event lands on the shield, not the
+     frame. For non-YouTube embeds the shield tap starts the stream once
+     (OK.ru needs the tap); it never restarts a playing stream. */
   var shieldEl = $("#bbb-ott-shield");
   if (shieldEl) shieldEl.addEventListener("click", function(){
+    if (extUrl) {
+      if (!extStarted) { frame.src = withOkAutoplay(extUrl); extStarted = true; syncPlayBtn(); }
+      return;
+    }
     if (!liveReady || !livePlayer) return;
     try { if (livePlayer.getPlayerState() === 1) livePlayer.pauseVideo(); else livePlayer.playVideo(); } catch (e) {}
     setTimeout(syncPlayBtn, 250);
@@ -1115,7 +1156,9 @@
     setTimeout(syncMuteBtn, 100);
   });
   $("#bbb-ott-fullscreen").addEventListener("click", function(){
-    var p = $("#bbb-ott-player");
+    /* Fullscreen the whole stage (player + our control bar), so the
+       custom player stays usable in fullscreen and landscape too. */
+    var p = $("#bbb-ott-stage");
     if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen(); return; }
     var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
     if (fn) fn.call(p); else toast("Fullscreen not supported on this device");
@@ -1124,7 +1167,7 @@
      iPhone does not allow orientation lock, so there it just goes
      fullscreen and the viewer tilts the phone. */
   $("#bbb-ott-landscape").addEventListener("click", function(){
-    var p = $("#bbb-ott-player");
+    var p = $("#bbb-ott-stage");
     if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen(); return; }
     var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
     if (!fn) { toast("Landscape not supported on this device"); return; }
