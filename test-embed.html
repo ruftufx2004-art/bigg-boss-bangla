@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>Embed test — delete after use</title>
+<style>body{background:#000;color:#fff;font-family:sans-serif;padding:16px}iframe{display:block;margin:12px 0;border:1px solid #555}</style>
+</head>
+<body>
+<h2>OK.ru embed test (temporary — delete after diagnosis)</h2>
+<p>A — same as the site player: sandbox + referrerpolicy strict-origin-when-cross-origin</p>
+<iframe id="test-a" src="https://ok.ru/videoembed/17758882569855?nochat=1" width="780" height="440" sandbox="allow-scripts allow-same-origin" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<p>B — same, but referrerpolicy no-referrer</p>
+<iframe id="test-b" src="https://ok.ru/videoembed/17758882569855?nochat=1" width="780" height="440" sandbox="allow-scripts allow-same-origin" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="no-referrer"></iframe>
+</body>
+</html>
