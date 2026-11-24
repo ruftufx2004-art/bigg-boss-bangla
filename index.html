@@ -81,13 +81,11 @@
 /* ---------- Theater grid ---------- */
 .bbb-ott-theater{display:grid; grid-template-columns:minmax(0,7fr) minmax(0,3fr); gap:20px; align-items:stretch;}
 .bbb-ott-playercol{min-width:0;}
-/* Fullscreen stage = the whole player column (player + our control bar),
-   so the custom player stays on screen in fullscreen / landscape.
-   The player is sized to fit the screen height, leaving room for the
-   controls below it. */
-.bbb-ott-stage:fullscreen, .bbb-ott-stage:-webkit-full-screen{background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center;}
-.bbb-ott-stage:fullscreen .bbb-ott-player, .bbb-ott-stage:-webkit-full-screen .bbb-ott-player{width:min(100%, calc((100vh - 70px) * 16 / 9));}
-.bbb-ott-stage:fullscreen .bbb-ott-controls, .bbb-ott-stage:-webkit-full-screen .bbb-ott-controls{width:100%;}
+/* Fullscreen = ONLY the video (the player box), never the whole site.
+   (Site-27: the stage used to be fullscreened here, so the whole player
+   column went fullscreen — wrong. Only #bbb-ott-player goes fullscreen;
+   the shield inside it stays active, so clicks still can't leave the site.) */
+.bbb-ott-player:fullscreen, .bbb-ott-player:-webkit-full-screen{width:100%; height:100%; background:#000; border-radius:0; border:0;}
 .bbb-ott-player{
   position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:#000;
   border:1px solid rgba(255,255,255,.1);
@@ -1175,9 +1173,11 @@
     setTimeout(syncMuteBtn, 100);
   });
   $("#bbb-ott-fullscreen").addEventListener("click", function(){
-    /* Fullscreen the whole stage (player + our control bar), so the
-       custom player stays usable in fullscreen and landscape too. */
-    var p = $("#bbb-ott-stage");
+    /* Fullscreen ONLY the video (the player box) — never the whole site.
+       (Site-27: the stage used to go fullscreen here, so the whole player
+       column filled the screen. The shield inside the player stays on,
+       so clicks still can't leave the site.) */
+    var p = $("#bbb-ott-player");
     if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen(); return; }
     var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
     if (fn) fn.call(p); else toast("Fullscreen not supported on this device");
@@ -1186,7 +1186,8 @@
      iPhone does not allow orientation lock, so there it just goes
      fullscreen and the viewer tilts the phone. */
   $("#bbb-ott-landscape").addEventListener("click", function(){
-    var p = $("#bbb-ott-stage");
+    /* Landscape = fullscreen ONLY the video, then lock to landscape. */
+    var p = $("#bbb-ott-player");
     if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen(); return; }
     var fn = p.requestFullscreen || p.webkitRequestFullscreen || p.msRequestFullscreen;
     if (!fn) { toast("Landscape not supported on this device"); return; }
