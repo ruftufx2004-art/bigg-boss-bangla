@@ -5,8 +5,12 @@
 // an estimate, because Cloudflare's free tier does not expose real per-site
 // bandwidth to this function). Also reports API/KV health.
 // Chat + poll totals come from Supabase (votes/chat moved there 2026-11-22);
-// everything else still reads KV. If Supabase is not configured, the totals
+// the live-viewer count comes from Supabase too (live_visitors, site-22).
+// Everything else still reads KV. If Supabase is not configured, the totals
 // fall back to the old KV keys.
+// The whole handler is wrapped in try/catch: /api/stats must NEVER throw
+// (Error 1101), because the header's Watching + chat numbers both depend
+// on this one endpoint — one throw blanks both numbers for every visitor.
 function json(data, status) {
   return new Response(JSON.stringify(data), { status: status || 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
 }
@@ -27,6 +31,13 @@ function sbBase(env) {
 }
 export async function onRequest(context) {
   const { env } = context;
+  try {
+    return await handleStats(env);
+  } catch (e) {
+    return json({ ok: false, kv: !!env.POLL_KV, liveNow: 0, error: String((e && e.message) || e).slice(0, 200) });
+  }
+}
+async function handleStats(env) {
   if (!env.POLL_KV) return json({ error: "KV not bound yet", kv: false }, 500);
   const kv = env.POLL_KV;
   const num = async (k) => parseInt((await kv.get(k)) || "0", 10) || 0;
@@ -56,19 +67,35 @@ export async function onRequest(context) {
   // unique visitors (device keys seen in the last 24h)
   const vis = await kv.list({ prefix: "visitors:", limit: 1000 });
   const uniqueVisitors = vis.keys.length;
-  // people on the site right now — counted in Supabase (live_visitors),
+  // People on the site right now — counted in Supabase (live_visitors),
   // because KV writes run out every evening. A visitor counts for 90s
   // after their last heartbeat (heartbeats fire every 30s), so the
   // header number is the real count: 1 visitor shows 1, 2 show 2.
+  // The read fetches the most recent rows and filters by time in plain
+  // JS (no PostgREST filter syntax, no content-range parsing), so a
+  // Supabase query quirk can never break this endpoint. If the Supabase
+  // read fails for any reason, the old KV count is used instead.
   let liveNow = null;
+  let liveSource = "kv";
+  let liveStatus = "";
   if (sbConfigured(env)) {
     try {
-      const since = new Date(Date.now() - 90000).toISOString();
-      const lr = await fetch(sbBase(env) + "live_visitors?select=device&last_seen=gt." + encodeURIComponent(since) + "&limit=1", { headers: { ...sbHeaders(env), "Prefer": "count=exact" }, signal: timeoutSignal(5000) });
-      const range = lr.headers.get("content-range") || "";
-      const n = parseInt((range.split("/")[1] || ""), 10);
-      if (!isNaN(n)) liveNow = n;
-    } catch (e) {}
+      const lr = await fetch(sbBase(env) + "live_visitors?select=device,last_seen&order=last_seen.desc&limit=1000", { headers: sbHeaders(env), signal: timeoutSignal(5000) });
+      liveStatus = "http " + lr.status;
+      if (lr.ok) {
+        const rows = await lr.json();
+        const cutoff = Date.now() - 90000;
+        let n = 0;
+        for (const r of rows || []) {
+          const t = Date.parse(r.last_seen);
+          if (!isNaN(t) && t >= cutoff) n++;
+        }
+        liveNow = n;
+        liveSource = "supabase";
+      }
+    } catch (e) {
+      liveStatus = "error: " + String((e && e.message) || e).slice(0, 120);
+    }
   }
   if (liveNow == null) {
     const live = await kv.list({ prefix: "live:", limit: 1000 });
@@ -96,6 +123,8 @@ export async function onRequest(context) {
     totalViews,
     uniqueVisitors,
     liveNow,
+    liveSource,
+    liveStatus,
     chatTotal,
     pollVotes,
     installed,
