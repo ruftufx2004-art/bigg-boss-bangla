@@ -1026,6 +1026,11 @@
   function isOkEmbed(u){ return !!u && /ok\.ru\/videoembed\//i.test(u); }
   function ytApiUrl(u){
     if (!u) return u;
+    /* An OK.ru watch link (ok.ru/video/<id>) is not an embed URL — the
+       player would treat it as a website. Convert it to the videoembed
+       URL (no chat), so pasting any OK.ru link just works. */
+    var ok = u.match(/ok\.ru\/video\/(\d+)/i);
+    if (ok) return "https://ok.ru/videoembed/" + ok[1] + "?nochat=1";
     /* A raw YouTube page link (watch / live / shorts / youtu.be) is not an
        embed URL — the player would treat it as a website and YouTube
        refuses to frame it. Convert it to a nocookie embed URL first. */
