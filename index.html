@@ -436,14 +436,15 @@
         <iframe id="bbb-ott-webiframe" title="Website live feed" scrolling="auto"></iframe>
       </div>
 
-      <!-- Player controls (YouTube IFrame API) -->
+      <!-- Player controls: YouTube buttons (IFrame API) + the site's own
+           Fullscreen / Landscape buttons, which work for any embed -->
       <div class="bbb-ott-controls" id="bbb-ott-controls">
-        <button type="button" class="bbb-ott-ctl" id="bbb-ott-play" title="Play / Pause">⏸ Pause</button>
-        <button type="button" class="bbb-ott-ctl" id="bbb-ott-back" title="10 seconds back">⏪ 10s</button>
-        <button type="button" class="bbb-ott-ctl" id="bbb-ott-fwd" title="10 seconds forward">10s ⏩</button>
-        <button type="button" class="bbb-ott-ctl" id="bbb-ott-mute" title="Mute / Unmute">🔇 Mute</button>
-        <input type="range" class="bbb-ott-vol" id="bbb-ott-vol" min="0" max="100" value="0" step="1" title="Volume" aria-label="Volume">
-        <select class="bbb-ott-quality" id="bbb-ott-quality" title="Video quality" aria-label="Video quality">
+        <button type="button" class="bbb-ott-ctl bbb-ott-yt-only" id="bbb-ott-play" title="Play / Pause">⏸ Pause</button>
+        <button type="button" class="bbb-ott-ctl bbb-ott-yt-only" id="bbb-ott-back" title="10 seconds back">⏪ 10s</button>
+        <button type="button" class="bbb-ott-ctl bbb-ott-yt-only" id="bbb-ott-fwd" title="10 seconds forward">10s ⏩</button>
+        <button type="button" class="bbb-ott-ctl bbb-ott-yt-only" id="bbb-ott-mute" title="Mute / Unmute">🔇 Mute</button>
+        <input type="range" class="bbb-ott-vol bbb-ott-yt-only" id="bbb-ott-vol" min="0" max="100" value="0" step="1" title="Volume" aria-label="Volume">
+        <select class="bbb-ott-quality bbb-ott-yt-only" id="bbb-ott-quality" title="Video quality" aria-label="Video quality">
           <option value="default" selected>Auto quality</option>
           <option value="hd1080">1080p</option>
           <option value="hd720">720p</option>
@@ -453,7 +454,7 @@
         </select>
         <button type="button" class="bbb-ott-ctl" id="bbb-ott-fullscreen" title="Fullscreen">⛶ Fullscreen</button>
         <button type="button" class="bbb-ott-ctl" id="bbb-ott-landscape" title="Landscape">🔄 Landscape</button>
-        <div class="bbb-ott-settings">
+        <div class="bbb-ott-settings bbb-ott-yt-only">
           <button type="button" class="bbb-ott-ctl" id="bbb-ott-settings" title="Settings">⚙ Settings</button>
           <div class="bbb-ott-settings-menu" id="bbb-ott-settings-menu" hidden>
             <div class="bbb-ott-settings-title">Playback speed</div>
@@ -914,12 +915,34 @@
     if (!isValid(url)) { showVideo(); frame.removeAttribute("src"); showEmpty(name); return false; }
     if (isWebsite(url)) { showWeb(url.trim()); overlay.hidden = true; return true; }
     showVideo();
-    /* Every platform has its own player controls — hide the click shield and
-       the YouTube-only control bar for non-YouTube embeds, so viewers can
-       use the platform's own play/pause/unmute. YouTube keeps the shield
-       + control bar. */
+    /* Every platform has its own player controls — hide the click shield
+       for non-YouTube embeds, so viewers can use the platform's own
+       play/pause/unmute. YouTube keeps the shield. The control bar below
+       shows all buttons for YouTube, only Fullscreen + Landscape for
+       other embeds. */
     var sh = $("#bbb-ott-shield"); if (sh) sh.style.display = isYT(url) ? "" : "none";
-    var ctl = $("#bbb-ott-controls"); if (ctl) ctl.style.display = isYT(url) ? "" : "none";
+    /* Controls: YouTube gets the full bar; any other video embed (Kick,
+       Rumble, ...) gets only the site's own Fullscreen + Landscape
+       buttons — the YouTube-only buttons would be dead there. */
+    var ctl = $("#bbb-ott-controls");
+    if (ctl) {
+      ctl.style.display = "";
+      $$(".bbb-ott-yt-only").forEach(function(el){ el.style.display = isYT(url) ? "" : "none"; });
+    }
+    /* Kick must not be able to take viewers away to kick.com: sandbox the
+       frame (no top navigation, no popups) and turn off the player's own
+       fullscreen, so the only fullscreen is the site's own Fullscreen /
+       Landscape buttons above. YouTube and other embeds keep the
+       unsandboxed frame. */
+    if (isKick(url)) {
+      frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
+      frame.removeAttribute("allowfullscreen");
+      frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+    } else {
+      frame.removeAttribute("sandbox");
+      frame.setAttribute("allowfullscreen", "");
+      frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture; fullscreen");
+    }
     overlay.hidden = false;
     overlay.classList.add("bbb-ott-overlay--loading");
     ovTitle.textContent = "Connecting to " + name + "…";
@@ -998,6 +1021,7 @@
   /* ---------- Live player controls (YouTube IFrame API) ---------- */
   var livePlayer = null, liveApiReady = false, liveReady = false, liveSyncTimer = null;
   function isYT(u){ return !!u && /youtube(-nocookie)?\.com\/embed\//i.test(u); }
+  function isKick(u){ return !!u && /player\.kick\.com\//i.test(u); }
   function ytApiUrl(u){
     if (!u) return u;
     /* A raw YouTube page link (watch / live / shorts / youtu.be) is not an
