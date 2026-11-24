@@ -1286,6 +1286,7 @@
   var CHAT_REACTS = ["👍","❤️","😂","😮","😢","😡"];
   // Individual profile avatar per user: a cute cat/dog picture, picked by name hash.
   // Same username always gets the same animal. Gradient + initial stays underneath as a fallback if the picture fails to load.
+  var chatAvatars = [["#f43f5e","#fb923c"],["#f59e0b","#facc15"],["#10b981","#34d399"],["#06b6d4","#22d3ee"],["#3b82f6","#60a5fa"],["#8b5cf6","#c084fc"],["#ec4899","#f472b6"],["#14b8a6","#2dd4bf"],["#f97316","#fb7185"],["#6366f1","#a78bfa"]];
   var chatAvatarImgs = ["https://bigg-boss-bangla.pages.dev/avatars/cat-1.webp","https://bigg-boss-bangla.pages.dev/avatars/cat-2.webp","https://bigg-boss-bangla.pages.dev/avatars/cat-3.webp","https://bigg-boss-bangla.pages.dev/avatars/cat-4.webp","https://bigg-boss-bangla.pages.dev/avatars/dog-1.webp","https://bigg-boss-bangla.pages.dev/avatars/dog-2.webp","https://bigg-boss-bangla.pages.dev/avatars/dog-3.webp","https://bigg-boss-bangla.pages.dev/avatars/dog-4.webp"];
   function chatAvatarImg(name){ var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; return chatAvatarImgs[h % chatAvatarImgs.length]; }
   function chatColor(name){ var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; var g = chatAvatars[h % chatAvatars.length]; return "linear-gradient(135deg," + g[0] + "," + g[1] + ")"; }
