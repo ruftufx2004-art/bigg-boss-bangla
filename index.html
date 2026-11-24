@@ -191,7 +191,7 @@
 .bbb-ott-chat-ad .bbb-ott-ad{margin:0;}
 .bbb-ott-msg{display:flex; gap:9px; align-items:flex-start; animation:bbbOttIn .35s ease;}
 @keyframes bbbOttIn{from{opacity:0; transform:translateY(8px);}to{opacity:1; transform:none;}}
-.bbb-ott-av{flex:0 0 30px; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff;}
+.bbb-ott-av{flex:0 0 30px; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; color:#fff; border:1px solid rgba(255,255,255,.28); box-shadow:0 2px 8px rgba(0,0,0,.35); text-shadow:0 1px 2px rgba(0,0,0,.35);}
 .bbb-ott-msg-body{min-width:0; font-size:13px; font-family:'Hind Siliguri','Poppins',sans-serif;}
 .bbb-ott-msg-body b{font-family:'Poppins',sans-serif; font-size:12px; margin-right:6px;}
 .bbb-ott-msg-body p{margin:1px 0 0; color:#dcdce6; word-wrap:break-word; overflow-wrap:anywhere;}
@@ -1283,8 +1283,10 @@
   var input = $("#bbb-ott-chat-input");
   var nameInput = $("#bbb-ott-chat-name");
   var CHAT_REACTS = ["👍","❤️","😂","😮","😢","😡"];
-  var chatColors = ["#D71921","#ffffff","#ff8a00","#00b894","#0984e3","#e84393","#c9a227","#6c5ce7"];
-  function chatColor(name){ var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; return chatColors[h % chatColors.length]; }
+  // Individual profile avatar per user: a deterministic gradient + initial letter.
+  // Same username always gets the same avatar (name hash), different users get different gradients.
+  var chatAvatars = [["#f43f5e","#fb923c"],["#f59e0b","#facc15"],["#10b981","#34d399"],["#06b6d4","#22d3ee"],["#3b82f6","#60a5fa"],["#8b5cf6","#c084fc"],["#ec4899","#f472b6"],["#14b8a6","#2dd4bf"],["#f97316","#fb7185"],["#6366f1","#a78bfa"]];
+  function chatColor(name){ var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; var g = chatAvatars[h % chatAvatars.length]; return "linear-gradient(135deg," + g[0] + "," + g[1] + ")"; }
   function chatTime(t){
     var s = Math.max(0, Math.floor((Date.now() - t) / 1000));
     if (s < 60) return "এখনই";
