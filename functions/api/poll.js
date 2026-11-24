@@ -6,9 +6,9 @@
 // Frontend contract unchanged: GET returns {counts, total, voted},
 // POST {device, choice} returns the same shape.
 // (Also fixes the old NAMES-before-definition bug in the POST path.)
-const FALLBACK = ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das","Ranieeta Dash"];
+const FALLBACK = ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das"];
 async function loadNames(kv) {
-  try { const raw = await kv.get("cfg:pollNames"); if (raw) { const a = JSON.parse(raw); if (Array.isArray(a) && a.length) return a; } } catch (e) {}
+  try { const raw = await kv.get("cfg:pollNames"); if (raw) { const a = JSON.parse(raw); if (Array.isArray(a) && a.length) return a.filter(function(n){ return n !== "Ranieeta Dash"; }); } } catch (e) {} // Ranieeta Dash evicted 2026-11-25; KV write blocked by daily limit — see config.js.
   return FALLBACK;
 }
 
