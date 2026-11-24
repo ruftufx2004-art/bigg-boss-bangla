@@ -1,5 +1,5 @@
 {
-  "background_color": "#0a0a0a",
+  "background_color": "#0d0618",
   "description": "Bigg Boss Bangla Season 3 — LIVE, সব এপিসোড আর ভোট পোল, এক অ্যাপে।",
   "display": "standalone",
   "icons": [
@@ -28,5 +28,5 @@
   "scope": "/",
   "short_name": "24X 7 Live",
   "start_url": "/",
-  "theme_color": "#0a0a0a"
+  "theme_color": "#150a2e"
 }
