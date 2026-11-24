@@ -55,7 +55,7 @@
       <h2>📺 LIVE NOW প্লেয়ার</h2>
       <label>Server 1 — OK.ru Live (OK.ru-র জন্য রিজার্ভড — নতুন লাইভের embed কোড বা লিংক এখানে বসিয়ে সেভ করুন)</label>
       <div class="row"><input type="text" id="live" placeholder="Embed লিংক বা পুরো <iframe> কোড বসাও"><button class="ghost srvTgl" id="tglS1" type="button" data-srv="s1">🟢 চালু</button></div>
-      <p class="hint">OK.ru লাইভ ১২ ঘণ্টা পর শেষ হয়ে যায় — নতুন লাইভ এলে তার embed কোড, videoembed লিংক বা সাধারণ ok.ru/video লিংক — যেকোনোটা এখানে বসিয়ে সেভ করলেই চলবে।</p>
+      <p class="hint">OK.ru লাইভ ৮ ঘণ্টা পর শেষ হয়ে যায় — নতুন লাইভ এলে তার embed কোড, videoembed লিংক, সাধারণ ok.ru/video লিংক বা ok.ru/live লিংক — যেকোনোটা এখানে বসিয়ে সেভ করলেই চলবে।</p>
       <label>Server 2 — (যেকোনো প্ল্যাটফর্মের Embed লিংক বা কোড)</label>
       <div class="row"><input type="text" id="s2" placeholder="Embed লিংক বা পুরো <iframe> কোড বসাও"><button class="ghost srvTgl" id="tglS2" type="button" data-srv="s2">🟢 চালু</button></div>
       <p class="hint">যেকোনো প্ল্যাটফর্মের embed লিংক বা পুরো &lt;iframe&gt; কোড দিলে ভিডিও চলবে — YouTube, Facebook, Rumble, TikTok, Kick যেকোনোটা।</p>
@@ -170,6 +170,8 @@ function toEmbed(u){
   u=extractSrc(u); if(!u) return "";
   if(u.indexOf("//")===0) u="https:"+u; /* protocol-relative link (//ok.ru/...) -> https */
   var m=u.match(/ok\.ru\/video\/(\d+)/i); if(m) return "https://ok.ru/videoembed/"+m[1]+"?nochat=1"; /* OK.ru watch link -> videoembed */
+  m=u.match(/ok\.ru\/live\/(\d+)/i); if(m) return "https://ok.ru/videoembed/"+m[1]+"?nochat=1"; /* OK.ru live-page link -> videoembed */
+  m=u.match(/^\d{8,}$/); if(m) return "https://ok.ru/videoembed/"+m[0]+"?nochat=1"; /* bare OK.ru video ID -> videoembed */
   m=u.match(/[?&]v=([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[1]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
   m=u.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[1]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";
   m=u.match(/\/(live|shorts)\/([A-Za-z0-9_-]{6,})/); if(m) return "https://www.youtube-nocookie.com/embed/"+m[2]+"?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3";

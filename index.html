@@ -112,21 +112,21 @@
 }
 .bbb-ott-overlay h3{margin:6px 0 0; font-size:clamp(15px,2vw,20px); font-weight:700;}
 .bbb-ott-overlay p{margin:0; color:var(--bbb-muted); font-size:13px; max-width:420px;}
-/* Click shield over the live player: it covers EVERY video embed
-   (YouTube, Kick, OK.ru, ...) so no click can ever reach the embedded
-   player — no title, channel, logo or "watch here" link can take a
-   viewer off our site. Play/Pause keep working from OUR control bar
-   below (YouTube via its API, other embeds by loading/unloading). */
+/* Click shield over the live player. YouTube keeps the full shield (the
+   site controls YouTube through its API, so no click ever reaches the
+   embedded player). For every other embed (OK.ru, Kick, ...) the shield
+   covers ONLY the top row, in two pieces: the left piece covers the
+   logo and title, the right piece covers the link icon — the places
+   where a click could take a viewer off our site. The rest of the
+   player stays open, so viewers can seek back/forward in the live's
+   copy, change volume, open settings, jump to LIVE and use
+   picture-in-picture. The sandbox still blocks any navigation or popup,
+   so nobody can leave from here. */
 .bbb-ott-shield{position:absolute; inset:0; z-index:3; background:transparent; cursor:default;}
 .bbb-ott-shield .bbb-ott-shield-strip{display:none; position:absolute; background:transparent;}
-/* OK.ru: the shield leaves a 90px hole in the middle so the viewer can
-   tap the player's own ▶ to start it (its ?autoplay=1 flag was
-   unreliable — it often left a blank frame with no play button). The
-   hole only exposes the centred ▶; the logo, title and controls stay
-   behind the shield strips, and the sandbox still blocks any
-   navigation or popup, so nobody can leave from here. */
-.bbb-ott-shield--ok-hole{pointer-events:none;}
-.bbb-ott-shield--ok-hole .bbb-ott-shield-strip{display:block; pointer-events:auto;}
+.bbb-ott-shield.bbb-ott-shield--top-only{pointer-events:none;}
+.bbb-ott-shield.bbb-ott-shield--top-only .bbb-ott-shield-strip--top{display:block; pointer-events:auto; left:0; right:176px; width:auto; height:max(64px, 12%);}
+.bbb-ott-shield.bbb-ott-shield--top-only .bbb-ott-shield-strip--right{display:block; pointer-events:auto; top:0; bottom:auto; left:auto; right:88px; width:80px; height:max(64px, 12%);}
 .bbb-ott-shield-strip--top{top:0; left:0; right:0; height:calc(50% - 45px);}
 .bbb-ott-shield-strip--bottom{bottom:0; left:0; right:0; height:calc(50% - 45px);}
 .bbb-ott-shield-strip--left{top:calc(50% - 45px); bottom:calc(50% - 45px); left:0; width:calc(50% - 45px);}
@@ -937,22 +937,24 @@
        there is no player API, so Play/Pause works by loading /
        unloading the iframe. The embed counts as loaded once load()
        sets its src. OK.ru is started by the viewer tapping its own ▶
-       through the hole in the shield (see the shield CSS) — its
-       autoplay flag was unreliable and often left a blank frame, so
-       no autoplay reload is used. Kick autoplays. */
+       in the open player (the shield covers only the top row — see
+       the shield CSS) — its autoplay flag was unreliable and often
+       left a blank frame, so no autoplay reload is used. Kick
+       autoplays. */
     extUrl = ""; extStarted = false;
     if (isEmbed(url) && !isYT(url)) { extUrl = url.trim(); extStarted = true; }
     if (!isValid(url)) { showVideo(); frame.removeAttribute("src"); showEmpty(name); return false; }
     if (isWebsite(url)) { showWeb(url.trim()); overlay.hidden = true; return true; }
     showVideo();
-    /* The click shield stays over EVERY video embed (YouTube, Kick,
-       OK.ru, ...) — no pointer event ever reaches the embedded player,
-       so nobody can click out to another platform. YouTube keeps its
-       API play/pause via the shield tap; other platforms start from
-       our own Play button below (the shield tap starts OK.ru once).
-       The control bar shows Play + Fullscreen + Landscape for
-       non-YouTube, the full bar for YouTube. */
-    var sh = $("#bbb-ott-shield"); if (sh) { sh.style.display = ""; sh.classList.toggle("bbb-ott-shield--ok-hole", isOkEmbed(url)); }
+    /* The click shield: YouTube keeps the full shield (the site drives it
+       through the API, so no click ever reaches the embedded player).
+       For any other video embed the shield covers only the top row —
+       logo, title and link icon — so viewers can use the player's own
+       seek, volume, settings, LIVE and picture-in-picture controls,
+       and the sandbox still blocks any navigation or popup. The control
+       bar shows Play + Fullscreen + Landscape for non-YouTube, the full
+       bar for YouTube. */
+    var sh = $("#bbb-ott-shield"); if (sh) { sh.style.display = ""; sh.classList.toggle("bbb-ott-shield--top-only", isEmbed(url) && !isYT(url)); }
     /* Controls: YouTube gets the full bar; any other video embed (Kick,
        Rumble, ...) gets only the site's own Fullscreen + Landscape
        buttons — the YouTube-only buttons would be dead there. */
@@ -976,7 +978,7 @@
       frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture; fullscreen");
     }
     var hp = $("#bbb-ott-helper-text");
-    if (hp) hp.textContent = isYT(url) ? "🔇 Autoplay starts muted — press 🔊 to unmute. Buffering? Hit Reload or switch servers." : (isOkEmbed(url) ? "ভিডিওর মাঝখানের ▶ চাপ দিলে লাইভ শুরু হবে — ভিডিওর উপরে শিল্ড আছে, তাই এখান থেকে বাইরে যাওয়া যাবে না।" : "▶ Play চাপ দিলে লাইভ শুরু হবে — ভিডিওর উপরে শিল্ড আছে, তাই এখান থেকে বাইরে যাওয়া যাবে না।");
+    if (hp) hp.textContent = isYT(url) ? "🔇 Autoplay starts muted — press 🔊 to unmute. Buffering? Hit Reload or switch servers." : (isOkEmbed(url) ? "ভিডিওর ▶ চাপ দিলে লাইভ শুরু হবে — সাউন্ড, সেটিংস, পেছনে/সামনে যাওয়া যাবে; শুধু লোগো আর লিংক বন্ধ আছে।" : "▶ Play চাপ দিলে লাইভ শুরু হবে — ভিডিওর সাউন্ড, সেটিংস, পেছনে/সামনে যাওয়া যাবে; শুধু লোগো আর লিংক বন্ধ আছে।");
     syncPlayBtn();
     overlay.hidden = false;
     overlay.classList.add("bbb-ott-overlay--loading");
@@ -1063,16 +1065,19 @@
      ?autoplay=1, but that flag is unreliable — it often leaves a
      blank frame with no play button, and the site went black even
      while the same video played fine directly on OK.ru. OK.ru now
-     loads plain and the viewer starts it by tapping its own ▶
-     through the hole in the shield (see the shield CSS). No autoplay
-     param is used anywhere. */
+     loads plain and the viewer starts it by tapping its own ▶ in the
+     open player (the shield covers only the top row — see the shield
+     CSS). No autoplay param is used anywhere. */
   function ytApiUrl(u){
     if (!u) return u;
-    /* An OK.ru watch link (ok.ru/video/<id>) is not an embed URL — the
-       player would treat it as a website. Convert it to the videoembed
-       URL (no chat), so pasting any OK.ru link just works. */
+    /* An OK.ru watch link (ok.ru/video/<id>) or live-page link
+       (ok.ru/live/<id>) is not an embed URL — the player would treat
+       it as a website. Convert it to the videoembed URL (no chat), so
+       pasting any OK.ru link just works. */
     var ok = u.match(/ok\.ru\/video\/(\d+)/i);
     if (ok) return "https://ok.ru/videoembed/" + ok[1] + "?nochat=1";
+    var okl = u.match(/ok\.ru\/live\/(\d+)/i);
+    if (okl) return "https://ok.ru/videoembed/" + okl[1] + "?nochat=1";
     /* A raw YouTube page link (watch / live / shorts / youtu.be) is not an
        embed URL — the player would treat it as a website and YouTube
        refuses to frame it. Convert it to a nocookie embed URL first. */
@@ -1138,16 +1143,15 @@
   }
   $("#bbb-ott-back").addEventListener("click", function(){ seekBy(-10); });
   $("#bbb-ott-fwd").addEventListener("click", function(){ seekBy(10); });
-  /* Pressing the video itself pauses / plays through our own player. The
-     click shield stops the press ever reaching the embedded player, so it
-     can never open another platform — and the frame cannot be dragged
-     either, because every pointer event lands on the shield, not the
-     frame. The one exception is OK.ru: the shield leaves a small hole
-     in the middle so the viewer can tap the player's own ▶ to start it
-     (its autoplay flag was unreliable); the logo, title and controls
-     stay behind the shield. For non-YouTube embeds the shield tap
-     loads the stream once if it is not loaded; it never restarts a
-     playing stream. */
+  /* Pressing the video itself pauses / plays through our own player. For
+     YouTube the click shield stops the press ever reaching the embedded
+     player, so it can never open another platform — and the frame cannot
+     be dragged either, because every pointer event lands on the shield,
+     not the frame. For other embeds the shield covers only the top row
+     (logo, title, link icon) — a tap there loads the stream once if it
+     is not loaded and never restarts a playing stream; taps anywhere
+     else reach the player's own controls (seek, volume, settings, LIVE,
+     picture-in-picture). The sandbox still blocks any navigation. */
   var shieldEl = $("#bbb-ott-shield");
   if (shieldEl) shieldEl.addEventListener("click", function(){
     if (extUrl) {
