@@ -1302,7 +1302,11 @@
     if (n) { try { localStorage.setItem("bbb-chat-name", n); } catch (e) {} return n; }
     try { return localStorage.getItem("bbb-chat-name") || ""; } catch (e) { return ""; }
   }
-  try { var savedName = localStorage.getItem("bbb-chat-name"); if (savedName) nameInput.value = savedName; } catch (e) {}
+  // Name box shows ONLY a server-assigned cute name (or Admin) — never a name the user typed.
+  // The pool mirrors functions/api/chat.js CUTE_NAMES; the server is the authority,
+  // this just keeps a stale user-typed name from showing in the box before the first post.
+  var CHAT_CUTE_NAMES = ["Classy","Muse","Oggy","Bani","Mimi","Coco","Lulu","Piku","Tofu","Momo","Kiki","Bubu","Chiku","Golu","Pingu","Simba","Nala","Milo","Luna","Oreo","Biscuit","Choco","Snowy","Chintu","Mintu","Tuni","Piu","Riku","Sona","Mitu","Jolly","Happy","Lucky","Cookie","Brownie","Pebble","Nimbus","Zuzu","Poppy"];
+  try { var savedName = localStorage.getItem("bbb-chat-name"); if (savedName && (savedName === "Admin" || CHAT_CUTE_NAMES.indexOf(savedName) >= 0)) nameInput.value = savedName; else localStorage.removeItem("bbb-chat-name"); } catch (e) {}
   var myPostedIds = new Set();
   try { (JSON.parse(localStorage.getItem("bbb-chat-mine") || "[]")).forEach(function(id){ myPostedIds.add(id); }); } catch (e) {}
   function saveMyPosted(){ try { localStorage.setItem("bbb-chat-mine", JSON.stringify(Array.from(myPostedIds).slice(-100))); } catch (e) {} }
