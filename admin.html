@@ -102,6 +102,35 @@
     </div>
 
     <div class="card">
+      <h2>📝 ব্লগ — Blogspot সাইট</h2>
+      <label>ব্লগের লিংক</label>
+      <div class="row"><input type="text" id="blogUrl" placeholder="https://biggboss-bangla.blogspot.com/"><button class="ghost srvTgl" id="tglBlog" type="button">🟢 চালু</button></div>
+      <p class="hint">ব্লগটা সাইটের লাইভের নিচে ফ্রেমে দেখাবে। বন্ধ করলে সাইটে দেখাবে না, লিংকটা ব্যাকআপ হিসেবে থেকে যাবে।</p>
+      <label>উপরে থেকে কতটুকু কাটবেন (px) — বাড়ালে ফ্রেম নিচের দিকে নামবে</label>
+      <div class="row">
+        <button class="ghost" id="blogUpBtn" type="button">▲ উপরে</button>
+        <input type="number" id="blogTop" min="0" step="40" value="0">
+        <button class="ghost" id="blogDownBtn" type="button">▼ নিচে</button>
+      </div>
+      <label>ফ্রেমের উচ্চতা (px)</label>
+      <input type="number" id="blogHeight" min="200" max="1200" step="20" value="560">
+      <label>জুম — ফ্রেমের ভেতরের ব্লগটা বড়/ছোট করুন</label>
+      <div class="row">
+        <button class="ghost" id="blogZoomOutBtn" type="button">➖ ছোট</button>
+        <input type="number" id="blogZoom" min="0.5" max="2" step="0.25" value="1">
+        <button class="ghost" id="blogZoomInBtn" type="button">➕ বড়</button>
+        <span id="blogZoomLabel" style="white-space:nowrap">100%</span>
+      </div>
+      <p class="hint">কোন অংশটা দেখাবে সেটা উপরের ▲ ▼ আর জুম দিয়ে ঠিক করুন — সেভ করলেই সবার কাছে লেগে যাবে।</p>
+      <h2 style="margin-top:16px">👁️ ব্লগ প্রিভিউ — এখানে ক্লিক করা যাবে</h2>
+      <p class="hint">ব্লগের যে অংশটা দেখাতে চান, উপরের ▲ ▼ আর জুম দিয়ে সেটা ঠিক করুন — প্রিভিউটাও সঙ্গে সঙ্গে সরবে।</p>
+      <div id="blogPreviewWrap" style="position:relative;overflow:hidden;height:320px;border:1px solid var(--line);border-radius:12px;background:#000">
+        <iframe id="blogPreview" style="position:absolute;left:0;top:0;width:100%;height:1600px;border:0;pointer-events:auto" scrolling="no" title="Blog preview"></iframe>
+      </div>
+      <button class="ghost" id="blogPreviewRefresh" type="button">🔄 প্রিভিউ রিফ্রেশ করুন</button>
+    </div>
+
+    <div class="card">
       <h2>🗳️ ভোট পোল — কে জিতবে?</h2>
       <label>ঘরে থাকা প্রতিযোগীদের নাম (প্রতি লাইনে একজন)</label>
       <textarea id="names"></textarea>
@@ -263,6 +292,26 @@ function loadServerPreview(n){
   }
   wrap.style.display="block";
 }
+var blogOn=true;
+function setBlogTgl(on){
+  var b=document.getElementById("tglBlog");
+  if(!b) return;
+  b.textContent=on?"🟢 চালু":"🔴 বন্ধ";
+  b.classList.toggle("off", !on);
+}
+function loadBlogPreview(){
+  var url=(document.getElementById("blogUrl").value||"").trim();
+  var fr=document.getElementById("blogPreview");
+  var top=parseInt(document.getElementById("blogTop").value||"0",10)||0;
+  fr.style.top=(-top)+"px";
+  var zm=parseFloat(document.getElementById("blogZoom").value||"1")||1;
+  zm=Math.min(2,Math.max(0.5,zm));
+  fr.style.zoom=zm;
+  document.getElementById("blogZoomLabel").textContent=Math.round(zm*100)+"%";
+  if(url){ if(fr.getAttribute("src")!==url) fr.setAttribute("src", url); document.getElementById("blogPreviewWrap").style.display="block"; }
+  else { document.getElementById("blogPreviewWrap").style.display="none"; }
+}
+function setBlogZoom(d){ var el=document.getElementById("blogZoom"); var v=(parseFloat(el.value||"1")||1)+d; v=Math.min(2,Math.max(0.5,Math.round(v*4)/4)); el.value=v; loadBlogPreview(); }
 function fillConfig(c){
   document.getElementById("live").value=c.live||"";
   document.getElementById("s2").value=c.s2||"";
@@ -272,7 +321,12 @@ function fillConfig(c){
   document.getElementById("frameHeight").value=(c.frameHeight!=null?c.frameHeight:560);
   document.getElementById("frameZoom").value=(c.frameZoom!=null?c.frameZoom:1);
   if(c.serversOn){ serversOn={s1:c.serversOn.s1!==false,s2:c.serversOn.s2!==false,s3:c.serversOn.s3!==false}; ["s1","s2","s3"].forEach(function(k){ setTgl(k, serversOn[k]); }); }
-  loadFramePreview(); loadServerPreview(2); loadServerPreview(3);
+  document.getElementById("blogUrl").value=c.blogUrl||"";
+  document.getElementById("blogTop").value=(c.blogTop!=null?c.blogTop:0);
+  document.getElementById("blogHeight").value=(c.blogHeight!=null?c.blogHeight:560);
+  document.getElementById("blogZoom").value=(c.blogZoom!=null?c.blogZoom:1);
+  if(c.blogOn!==undefined){ blogOn=c.blogOn!==false; setBlogTgl(blogOn); }
+  loadFramePreview(); loadServerPreview(2); loadServerPreview(3); loadBlogPreview();
 }
 function loadConfig(){
   fetch("/api/config",{cache:"no-store"}).then(function(r){return r.json();}).then(fillConfig);
@@ -310,6 +364,11 @@ document.getElementById("saveBtn").addEventListener("click", function(){
     frameHeight:parseInt(document.getElementById("frameHeight").value||"560",10)||560,
     frameZoom:Math.min(2,Math.max(0.5,parseFloat(document.getElementById("frameZoom").value||"1")||1)),
     serversOn:serversOn,
+    blogUrl:document.getElementById("blogUrl").value.trim(),
+    blogTop:parseInt(document.getElementById("blogTop").value||"0",10)||0,
+    blogHeight:parseInt(document.getElementById("blogHeight").value||"560",10)||560,
+    blogZoom:Math.min(2,Math.max(0.5,parseFloat(document.getElementById("blogZoom").value||"1")||1)),
+    blogOn:blogOn,
     pollNames:document.getElementById("names").value.split("\n").map(function(x){return x.trim();}).filter(Boolean)};
   var np=document.getElementById("newPw").value.trim(); if(np) body.newPassword=np;
   var at=document.getElementById("adToken").value.trim(); if(at) body.adsterraToken=at;
@@ -330,6 +389,15 @@ document.getElementById("frameZoom").addEventListener("input", function(){ loadF
 document.getElementById("previewRefresh").addEventListener("click", function(){ var fr=document.getElementById("framePreview"); fr.removeAttribute("src"); loadFramePreview(); });
 document.getElementById("live").addEventListener("change", loadFramePreview);
 document.getElementById("frameTop").addEventListener("input", function(){ loadFramePreview(); loadServerPreview(2); loadServerPreview(3); });
+document.getElementById("blogUpBtn").addEventListener("click", function(){ var el=document.getElementById("blogTop"); el.value=Math.max(0,(parseInt(el.value||"0",10)||0)-40); loadBlogPreview(); });
+document.getElementById("blogDownBtn").addEventListener("click", function(){ var el=document.getElementById("blogTop"); el.value=(parseInt(el.value||"0",10)||0)+40; loadBlogPreview(); });
+document.getElementById("blogZoomOutBtn").addEventListener("click", function(){ setBlogZoom(-0.25); });
+document.getElementById("blogZoomInBtn").addEventListener("click", function(){ setBlogZoom(0.25); });
+document.getElementById("blogZoom").addEventListener("input", loadBlogPreview);
+document.getElementById("blogTop").addEventListener("input", loadBlogPreview);
+document.getElementById("blogUrl").addEventListener("change", loadBlogPreview);
+document.getElementById("blogPreviewRefresh").addEventListener("click", function(){ var fr=document.getElementById("blogPreview"); fr.removeAttribute("src"); loadBlogPreview(); });
+document.getElementById("tglBlog").addEventListener("click", function(){ blogOn=!blogOn; setBlogTgl(blogOn); });
 ["s1","s2","s3"].forEach(function(k){
   var b=document.getElementById("tgl"+k.toUpperCase());
   if(b) b.addEventListener("click", function(){ serversOn[k]=!serversOn[k]; setTgl(k, serversOn[k]); });

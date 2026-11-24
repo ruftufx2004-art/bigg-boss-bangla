@@ -2,7 +2,8 @@
 // Public GET returns live stream links + poll names.
 // POST with the admin password updates them.
 //
-// LIVE settings (live, s2, s3, frameTop, frameHeight, frameZoom, serversOn)
+// LIVE settings (live, s2, s3, frameTop, frameHeight, frameZoom, serversOn,
+// blogUrl, blogTop, blogHeight, blogZoom, blogOn)
 // live in Supabase (table live_config, row id=1) — no KV daily-write limit.
 // Poll names/photos, the Adsterra token and the admin password stay in KV,
 // as do stats. Votes and chat moved to Supabase 2026-11-22 (tables
@@ -18,6 +19,11 @@ const DEFAULTS = {
   frameHeight: 560,
   frameZoom: 1,
   serversOn: { s1: true, s2: true, s3: true },
+  blogUrl: "https://biggboss-bangla.blogspot.com/",
+  blogTop: 0,
+  blogHeight: 560,
+  blogZoom: 1,
+  blogOn: true,
   s2: "https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3",
   s3: "https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3",
   pollNames: ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das","Ranieeta Dash"],
@@ -46,7 +52,7 @@ function sbRowUrl(env) {
 // Read the live row from Supabase. Returns the row object or null on any failure.
 async function sbGet(env) {
   try {
-    const res = await fetch(sbRowUrl(env) + "&select=live,s2,s3,frame_top,frame_height,frame_zoom,servers_on", { headers: sbHeaders(env), signal: timeoutSignal(5000) });
+    const res = await fetch(sbRowUrl(env) + "&select=live,s2,s3,frame_top,frame_height,frame_zoom,servers_on,blog_url,blog_top,blog_height,blog_zoom,blog_on", { headers: sbHeaders(env), signal: timeoutSignal(5000) });
     if (!res.ok) return null;
     const rows = await res.json();
     if (Array.isArray(rows) && rows.length) return rows[0];
@@ -68,6 +74,10 @@ function clampLive(cfg) {
   cfg.frameHeight = Math.min(1200, Math.max(200, Math.floor(cfg.frameHeight) || 560));
   cfg.frameZoom = Math.min(2, Math.max(0.5, cfg.frameZoom || 1));
   cfg.serversOn = { s1: cfg.serversOn.s1 !== false, s2: cfg.serversOn.s2 !== false, s3: cfg.serversOn.s3 !== false };
+  cfg.blogTop = Math.max(0, Math.floor(cfg.blogTop) || 0);
+  cfg.blogHeight = Math.min(1200, Math.max(200, Math.floor(cfg.blogHeight) || 560));
+  cfg.blogZoom = Math.min(2, Math.max(0.5, cfg.blogZoom || 1));
+  cfg.blogOn = cfg.blogOn !== false;
   return cfg;
 }
 async function readKvLive(kv, cfg) {
@@ -83,6 +93,16 @@ async function readKvLive(kv, cfg) {
   if (fz !== null && fz !== undefined && fz !== "") { const n = parseFloat(fz); if (!isNaN(n)) cfg.frameZoom = Math.min(2, Math.max(0.5, n)); }
   const so = await kv.get("cfg:serversOn");
   if (so) { try { const o = JSON.parse(so); if (o && typeof o === "object") cfg.serversOn = { s1: o.s1 !== false, s2: o.s2 !== false, s3: o.s3 !== false }; } catch (e) {} }
+  const bu = await kv.get("cfg:blogUrl");
+  if (bu) cfg.blogUrl = bu;
+  const bt = await kv.get("cfg:blogTop");
+  if (bt !== null && bt !== undefined && bt !== "") { const n = parseInt(bt, 10); if (!isNaN(n)) cfg.blogTop = Math.max(0, n); }
+  const bh = await kv.get("cfg:blogHeight");
+  if (bh !== null && bh !== undefined && bh !== "") { const n = parseInt(bh, 10); if (!isNaN(n)) cfg.blogHeight = Math.min(1200, Math.max(200, n)); }
+  const bz = await kv.get("cfg:blogZoom");
+  if (bz !== null && bz !== undefined && bz !== "") { const n = parseFloat(bz); if (!isNaN(n)) cfg.blogZoom = Math.min(2, Math.max(0.5, n)); }
+  const bo = await kv.get("cfg:blogOn");
+  if (bo !== null && bo !== undefined && bo !== "") { try { cfg.blogOn = JSON.parse(bo) !== false; } catch (e) {} }
   return cfg;
 }
 async function readConfig(kv, env) {
@@ -100,6 +120,11 @@ async function readConfig(kv, env) {
       if (typeof row.frame_height === "number") cfg.frameHeight = row.frame_height;
       if (typeof row.frame_zoom === "number") cfg.frameZoom = row.frame_zoom;
       if (row.servers_on && typeof row.servers_on === "object") cfg.serversOn = row.servers_on;
+      if (typeof row.blog_url === "string" && row.blog_url) cfg.blogUrl = row.blog_url;
+      if (typeof row.blog_top === "number") cfg.blogTop = row.blog_top;
+      if (typeof row.blog_height === "number") cfg.blogHeight = row.blog_height;
+      if (typeof row.blog_zoom === "number") cfg.blogZoom = row.blog_zoom;
+      if (typeof row.blog_on === "boolean") cfg.blogOn = row.blog_on;
     }
   }
   if (!fromSb) await readKvLive(kv, cfg);
@@ -131,6 +156,11 @@ export async function onRequest(context) {
     if (typeof body.frameHeight === "number") liveFields.frame_height = Math.min(1200, Math.max(200, Math.floor(body.frameHeight)));
     if (typeof body.frameZoom === "number") liveFields.frame_zoom = Math.min(2, Math.max(0.5, body.frameZoom));
     if (body.serversOn && typeof body.serversOn === "object") liveFields.servers_on = { s1: body.serversOn.s1 !== false, s2: body.serversOn.s2 !== false, s3: body.serversOn.s3 !== false };
+    if (typeof body.blogUrl === "string" && body.blogUrl.trim()) liveFields.blog_url = body.blogUrl.trim();
+    if (typeof body.blogTop === "number") liveFields.blog_top = Math.max(0, Math.floor(body.blogTop));
+    if (typeof body.blogHeight === "number") liveFields.blog_height = Math.min(1200, Math.max(200, Math.floor(body.blogHeight)));
+    if (typeof body.blogZoom === "number") liveFields.blog_zoom = Math.min(2, Math.max(0.5, body.blogZoom));
+    if (typeof body.blogOn === "boolean") liveFields.blog_on = body.blogOn;
     if (Object.keys(liveFields).length) {
       if (sbConfigured(env)) {
         let pr;
@@ -145,6 +175,11 @@ export async function onRequest(context) {
         if (liveFields.frame_height !== undefined) await kv.put("cfg:frameHeight", String(liveFields.frame_height));
         if (liveFields.frame_zoom !== undefined) await kv.put("cfg:frameZoom", String(liveFields.frame_zoom));
         if (liveFields.servers_on !== undefined) await kv.put("cfg:serversOn", JSON.stringify(liveFields.servers_on));
+        if (liveFields.blog_url !== undefined) await kv.put("cfg:blogUrl", liveFields.blog_url);
+        if (liveFields.blog_top !== undefined) await kv.put("cfg:blogTop", String(liveFields.blog_top));
+        if (liveFields.blog_height !== undefined) await kv.put("cfg:blogHeight", String(liveFields.blog_height));
+        if (liveFields.blog_zoom !== undefined) await kv.put("cfg:blogZoom", String(liveFields.blog_zoom));
+        if (liveFields.blog_on !== undefined) await kv.put("cfg:blogOn", JSON.stringify(liveFields.blog_on));
       }
     }
     // KV-backed fields: best effort — a KV write-limit failure must not
