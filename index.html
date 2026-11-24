@@ -408,16 +408,21 @@
         <span class="bbb-ott-nowtag" id="bbb-ott-nowtag">▶ Server 1 • Main Live HD</span>
 
         <!--
-          NOTE: Do NOT put any URL in this iframe's src. The live link comes
-          from the Admin Panel (/api/config) and is loaded by applyConfig()
-          after the page loads. A hardcoded src here would play FIRST and
-          visitors would see that preview before the real live appears.
+          NOTE (site-32): the live link is set here as the iframe's src so it
+          loads WITH the page, exactly like a plain embed — setting src later
+          from JS left the OK.ru player black / unstartable on this site
+          (verified: the same embed plays on a bare page on this site).
+          applyConfig() still reloads it if the Admin Panel link changes,
+          so swapping the live from admin works exactly as before.
+          The src/sandbox/allow below match the current Server 1 (OK.ru)
+          settings; load() re-applies them for whichever server is active.
         -->
         <iframe
           id="bbb-ott-frame"
           title="Bigg Boss Bangla Live Player"
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowfullscreen
+          src="https://ok.ru/videoembed/17758882569855?nochat=1"
+          sandbox="allow-scripts allow-same-origin"
+          allow="autoplay; encrypted-media; picture-in-picture"
           referrerpolicy="strict-origin-when-cross-origin"
           loading="eager"></iframe>
 
@@ -936,7 +941,10 @@
       frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture; fullscreen");
     }
     syncPlayBtn();
-    frame.src = url.trim();
+    /* Only (re)load the iframe when the URL actually changed (site-32):
+       re-setting the same src tears the player down and re-inits it,
+       which left the OK.ru player black / unstartable. */
+    if (frame.getAttribute("src") !== url.trim()) frame.src = url.trim();
     return true;
   }
 
@@ -945,7 +953,10 @@
     var direct = frame.getAttribute("src");
     if (isValid(direct)) {
       if (!isValid(servers[0].getAttribute("data-src"))) servers[0].setAttribute("data-src", direct);
-      if (isWebsite(direct)) { load(direct, "Server 1"); return; }
+      /* Set up the shield / sandbox / allow for the src already in the
+         iframe (site-32). load() will not reload it — see the src guard
+         in load() — it only wires up the player around the live embed. */
+      load(direct, "Server 1");
     } else {
       var s1 = servers[0].getAttribute("data-src");
       if (isValid(s1)) load(s1, servers[0].getAttribute("data-name"));
