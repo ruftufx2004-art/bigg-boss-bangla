@@ -56,9 +56,24 @@ export async function onRequest(context) {
   // unique visitors (device keys seen in the last 24h)
   const vis = await kv.list({ prefix: "visitors:", limit: 1000 });
   const uniqueVisitors = vis.keys.length;
-  // people on the site right now (heartbeat keys, 120s TTL)
-  const live = await kv.list({ prefix: "live:", limit: 1000 });
-  const liveNow = live.keys.length;
+  // people on the site right now — counted in Supabase (live_visitors),
+  // because KV writes run out every evening. A visitor counts for 90s
+  // after their last heartbeat (heartbeats fire every 30s), so the
+  // header number is the real count: 1 visitor shows 1, 2 show 2.
+  let liveNow = null;
+  if (sbConfigured(env)) {
+    try {
+      const since = new Date(Date.now() - 90000).toISOString();
+      const lr = await fetch(sbBase(env) + "live_visitors?select=device&last_seen=gt." + encodeURIComponent(since) + "&limit=1", { headers: { ...sbHeaders(env), "Prefer": "count=exact" }, signal: timeoutSignal(5000) });
+      const range = lr.headers.get("content-range") || "";
+      const n = parseInt((range.split("/")[1] || ""), 10);
+      if (!isNaN(n)) liveNow = n;
+    } catch (e) {}
+  }
+  if (liveNow == null) {
+    const live = await kv.list({ prefix: "live:", limit: 1000 });
+    liveNow = live.keys.length;
+  }
   // top pages by views
   const pages = await kv.list({ prefix: "views:page:", limit: 1000 });
   const topPages = [];
