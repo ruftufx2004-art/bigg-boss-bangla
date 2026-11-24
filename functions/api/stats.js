@@ -55,6 +55,12 @@ async function handleStats(env) {
   let liveNow = 0;
   let liveSource = "kv";
   let liveStatus = "";
+  // Today's unique visitors (Dhaka day): devices whose last heartbeat was
+  // after Dhaka midnight. Read-only — no extra KV writes, so it works even
+  // when the KV daily write limit is exhausted.
+  let todayVisitors = 0;
+  const dhakaShifted = new Date(Date.now() + 6 * 3600 * 1000);
+  const dhakaMidnightUTC = Date.UTC(dhakaShifted.getUTCFullYear(), dhakaShifted.getUTCMonth(), dhakaShifted.getUTCDate()) - 6 * 3600 * 1000;
   if (sbConfigured(env)) {
     try {
       const lr = await fetch(sbBase(env) + "live_visitors?select=device,last_seen&order=last_seen.desc&limit=1000", { headers: sbHeaders(env), signal: timeoutSignal(5000) });
@@ -66,6 +72,7 @@ async function handleStats(env) {
         for (const r of rows || []) {
           const t = Date.parse(r.last_seen);
           if (!isNaN(t) && t >= cutoff) n++;
+          if (!isNaN(t) && t >= dhakaMidnightUTC) todayVisitors++;
         }
         liveNow = n;
         liveSource = "supabase";
@@ -137,6 +144,7 @@ async function handleStats(env) {
     at: new Date().toISOString(),
     totalViews,
     uniqueVisitors,
+    todayVisitors,
     liveNow,
     liveSource,
     liveStatus,
