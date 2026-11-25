@@ -1276,7 +1276,7 @@
       if (d.chatTotal != null) chatCountEl.textContent = fmt(d.chatTotal);
     }).catch(function(){});
   }
-  loadRealCounts(); setInterval(loadRealCounts, 30000);
+  loadRealCounts(); setInterval(loadRealCounts, 60000);
 
   /* ---------- Live chat — real shared comments (Facebook style) ---------- */
   var list  = $("#bbb-ott-chat-list");
@@ -1501,7 +1501,7 @@
       if (!d.messages.length) showChatEmpty();
     }).catch(function(){});
   }
-  loadChat(); setInterval(loadChat, 10000);
+  loadChat(); setInterval(loadChat, 15000);
   setInterval(function(){
     Object.keys(chatRows).forEach(function(id){
       var tm = chatRows[id].querySelector(".bbb-ott-msg-time");
@@ -1543,7 +1543,7 @@
   (function(){
     function track(t){ try { fetch("/api/track", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:t, page:location.pathname, device:deviceId})}).catch(function(){}); } catch (e) {} }
     track("view");
-    setInterval(function(){ track("heartbeat"); }, 30000);
+    setInterval(function(){ track("heartbeat"); }, 60000);
   })();
   var pollNodes = {};
   function pollRender(data){

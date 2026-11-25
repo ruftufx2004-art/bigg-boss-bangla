@@ -46,8 +46,8 @@ async function handleStats(env) {
   if (!env.POLL_KV) return json({ error: "KV not bound yet", kv: false }, 500);
   const kv = env.POLL_KV;
   // 1) People on the site right now — FIRST, before any KV call.
-  // Counted in Supabase (live_visitors): a visitor counts for 90s after
-  // their last heartbeat (heartbeats fire every 30s), so the header
+  // Counted in Supabase (live_visitors): a visitor counts for 150s after
+  // their last heartbeat (heartbeats fire every 60s), so the header
   // number is the real count: 1 visitor shows 1, 2 show 2. The read
   // fetches the most recent rows and filters by time in plain JS (no
   // PostgREST filter syntax, no content-range parsing). If the Supabase
@@ -67,7 +67,7 @@ async function handleStats(env) {
       liveStatus = "http " + lr.status;
       if (lr.ok) {
         const rows = await lr.json();
-        const cutoff = Date.now() - 90000;
+        const cutoff = Date.now() - 150000;
         let n = 0;
         for (const r of rows || []) {
           const t = Date.parse(r.last_seen);
