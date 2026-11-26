@@ -92,7 +92,7 @@
 }
 
 /* ---------- Theater grid ---------- */
-.bbb-ott-theater{display:grid; grid-template-columns:minmax(0,7fr) minmax(0,3fr); gap:20px; align-items:stretch;}
+.bbb-ott-theater{display:grid; grid-template-columns:1fr; gap:20px; align-items:stretch;}
 .bbb-ott-playercol{min-width:0;}
 /* Fullscreen = ONLY the video (the player box), never the whole site.
    (Site-27: the stage used to be fullscreened here, so the whole player
@@ -136,18 +136,14 @@
   background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.15); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   pointer-events:none;
 }
-/* ---------- Transparent chat overlay over the video (YouTube-style) ----------
-   SAME chat, SAME comment box — just shown over the video, transparent.
-   A message posted here shows in the side chat too, and vice versa.
-   Sits above the shield (z-index 5) so the input/buttons are clickable.
-   Lives inside .bbb-ott-player, so it also shows in fullscreen. */
+/* Live chat BELOW the video (site-56): no longer an overlay on the video —
+   it sits right under the player, above the controls, so the video is fully visible.
+   SAME chat, SAME comment box as the comment section below the vote. */
 .bbb-ott-chat-overlay{
-  position:absolute; top:0; right:0; bottom:0; z-index:5;
-  width:340px; max-width:92%;
+  position:static; width:100%; max-width:none; height:300px; margin-top:10px;
   display:flex; flex-direction:column;
   background:rgba(0,0,0,.55);
-  backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
-  border-left:1px solid rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.12); border-radius:12px;
   color:#fff;
 }
 .bbb-ott-chat-overlay--hidden{display:none;}
@@ -165,15 +161,23 @@
 .bbb-ott-ov-form input::placeholder{color:rgba(255,255,255,.65);}
 .bbb-ott-ov-form button{padding:10px 14px; border-radius:20px; border:none; background:#8b5cf6; color:#fff; cursor:pointer; font-weight:700;}
 .bbb-ott-ov-open{
-  position:absolute; right:10px; bottom:10px; z-index:5;
-  padding:8px 12px; border-radius:20px; border:1px solid rgba(255,255,255,.25);
-  background:rgba(0,0,0,.6); color:#fff; cursor:pointer; font-size:13px; font-weight:700;
+  position:static; display:block; width:100%; margin-top:10px;
+  padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08); color:#fff; cursor:pointer; font-size:13px; font-weight:700;
 }
 .bbb-ott-ov-open[hidden]{display:none;}
-@media (max-width:560px){
-  .bbb-ott-chat-overlay{top:auto; left:0; right:0; bottom:0; width:100%; max-width:none; height:55%; border-left:none; border-top:1px solid rgba(255,255,255,.12);}
-}
 
+/* Video loader (site-56): JioHotstar-style ring that fills 0-100% while the
+   video (re)loads. Sits over the player; hides when the embed loads + ~2s,
+   or after a 10s safety cutoff. Cross-origin, so it cannot see the exact
+   second the video starts — the fill is an "almost done" feeling, not real progress. */
+.bbb-ott-loader{position:absolute; inset:0; z-index:6; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);}
+.bbb-ott-loader--hidden{display:none;}
+.bbb-ott-loader-box{text-align:center;}
+.bbb-ott-loader-ringwrap{position:relative; width:84px; height:84px; margin:0 auto;}
+.bbb-ott-loader-svg{display:block;}
+.bbb-ott-loader-pct{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:16px;}
+.bbb-ott-loader-text{color:#fff; font-size:13px; font-weight:700; margin-top:10px;}
 .bbb-ott-mini{
   padding:6px 11px; border-radius:12px; font-size:11px; font-weight:600; color:var(--bbb-text);
   background:rgba(255,255,255,.06); border:1px solid var(--bbb-line); transition:.2s;
@@ -193,7 +197,7 @@
 .bbb-ott-speeds button.is-on{background:rgba(255,255,255,.2);border-color:var(--bbb-gold);color:var(--bbb-gold);}
 .bbb-ott-cinema{width:100%;margin-top:10px;padding:7px 8px;border-radius:12px;font-size:12px;font-weight:700;color:var(--bbb-text);background:rgba(255,255,255,.06);border:1px solid var(--bbb-line);cursor:pointer;}
 .bbb-ott-theater--wide{grid-template-columns:1fr;}
-.bbb-ott-theater--wide .bbb-ott-chat{display:none;}
+.bbb-ott-theater--wide .bbb-ott-chat-overlay{display:none;}
 
 /* "24X7 uncut live" label under the servers */
 .bbb-ott-liveind{text-align:center;margin-top:12px;font-size:14px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#c084fc;}
@@ -213,13 +217,13 @@
 .bbb-ott-srv:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.2);}
 .bbb-ott-srv.is-active{background:linear-gradient(135deg,var(--bbb-red),#6d28d9); border-color:transparent; box-shadow:0 8px 26px rgba(139,92,246,.45);}
 .bbb-ott-srv.is-active small{color:rgba(255,255,255,.85);}
-.bbb-ott-srv--reload{flex:1 1 100%; background:#fff; color:#111; border-color:#fff; padding:8px 12px;}
-.bbb-ott-srv--reload small{color:#555;}
-.bbb-ott-srv--reload:hover{box-shadow:0 4px 18px rgba(255,255,255,.25);}
+.bbb-ott-srv--reload{flex:1 1 100%; background:linear-gradient(135deg,#1f80e0,#7c3aed); color:#fff; border-color:transparent; padding:8px 12px;}
+.bbb-ott-srv--reload small{color:rgba(255,255,255,.82);}
+.bbb-ott-srv--reload:hover{box-shadow:0 4px 18px rgba(31,128,224,.45);}
 
 /* ---------- Chat ---------- */
 .bbb-ott-chat{
-  display:flex; flex-direction:column; min-height:0; height:100%; max-height:640px; border-radius:12px; overflow:hidden;
+  display:flex; flex-direction:column; min-height:0; height:460px; max-height:640px; border-radius:12px; overflow:hidden;
   background:rgba(139,92,246,.10); border:1px solid var(--bbb-line);
   backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 20px 60px rgba(0,0,0,.55);
 }
@@ -534,21 +538,36 @@
           referrerpolicy="strict-origin-when-cross-origin"
           loading="eager"></iframe>
 
+        <!-- Video loader (site-56): JioHotstar-style ring + % that fills while the video loads -->
+        <div class="bbb-ott-loader bbb-ott-loader--hidden" id="bbb-ott-loader">
+          <div class="bbb-ott-loader-box">
+            <div class="bbb-ott-loader-ringwrap">
+              <svg class="bbb-ott-loader-svg" width="84" height="84" viewBox="0 0 84 84">
+                <defs><linearGradient id="bbbLoaderGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1f80e0"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs>
+                <circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="6"/>
+                <circle class="bbb-ott-loader-ring-fg" cx="42" cy="42" r="34" fill="none" stroke="url(#bbbLoaderGrad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" transform="rotate(-90 42 42)"/>
+              </svg>
+              <span class="bbb-ott-loader-pct" id="bbb-ott-loader-pct">0%</span>
+            </div>
+            <div class="bbb-ott-loader-text">ভিডিও লোড হচ্ছে…</div>
+          </div>
+        </div>
+
         <div class="bbb-ott-shield" id="bbb-ott-shield"><div class="bbb-ott-shield-strip bbb-ott-shield-strip--top"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--bottom"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--left"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--right"></div></div>
 
-        <!-- Transparent chat overlay over the video (YouTube-style).
-             SAME chat, SAME comment box — just shown over the video.
-             A message posted here shows in the side chat too, and vice versa. -->
-        <div class="bbb-ott-chat-overlay" id="bbb-ott-chat-overlay">
-          <div class="bbb-ott-ov-head"><span>Live Chat</span><span><span class="bbb-ott-ov-live">● LIVE</span><button type="button" class="bbb-ott-ov-close" id="bbb-ott-ov-close" title="Hide chat">✕</button></span></div>
-          <div class="bbb-ott-ov-list" id="bbb-ott-ov-list"></div>
-          <form class="bbb-ott-ov-form" id="bbb-ott-ov-form" autocomplete="off">
-            <input type="text" id="bbb-ott-ov-input" maxlength="200" placeholder="Comment লিখো..." aria-label="Chat message" />
-            <button type="submit">Send</button>
-          </form>
-        </div>
-        <button type="button" class="bbb-ott-ov-open" id="bbb-ott-ov-open" hidden>💬 Chat</button>
       </div>
+
+      <!-- Live chat BELOW the video (site-56): moved off the video so it no
+           longer covers half of it. SAME chat as the comment section below the vote. -->
+      <div class="bbb-ott-chat-overlay" id="bbb-ott-chat-overlay">
+        <div class="bbb-ott-ov-head"><span>Live Chat</span><span><span class="bbb-ott-ov-live">● LIVE</span><button type="button" class="bbb-ott-ov-close" id="bbb-ott-ov-close" title="Hide chat">✕</button></span></div>
+        <div class="bbb-ott-ov-list" id="bbb-ott-ov-list"></div>
+        <form class="bbb-ott-ov-form" id="bbb-ott-ov-form" autocomplete="off">
+          <input type="text" id="bbb-ott-ov-input" maxlength="200" placeholder="Comment লিখো..." aria-label="Chat message" />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+      <button type="button" class="bbb-ott-ov-open" id="bbb-ott-ov-open" hidden>💬 Chat দেখাও</button>
 
       <!-- Website frame mode: shows a cropped part of any website as the live feed -->
       <div class="bbb-ott-webframe" id="bbb-ott-webframe" hidden>
@@ -614,19 +633,7 @@
       </div>
     </div>
 
-    <!-- Live Fan Chat -->
-    <aside class="bbb-ott-chat" aria-label="Live Fan Chat">
-      <div class="bbb-ott-chat-head">
-        <h2>💬 Live Fan Chat</h2>
-        <span><b id="bbb-ott-chatcount">—</b> in chat</span>
-      </div>
-      <div class="bbb-ott-chat-list" id="bbb-ott-chat-list" aria-live="polite"></div>
-      <form class="bbb-ott-chat-form" id="bbb-ott-chat-form" autocomplete="off">
-        <input type="text" id="bbb-ott-chat-name" maxlength="20" placeholder="নাম" aria-label="Your name" readonly />
-        <input type="text" id="bbb-ott-chat-input" maxlength="200" placeholder="আপনার মতামত লিখুন… Say something!" aria-label="Chat message" />
-        <button type="submit">Send</button>
-      </form>
-    </aside>
+
   </section>
 
   <!-- Ad: 728x90 banner below theater -->
@@ -671,6 +678,21 @@
     <div class="bbb-ott-vote99-note" id="bbb-ott-vote99-note">ছবিতে চাপ দিলে ১টা করে ভোট জমা হবে — Submit চাপলে ভোট যাবে। লগইন ছাড়া ভোট যাবে না।</div>
     <div class="bbb-ott-vote99-bar"></div>
   </section>
+
+  <!-- Live Fan Chat -->
+    <aside class="bbb-ott-chat" aria-label="Live Fan Chat">
+      <div class="bbb-ott-chat-head">
+        <h2>💬 Live Fan Chat</h2>
+        <span><b id="bbb-ott-chatcount">—</b> in chat</span>
+      </div>
+      <div class="bbb-ott-chat-list" id="bbb-ott-chat-list" aria-live="polite"></div>
+      <form class="bbb-ott-chat-form" id="bbb-ott-chat-form" autocomplete="off">
+        <input type="text" id="bbb-ott-chat-name" maxlength="20" placeholder="নাম" aria-label="Your name" readonly />
+        <input type="text" id="bbb-ott-chat-input" maxlength="200" placeholder="আপনার মতামত লিখুন… Say something!" aria-label="Chat message" />
+        <button type="submit">Send</button>
+      </form>
+    </aside>
+
 
   <!-- ===== Episodes: Star Jalsha Official YouTube ===== -->
   <div class="bbb-ott-rowhead"><h2>All Episodes — Star Jalsha Official</h2><span>Episode 1–88 • Click to watch</span></div>
@@ -1109,7 +1131,37 @@
     });
   });
 
+  /* ---------- Video loader (site-56): JioHotstar ring + % ---------- */
+  var loaderEl = $("#bbb-ott-loader");
+  var loaderPct = $("#bbb-ott-loader-pct");
+  var loaderRing = loaderEl ? loaderEl.querySelector(".bbb-ott-loader-ring-fg") : null;
+  var loaderTimer = null, loaderCutoff = null;
+  function bbbShowLoader(maxMs){
+    if (!loaderEl) return;
+    loaderEl.classList.remove("bbb-ott-loader--hidden");
+    var start = Date.now(), dur = 2500, CIRC = 213.6;
+    if (loaderTimer) clearInterval(loaderTimer);
+    loaderTimer = setInterval(function(){
+      var p = Math.min(100, Math.round((Date.now()-start)/dur*100));
+      if (loaderRing) loaderRing.style.strokeDashoffset = (CIRC*(1-p/100)).toFixed(1);
+      if (loaderPct) loaderPct.textContent = p + "%";
+      if (p >= 100) clearInterval(loaderTimer);
+    }, 50);
+    if (loaderCutoff) clearTimeout(loaderCutoff);
+    loaderCutoff = setTimeout(bbbHideLoader, maxMs || 10000);
+  }
+  function bbbHideLoader(){
+    if (loaderTimer) clearInterval(loaderTimer);
+    if (loaderCutoff) clearTimeout(loaderCutoff);
+    if (loaderEl) loaderEl.classList.add("bbb-ott-loader--hidden");
+  }
+  /* Hide ~2s after the embed reports loaded; the cutoff above is the safety net
+     (the load event may already have fired before this script ran). */
+  if (frame) frame.addEventListener("load", function(){ setTimeout(bbbHideLoader, 2000); });
+  bbbShowLoader(6000);
+
   $("#bbb-ott-reload").addEventListener("click", function(){
+    bbbShowLoader(10000);
     if (webframe && !webframe.hidden) {
       var w = webiframe.getAttribute("src");
       if (!w) { toast("Nothing to reload — add a stream link first"); return; }
