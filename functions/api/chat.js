@@ -72,11 +72,12 @@ function normMsg(m) {
   return {
     id: m.id, name: m.name, text: m.text, t: m.t, parent: m.parent || null,
     likes: Array.isArray(m.likes) ? m.likes : [],
-    reacts: (m.reacts && typeof m.reacts === "object") ? m.reacts : {}
+    reacts: (m.reacts && typeof m.reacts === "object") ? m.reacts : {},
+    photo: (typeof m.photo === "string" && m.photo.indexOf("http") === 0) ? m.photo : null
   };
 }
 async function loadMsgs(env) {
-  const res = await sbReq(env, "chat_messages?select=id,name,text,t,parent,likes,reacts&order=t.desc&limit=" + MAX_MSG);
+  const res = await sbReq(env, "chat_messages?select=id,name,text,t,parent,likes,reacts,photo&order=t.desc&limit=" + MAX_MSG);
   if (!res.ok) throw new Error("chat read failed: " + res.status);
   const rows = await res.json();
   const list = (Array.isArray(rows) ? rows : []).reverse();
@@ -126,7 +127,7 @@ export async function onRequest(context) {
   if (body.action === "like" || body.action === "react") {
     let m;
     try {
-      const res = await sbReq(env, "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts");
+      const res = await sbReq(env, "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts,photo");
       if (!res.ok) return json({ error: "chat read failed" }, 500);
       const rows = await res.json();
       if (!Array.isArray(rows) || !rows.length) return json({ error: "not found" }, 404);
@@ -156,11 +157,21 @@ export async function onRequest(context) {
   // Server-authoritative display name: the device's assigned cute name, or
   // "Admin" only for Samiya's registered device. The name the browser sends
   // is ignored, so nobody can take another user's name or pretend to be Admin.
+  // Exception: a Google-logged-in user posts under their Google profile
+  // (name + photo) — the browser sends googleName/googlePhoto for that.
   var name = await getDeviceName(env, device);
-  if (!name) name = await assignCuteName(env, device);
-  if (!name) {
-    name = clean(body.name).slice(0, 20) || "Fan";
-    if (name.toLowerCase() === "admin") name = "Fan"; // KV down: never let anyone claim Admin
+  var photo = null;
+  var gName = clean(body.googleName).slice(0, 60);
+  var gPhoto = clean(body.googlePhoto).slice(0, 500);
+  if (gName && gName.toLowerCase() !== "admin") {
+    name = gName;
+    if (gPhoto.indexOf("http") === 0) photo = gPhoto;
+  } else {
+    if (!name) name = await assignCuteName(env, device);
+    if (!name) {
+      name = clean(body.name).slice(0, 20) || "Fan";
+      if (name.toLowerCase() === "admin") name = "Fan"; // KV down: never let anyone claim Admin
+    }
   }
   try {
     const rateRes = await sbReq(env, "chat_rate?device=eq." + encodeURIComponent(device) + "&select=last_ms");
@@ -177,7 +188,7 @@ export async function onRequest(context) {
   if (parent && !msgs.find(function (x) { return x.id === parent; })) return json({ error: "no parent" }, 400);
   const msg = {
     id: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-    name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}
+    name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}, photo: photo
   };
   let ins;
   try {

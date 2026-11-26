@@ -97,6 +97,13 @@
     </div>
 
     <div class="card">
+      <h2>👥 ভোটাররা — কে কাকে কত ভোট দিল</h2>
+      <p class="hint">Google লগইন করে যারা ভোট দিয়েছে, তাদের নাম, ইমেইল আর প্রত্যেক প্রতিযোগীকে কত ভোট দিয়েছে — এখানে দেখাবে। (আগের ডিভাইস-ভিত্তিক ভোটাররা "Device (old)" হিসেবে দেখাবে।)</p>
+      <button class="ghost" id="votersRefresh" type="button">🔄 ভোটার তালিকা রিফ্রেশ করুন</button>
+      <div id="votersList" style="font-size:13px;line-height:1.7;margin-top:10px">—</div>
+    </div>
+
+    <div class="card">
       <h2>💬 লাইভ চ্যাট — Admin নাম</h2>
       <p class="hint">চ্যাটে <b style="color:var(--gold)">Admin</b> নামটি শুধু আপনার। এই বোতামটি চাপলে এই ডিভাইসটি Admin হিসেবে নিবন্ধিত হবে — এরপর এই ডিভাইস থেকে চ্যাট করলে আপনার নাম Admin দেখাবে। অন্য কেউ Admin নাম নিতে পারবে না; বাকি সবাই একটা করে আলাদা কিউট নাম (Classy, Muse, Oggy…) পাবে। প্রতিটি ডিভাইসে (ফোন / কম্পিউটার) একবার করে করুন।</p>
       <button class="ghost" id="regAdminBtn" type="button">👑 এই ডিভাইসকে Admin হিসেবে নিবন্ধন করুন</button>
@@ -214,6 +221,25 @@ function loadAdsterra(){
     note.textContent="গত "+(d.days||7)+" দিনের হিসাব ("+(d.start_date||"")+" → "+(d.finish_date||"")+")।";
   }).catch(function(){});
 }
+function loadVoters(){
+  var box=document.getElementById("votersList");
+  if(!box) return;
+  fetch("/api/voters",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})})
+    .then(function(r){ if(!r.ok) throw new Error("err"); return r.json(); })
+    .then(function(d){
+      if(!d.ok || !d.voters) { box.textContent="ভোটার তালিকা আনতে সমস্যা।"; return; }
+      if(!d.voters.length){ box.textContent="এখনো কেউ Google লগইন করে ভোট দেয়নি।"; return; }
+      var html="<b>"+d.totalVoters+" জন ভোটার • "+d.totalVotes+" ভোট</b><br>";
+      d.voters.forEach(function(v,i){
+        var parts=[];
+        Object.keys(v.votes||{}).forEach(function(k){ parts.push(k+" — "+v.votes[k]); });
+        html += (i+1)+". <b>"+escapeHtml(v.name||"—")+"</b>"+(v.email?" ("+escapeHtml(v.email)+")":"")+" • মোট <b>"+v.total+"</b> ভোট<br><span style='color:var(--gold)'>"+escapeHtml(parts.join(" • "))+"</span><br>";
+      });
+      box.innerHTML=html;
+    })
+    .catch(function(){ box.textContent="ভোটার তালিকা আনতে সমস্যা (Workers বন্ধ থাকলে পরে চেষ্টা করো)।"; });
+}
+function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 function isWebsiteLink(u){
   u=extractSrc(u);
   if(!u) return false;
@@ -262,6 +288,7 @@ function enterPanel(){
   document.getElementById("panel").style.display="block";
   loadConfig(); loadInstallStats(); setInterval(loadInstallStats, 10000);
   loadStats(); loadAdsterra(); setInterval(function(){ loadStats(); loadAdsterra(); }, 30000);
+  loadVoters();
 }
 document.getElementById("loginBtn").addEventListener("click", function(){
   pw=document.getElementById("pw").value;
@@ -299,6 +326,7 @@ document.getElementById("saveBtn").addEventListener("click", function(){
 });
 document.getElementById("statRefresh").addEventListener("click", function(e){ e.preventDefault(); loadInstallStats(); });
 document.getElementById("statsRefresh").addEventListener("click", function(e){ e.preventDefault(); loadStats(); loadAdsterra(); });
+document.getElementById("votersRefresh").addEventListener("click", function(e){ e.preventDefault(); loadVoters(); });
 document.getElementById("upBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=Math.max(0,(parseInt(el.value||"0",10)||0)-40); loadFramePreview(); });
 document.getElementById("downBtn").addEventListener("click", function(){ var el=document.getElementById("frameTop"); el.value=(parseInt(el.value||"0",10)||0)+40; loadFramePreview(); });
 function setZoom(d){ var el=document.getElementById("frameZoom"); var v=(parseFloat(el.value||"1")||1)+d; v=Math.min(2,Math.max(0.5,Math.round(v*4)/4)); el.value=v; loadFramePreview(); }

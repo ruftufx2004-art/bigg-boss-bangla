@@ -394,6 +394,23 @@
 .bbb-ott-vote99-note{font-size:12px;color:var(--bbb-muted);padding:0 18px 14px;text-align:center;}
 .bbb-ott-vote99-sharewrap{text-align:center;padding:0 18px 16px;}
 .bbb-ott-vote99-share{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;border:0;font-family:inherit;background:#7c3aed;color:#fff;}
+.bbb-ott-vote99-auth{margin:10px 18px 0;border:1px solid var(--bbb-line);border-radius:12px;padding:12px;background:rgba(255,255,255,.03);}
+.bbb-ott-vote99-authrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.bbb-ott-vote99-googlebtn{padding:10px 16px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;border:0;font-family:inherit;background:#fff;color:#111;}
+.bbb-ott-vote99-authhint{font-size:12px;color:var(--bbb-muted);}
+.bbb-ott-vote99-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#222;flex:0 0 auto;}
+.bbb-ott-vote99-who{line-height:1.3;flex:1;min-width:0;}
+.bbb-ott-vote99-who b{font-size:14px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bbb-ott-vote99-who span{display:block;font-size:12px;color:var(--bbb-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bbb-ott-vote99-signout{padding:8px 12px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;border:1px solid var(--bbb-line);font-family:inherit;background:transparent;color:var(--bbb-text);}
+.bbb-ott-vote99-pending{text-align:center;font-size:13px;font-weight:700;color:#fbbf24;padding:2px 18px 0;}
+.bbb-ott-vote99-pic--pending{border-color:#f59e0b;}
+.bbb-ott-vote99-badge--pending{background:#f59e0b;}
+.bbb-ott-vote99-submitwrap{text-align:center;padding:4px 18px 12px;}
+.bbb-ott-vote99-submit{padding:12px 28px;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;border:0;font-family:inherit;background:#22c55e;color:#fff;width:100%;max-width:340px;}
+.bbb-ott-vote99-submit:disabled{background:#333;color:#888;cursor:not-allowed;}
+.bbb-ott-vote99-loginprompt{text-align:center;color:#fbbf24;font-weight:800;font-size:14px;padding:8px 18px 0;}
+.bbb-ott-vote99-errline{text-align:center;color:#f87171;font-weight:700;font-size:13px;padding:6px 18px 0;}
 .bbb-ott-epad{display:none; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 @media (max-width:980px){ .bbb-ott-epad{display:flex;} }
 
@@ -630,12 +647,27 @@
   <section class="bbb-ott-vote99" id="bbb-ott-vote99">
     <div class="bbb-ott-vote99-head"><h2>Bigg Boss</h2></div>
     <div class="bbb-ott-vote99-sub">VOTE TO SAVE YOUR FAVOURITE CONTESTANT!</div>
+    <div class="bbb-ott-vote99-auth" id="bbb-ott-vote99-auth">
+      <div class="bbb-ott-vote99-authrow" id="bbb-ott-vote99-auth-out">
+        <button type="button" class="bbb-ott-vote99-googlebtn" id="bbb-ott-vote99-google">G&nbsp; Sign in with Google</button>
+        <span class="bbb-ott-vote99-authhint">ভোট দিতে Google দিয়ে লগইন করো — একটাই ক্লিক, কোনো OTP লাগবে না।</span>
+      </div>
+      <div class="bbb-ott-vote99-authrow" id="bbb-ott-vote99-auth-in" hidden>
+        <img class="bbb-ott-vote99-avatar" id="bbb-ott-vote99-avatar" src="" alt="" hidden>
+        <div class="bbb-ott-vote99-who"><b id="bbb-ott-vote99-name"></b><span id="bbb-ott-vote99-email"></span></div>
+        <button type="button" class="bbb-ott-vote99-signout" id="bbb-ott-vote99-signout">Sign out</button>
+      </div>
+    </div>
     <div class="bbb-ott-vote99-thanks" id="bbb-ott-vote99-thanks" hidden>ধন্যবাদ! তোমার ভোট দেওয়া হয়েছে</div>
     <div class="bbb-ott-vote99-sharewrap" id="bbb-ott-vote99-sharewrap" hidden><button type="button" class="bbb-ott-vote99-share" id="bbb-ott-vote99-share">↗ বন্ধুদের সাথে শেয়ার করো</button></div>
-    <div class="bbb-ott-vote99-left" id="bbb-ott-vote99-left">৯৯ ভোট বাকি — ভোট দিতে থাকো!</div>
+    <div class="bbb-ott-vote99-left" id="bbb-ott-vote99-left">ভোট দিতে Google দিয়ে লগইন করো</div>
+    <div class="bbb-ott-vote99-pending" id="bbb-ott-vote99-pending" hidden></div>
+    <div class="bbb-ott-vote99-loginprompt" id="bbb-ott-vote99-loginprompt" hidden>👆 ভোট দিতে প্রথমে Google দিয়ে লগইন করো</div>
+    <div class="bbb-ott-vote99-errline" id="bbb-ott-vote99-errline" hidden></div>
     <div class="bbb-ott-vote99-grid" id="bbb-ott-vote99-grid"></div>
+    <div class="bbb-ott-vote99-submitwrap"><button type="button" class="bbb-ott-vote99-submit" id="bbb-ott-vote99-submit" disabled>Submit</button></div>
     <div class="bbb-ott-vote99-results" id="bbb-ott-vote99-results"></div>
-    <div class="bbb-ott-vote99-note" id="bbb-ott-vote99-note">ছবিতে চাপ দিলেই ১টা করে ভোট যাবে — বারবার চাপলে ভোট বাড়তে থাকবে।</div>
+    <div class="bbb-ott-vote99-note" id="bbb-ott-vote99-note">ছবিতে চাপ দিলে ১টা করে ভোট জমা হবে — Submit চাপলে ভোট যাবে। লগইন ছাড়া ভোট যাবে না।</div>
     <div class="bbb-ott-vote99-bar"></div>
   </section>
 
@@ -1521,7 +1553,7 @@
     return sbCuteName(deviceId);
   }
   function sbLoad(){
-    return fetch(sbBase() + "chat_messages?select=id,name,text,t,parent,likes,reacts&order=t.desc&limit=100", {headers: sbHeaders()})
+    return fetch(sbBase() + "chat_messages?select=id,name,text,t,parent,likes,reacts,photo&order=t.desc&limit=100", {headers: sbHeaders()})
       .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
       .then(function(rows){
         var list = (Array.isArray(rows) ? rows : []).reverse();
@@ -1534,7 +1566,7 @@
       return Promise.resolve({ok: true, name: sbDirectName()});
     }
     if (body.action === "like" || body.action === "react") {
-      return fetch(sbBase() + "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts", {headers: sbHeaders()})
+      return fetch(sbBase() + "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts,photo", {headers: sbHeaders()})
         .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
         .then(function(rows){
           if (!rows || !rows.length) throw new Error("err");
@@ -1568,12 +1600,21 @@
     if (!text) return Promise.reject(new Error("empty"));
     if (Date.now() - sbLastPostMs < 5000) return Promise.reject(new Error("too fast"));
     sbLastPostMs = Date.now();
+    /* Google-logged-in users post under their Google profile (name + photo);
+       anonymous users keep their cute name, as before. */
     var name = sbDirectName();
-    if (String(body.name || "").toLowerCase() === "admin" && name !== "Admin") name = sbCuteName(device);
+    var photo = "";
+    if (typeof googleUser !== "undefined" && googleUser) {
+      name = googleUser.name || "Google User";
+      photo = googleUser.avatar || "";
+      if (name.toLowerCase() === "admin") name = "Google User";
+    } else if (String(body.name || "").toLowerCase() === "admin" && name !== "Admin") {
+      name = sbCuteName(device);
+    }
     var parent = String(body.parent || "");
     var msg = {
       id: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-      name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}
+      name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}, photo: photo || null
     };
     return fetch(sbBase() + "chat_messages", {
       method: "POST",
@@ -1586,6 +1627,12 @@
     });
   }
   function chatPost(body){
+    /* Google-logged-in users post under their Google profile — the Worker
+       (and the direct fallback) use googleName/googlePhoto for the message. */
+    if (typeof googleUser !== "undefined" && googleUser && body && body.text) {
+      body.googleName = googleUser.name || "";
+      body.googlePhoto = googleUser.avatar || "";
+    }
     return fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)})
       .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
       .then(function(d){ if (!d || d.error) throw new Error("err"); chatDirect = false; return d; })
@@ -1709,7 +1756,7 @@
     av.style.background = chatColor(m.name);
     av.textContent = (m.name || "F").charAt(0).toUpperCase();
     var avImg = document.createElement("img");
-    avImg.src = chatAvatarImg(m.name || "F");
+    avImg.src = (m.photo && typeof m.photo === "string" && m.photo.indexOf("http") === 0) ? m.photo : chatAvatarImg(m.name || "F");
     avImg.alt = "";
     avImg.onerror = function(){ avImg.remove(); };
     av.appendChild(avImg);
@@ -1865,15 +1912,109 @@
   ];
   var vote99Mine = {};
   var vote99Used = 0;
+  var vote99Pending = {};
+  var vote99PendingTotal = 0;
   var vote99Counts = {};
   var vote99TotalAll = 0;
-  try {
-    var saved99 = JSON.parse(localStorage.getItem("bbb-vote99") || "{}");
-    if (saved99 && typeof saved99 === "object") {
-      VOTE99.forEach(function(p){ var v = parseInt(saved99[p.key], 10) || 0; if (v > 0) { vote99Mine[p.key] = v; vote99Used += v; } });
+  var vote99Submitting = false;
+
+  /* ---------- Google login (Supabase Auth REST, no supabase-js) ---------- */
+  /* One Google account = one voter, 99 votes. Clearing browser data cannot
+     reset it — signing in again gives the same Google id, so the same 99
+     budget applies. Old device votes stay counted in the shared totals. */
+  var GOOGLE_USER_KEY = "bbb-google-user";
+  var googleUser = null; /* {id, email, name, avatar, access_token} */
+  function loadGoogleUser(){
+    try { var s = localStorage.getItem(GOOGLE_USER_KEY); if (s) googleUser = JSON.parse(s); } catch (e) { googleUser = null; }
+  }
+  function saveGoogleUser(){
+    try { if (googleUser) localStorage.setItem(GOOGLE_USER_KEY, JSON.stringify(googleUser)); else localStorage.removeItem(GOOGLE_USER_KEY); } catch (e) {}
+  }
+  /* Vote key: "g_" + Google user id. Null when logged out (no voting). */
+  function voteKey(){ return googleUser ? ("g_" + googleUser.id) : null; }
+  function mineStorageKey(){ var k = voteKey(); return k ? ("bbb-google-vote99-" + k) : null; }
+  function vote99SaveMine(){
+    var k = mineStorageKey(); if (!k) return;
+    try { localStorage.setItem(k, JSON.stringify(vote99Mine)); } catch (e) {}
+  }
+  function vote99LoadMineLocal(){
+    var k = mineStorageKey(); if (!k) return;
+    try {
+      var saved = JSON.parse(localStorage.getItem(k) || "{}");
+      vote99Mine = {}; vote99Used = 0;
+      VOTE99.forEach(function(p){ var v = parseInt(saved[p.key], 10) || 0; if (v > 0) { vote99Mine[p.key] = v; vote99Used += v; } });
+    } catch (e) {}
+  }
+  function googleSignIn(){
+    var redirect = location.href.split("#")[0].split("?")[0];
+    location.href = SB_URL + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(redirect);
+  }
+  function googleSignOut(){
+    googleUser = null; saveGoogleUser();
+    vote99Mine = {}; vote99Used = 0; vote99Pending = {}; vote99PendingTotal = 0;
+    renderAuth(); vote99Render();
+  }
+  /* On return from Google, the access_token is in location.hash. */
+  function handleAuthHash(){
+    if (!location.hash) return false;
+    var params = new URLSearchParams(location.hash.substring(1));
+    var token = params.get("access_token");
+    if (!token) return false;
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+    fetch(SB_URL + "/auth/v1/user", {headers: {"apikey": SB_ANON, "Authorization": "Bearer " + token, "Accept": "application/json"}})
+      .then(function(r){ if (!r.ok) throw new Error("user fetch HTTP " + r.status); return r.json(); })
+      .then(function(u){
+        var md = u.user_metadata || {};
+        googleUser = {
+          id: u.id,
+          email: u.email || "",
+          name: md.full_name || md.name || u.email || "Google User",
+          avatar: md.avatar_url || md.picture || "",
+          access_token: token
+        };
+        saveGoogleUser();
+        renderAuth();
+        upsertProfile();
+        vote99LoadMineLocal();
+        vote99Load();
+      })
+      .catch(function(){ renderAuth(); });
+    return true;
+  }
+  /* Save the voter's profile so the Admin Panel can show who voted for whom.
+     user_id = the vote key, so vote99.device joins vote_profiles.user_id. */
+  function upsertProfile(){
+    if (!googleUser) return;
+    var body = { user_id: voteKey(), name: googleUser.name || "", email: googleUser.email || "", photo: googleUser.avatar || "", updated_at: new Date().toISOString() };
+    try {
+      fetch(sbBase() + "vote_profiles", {method: "POST", headers: Object.assign({}, sbHeaders(), {"Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"}), body: JSON.stringify(body)}).catch(function(){});
+    } catch (e) {}
+  }
+  function renderAuth(){
+    var out = $("#bbb-ott-vote99-auth-out"), inn = $("#bbb-ott-vote99-auth-in");
+    if (!out || !inn) return;
+    if (googleUser) {
+      out.hidden = true; inn.hidden = false;
+      var nm = $("#bbb-ott-vote99-name"), em = $("#bbb-ott-vote99-email"), av = $("#bbb-ott-vote99-avatar");
+      if (nm) nm.textContent = googleUser.name;
+      if (em) em.textContent = googleUser.email;
+      if (av) { if (googleUser.avatar) { av.src = googleUser.avatar; av.hidden = false; } else { av.hidden = true; } }
+    } else {
+      out.hidden = false; inn.hidden = true;
     }
-  } catch (e) {}
-  function vote99SaveMine(){ try { localStorage.setItem("bbb-vote99", JSON.stringify(vote99Mine)); } catch (e) {} }
+  }
+  var googleBtn = $("#bbb-ott-vote99-google");
+  if (googleBtn) googleBtn.addEventListener("click", googleSignIn);
+  var signoutBtn = $("#bbb-ott-vote99-signout");
+  if (signoutBtn) signoutBtn.addEventListener("click", googleSignOut);
+  loadGoogleUser();
+  var authHashHandled = handleAuthHash();
+  renderAuth();
+  if (googleUser && !authHashHandled) { vote99LoadMineLocal(); upsertProfile(); }
+
+  /* ---------- Device id (chat cute names + stats) ---------- */
+  /* The vote key is the Google user id now, but chat names and stats still
+     use the per-device id (unchanged). */
   var deviceId = localStorage.getItem("bbb-poll-device");
   if (!deviceId) { deviceId = "d" + Date.now().toString(36) + Math.random().toString(36).slice(2,10); localStorage.setItem("bbb-poll-device", deviceId); }
   // Cute default chat name: the server gives each device one unique cute name.
@@ -1896,38 +2037,60 @@
     track("view");
     setInterval(function(){ track("heartbeat"); }, 60000);
   })();
+  function vote99ShowErr(msg){
+    var e = $("#bbb-ott-vote99-errline");
+    if (!e) return;
+    if (msg) { e.textContent = msg; e.hidden = false; } else { e.hidden = true; }
+  }
   function vote99Render(){
-    var left = VOTE99_TOTAL - vote99Used;
+    var left = VOTE99_TOTAL - vote99Used - vote99PendingTotal;
     if (left < 0) left = 0;
-    if (vote99Left) vote99Left.textContent = left > 0 ? (left + " Votes left today. Keep voting!") : "0 Votes left today. Thanks for voting!";
+    var pendEl = $("#bbb-ott-vote99-pending");
+    if (!googleUser) {
+      if (vote99Left) vote99Left.textContent = "ভোট দিতে Google দিয়ে লগইন করো";
+      if (pendEl) pendEl.hidden = true;
+    } else if (left > 0) {
+      if (vote99Left) vote99Left.textContent = left + " ভোট বাকি — ভোট দিতে থাকো!";
+      if (pendEl) { pendEl.hidden = vote99PendingTotal <= 0; if (vote99PendingTotal > 0) pendEl.textContent = "⏳ " + vote99PendingTotal + " ভোট সাবমিটের অপেক্ষায়"; }
+    } else {
+      if (vote99Left) vote99Left.textContent = "০ ভোট বাকি — ধন্যবাদ!";
+      if (pendEl) { pendEl.hidden = vote99PendingTotal <= 0; if (vote99PendingTotal > 0) pendEl.textContent = "⏳ " + vote99PendingTotal + " ভোট সাবমিটের অপেক্ষায়"; }
+    }
     if (vote99Thanks) vote99Thanks.hidden = vote99Used <= 0;
     var vote99ShareWrap = $("#bbb-ott-vote99-sharewrap");
     if (vote99ShareWrap) vote99ShareWrap.hidden = vote99Used <= 0;
+    var submitBtn = $("#bbb-ott-vote99-submit");
+    if (submitBtn) {
+      submitBtn.disabled = (vote99PendingTotal <= 0) || vote99Submitting || !googleUser;
+      submitBtn.textContent = vote99Submitting ? "পাঠানো হচ্ছে…" : (vote99PendingTotal > 0 ? ("Submit (" + vote99PendingTotal + " ভোট)") : "Submit");
+    }
     if (vote99Grid) {
       vote99Grid.textContent = "";
       VOTE99.forEach(function(p){
         var mine = vote99Mine[p.key] || 0;
+        var pend = vote99Pending[p.key] || 0;
+        var shown = mine + pend;
         var cell = document.createElement("button");
         cell.type = "button";
         cell.className = "bbb-ott-vote99-cell";
         var wrap = document.createElement("span");
         wrap.className = "bbb-ott-vote99-picwrap";
         var img = document.createElement("img");
-        img.className = "bbb-ott-vote99-pic" + (mine > 0 ? " bbb-ott-vote99-pic--voted" : "");
+        img.className = "bbb-ott-vote99-pic" + (mine > 0 ? " bbb-ott-vote99-pic--voted" : "") + ((mine <= 0 && pend > 0) ? " bbb-ott-vote99-pic--pending" : "");
         img.src = p.photo; img.alt = p.short; img.loading = "lazy";
         img.onerror = function(){ this.style.display = "none"; };
         wrap.appendChild(img);
-        if (mine > 0) {
+        if (shown > 0) {
           var badge = document.createElement("span");
-          badge.className = "bbb-ott-vote99-badge";
-          badge.textContent = mine;
+          badge.className = "bbb-ott-vote99-badge" + (pend > 0 ? " bbb-ott-vote99-badge--pending" : "");
+          badge.textContent = shown;
           wrap.appendChild(badge);
         }
         var nm = document.createElement("span");
         nm.className = "bbb-ott-vote99-name";
         nm.textContent = p.short;
         cell.appendChild(wrap); cell.appendChild(nm);
-        cell.addEventListener("click", function(){ vote99Cast(p.key, 1); });
+        cell.addEventListener("click", function(){ vote99Tap(p.key); });
         vote99Grid.appendChild(cell);
       });
     }
@@ -1974,12 +2137,18 @@
     vote99Render();
   }
   function vote99Load(){
-    fetch("/api/poll?device=" + encodeURIComponent(deviceId)).then(function(r){
+    var k = voteKey();
+    if (!k) { vote99LoadDirect(); return; }
+    fetch("/api/poll?device=" + encodeURIComponent(k)).then(function(r){
       if (!r.ok) throw new Error("api");
       return r.json();
     }).then(vote99Apply).catch(function(){ vote99LoadDirect(); });
   }
   function vote99LoadDirect(){
+    /* Totals come from poll_votes (public). My own votes cannot be read
+       from vote99 (anon has no SELECT on it), so they load from localStorage
+       keyed by my Google vote key and sync from the RPC on each Submit. */
+    vote99LoadMineLocal();
     try {
       fetch(sbBase() + "poll_votes?select=name,count", {headers: sbHeaders()}).then(function(r){
         if (!r.ok) throw new Error("sb");
@@ -1992,26 +2161,65 @@
       }).catch(function(){ vote99Render(); });
     } catch (e) { vote99Render(); }
   }
-  function vote99Cast(key, n){
-    if (vote99Used >= VOTE99_TOTAL) return;
-    var give = Math.min(n, VOTE99_TOTAL - vote99Used);
-    vote99Mine[key] = (vote99Mine[key] || 0) + give;
-    vote99Used += give;
-    vote99SaveMine();
+  /* Tap = allocate one vote LOCALLY as pending (not sent yet). */
+  function vote99Tap(key){
+    if (!googleUser) {
+      var lp = $("#bbb-ott-vote99-loginprompt");
+      if (lp) lp.hidden = false;
+      return;
+    }
+    var lp2 = $("#bbb-ott-vote99-loginprompt");
+    if (lp2) lp2.hidden = true;
+    if (vote99Submitting) return;
+    var left = VOTE99_TOTAL - vote99Used - vote99PendingTotal;
+    if (left <= 0) return;
+    vote99Pending[key] = (vote99Pending[key] || 0) + 1;
+    vote99PendingTotal += 1;
     vote99Render();
-    fetch("/api/poll", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: deviceId, choice: key, count: give})})
+  }
+  /* Submit = send all pending votes, then show thanks + share. */
+  function vote99Submit(){
+    if (!googleUser) { var lp = $("#bbb-ott-vote99-loginprompt"); if (lp) lp.hidden = false; return; }
+    if (vote99PendingTotal <= 0 || vote99Submitting) return;
+    vote99Submitting = true;
+    vote99ShowErr("");
+    vote99Render();
+    var keys = Object.keys(vote99Pending).filter(function(k){ return vote99Pending[k] > 0; });
+    var failed = [];
+    var chain = Promise.resolve();
+    keys.forEach(function(key){
+      chain = chain.then(function(){
+        var n = vote99Pending[key] || 0;
+        if (n <= 0) return;
+        return vote99Send(key, n).then(function(){
+          vote99Pending[key] = 0;
+          vote99PendingTotal -= n;
+        }).catch(function(){ failed.push(key); });
+      });
+    });
+    chain.then(function(){
+      vote99Submitting = false;
+      if (failed.length) {
+        vote99ShowErr("⚠ " + failed.join(", ") + "-এর ভোট পাঠানো যায়নি — পেন্ডিং আছে, আবার Submit চাপো।");
+      }
+      vote99Render();
+      vote99Load();
+    });
+  }
+  /* Send one contestant's votes: /api/poll first, direct RPC when Workers are down. */
+  function vote99Send(key, n){
+    var body = JSON.stringify({device: voteKey(), choice: key, count: n});
+    return fetch("/api/poll", {method:"POST", headers:{"Content-Type":"application/json"}, body: body})
       .then(function(r){ if (!r.ok) throw new Error("api"); return r.json(); })
-      .then(vote99Apply)
-      .catch(function(){ vote99CastDirect(key, give); });
+      .then(function(d){ if (d) vote99Apply(d); return d; })
+      .catch(function(){
+        return fetch(sbBase() + "rpc/cast_vote99", {method:"POST", headers: Object.assign({}, sbHeaders(), {"Content-Type":"application/json"}), body: JSON.stringify({p_device: voteKey(), p_choice: key, p_n: n})})
+          .then(function(r){ if (!r.ok) throw new Error("rpc"); return r.json(); })
+          .then(function(d){ if (d) vote99Apply(d); return d; });
+      });
   }
-  function vote99CastDirect(key, give){
-    try {
-      fetch(sbBase() + "rpc/cast_vote99", {method:"POST", headers: Object.assign({}, sbHeaders(), {"Content-Type":"application/json"}), body: JSON.stringify({p_device: deviceId, p_choice: key, p_n: give})})
-        .then(function(r){ if (!r.ok) throw new Error("rpc"); return r.json(); })
-        .then(function(d){ if (d) vote99Apply(d); })
-        .catch(function(){});
-    } catch (e) {}
-  }
+  var vote99SubmitBtn = $("#bbb-ott-vote99-submit");
+  if (vote99SubmitBtn) vote99SubmitBtn.addEventListener("click", vote99Submit);
   /* Site config from Admin Panel (live links + poll names); falls back to built-in values */
   function applyConfig(cfg){
     if (cfg && typeof cfg.frameTop === "number") frameCfg.top = Math.max(0, cfg.frameTop);
