@@ -2325,6 +2325,7 @@
         saveGoogleUser();
         renderAuth();
         hideLoginPop();
+        applyStoredName();
         upsertProfile();
         vote99LoadMineLocal();
         vote99Load();
@@ -2332,13 +2333,36 @@
       .catch(function(){ renderAuth(); });
     return true;
   }
+  /* If vote_profiles has a manually-set display name for this user, use it
+     for chat + header instead of the Google account name. */
+  function applyStoredName(){
+    if (!googleUser) return;
+    try {
+      fetch(sbBase() + "vote_profiles?select=name&user_id=eq." + encodeURIComponent(profileKey()), {headers: sbHeaders()}).then(function(r){ return r.json(); }).then(function(rows){
+        if (rows && rows.length && rows[0].name && rows[0].name !== googleUser.name) {
+          googleUser.name = rows[0].name;
+          saveGoogleUser(); renderAuth();
+        }
+      }).catch(function(){});
+    } catch (e) {}
+  }
   /* Save the voter's profile so the Admin Panel can show who voted for whom.
      user_id = the vote key, so vote99.device joins vote_profiles.user_id. */
   function upsertProfile(){
     if (!googleUser) return;
     var body = { user_id: profileKey(), name: googleUser.name || "", email: googleUser.email || "", photo: googleUser.avatar || "", updated_at: new Date().toISOString() };
     try {
-      fetch(sbBase() + "vote_profiles", {method: "POST", headers: Object.assign({}, sbHeaders(), {"Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"}), body: JSON.stringify(body)}).catch(function(){});
+      /* Preserve a manually-set display name: if vote_profiles already has a
+         name for this user, keep it instead of overwriting with Google's name. */
+      fetch(sbBase() + "vote_profiles?select=name&user_id=eq." + encodeURIComponent(profileKey()), {headers: sbHeaders()}).then(function(r){ return r.json(); }).then(function(rows){
+        if (rows && rows.length && rows[0].name) body.name = rows[0].name;
+        upsertProfileSend(body);
+      }).catch(function(){ upsertProfileSend(body); });
+    } catch (e) {}
+  }
+  function upsertProfileSend(b){
+    try {
+      fetch(sbBase() + "vote_profiles", {method: "POST", headers: Object.assign({}, sbHeaders(), {"Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"}), body: JSON.stringify(b)}).catch(function(){});
     } catch (e) {}
   }
   /* Header profile button + menu (site-59): name from Gmail, avatar = assigned random one. */
@@ -2376,6 +2400,7 @@
   loadGoogleUser();
   var authHashHandled = handleAuthHash();
   renderAuth();
+  applyStoredName();
   if (googleUser && !authHashHandled) { vote99LoadMineLocal(); upsertProfile(); }
 
   /* ---------- Device id (chat cute names + stats) ---------- */
