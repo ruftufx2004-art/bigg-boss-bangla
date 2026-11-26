@@ -543,6 +543,14 @@
 .bbb-ott-vote99-dlbtn{flex:1;padding:12px;border-radius:11px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;font-size:15px;font-weight:800;text-decoration:none;text-align:center;}
 .bbb-ott-vote99-backbtn{flex:1;padding:12px;border-radius:11px;border:1px solid #7c3aed;background:rgba(124,58,237,.18);color:#c7d2fe;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
 .bbb-ott-vote99-sharenote{font-size:12px;color:#c7d2fe;margin-top:10px;line-height:1.6;}
+.bbb-ott-vote99-platforms{margin-top:14px;text-align:center;}
+.bbb-ott-vote99-platforms-label{font-size:12px;color:#c7d2fe;margin-bottom:8px;}
+.bbb-ott-vote99-platforms-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.bbb-ott-vote99-plat{padding:9px 14px;border-radius:10px;font-size:13px;font-weight:800;border:0;cursor:pointer;font-family:inherit;color:#fff;}
+.bbb-ott-vote99-plat--wa{background:#25d366;}
+.bbb-ott-vote99-plat--fb{background:#1877f2;}
+.bbb-ott-vote99-plat--tg{background:#229ed9;}
+.bbb-ott-vote99-plat--copy{background:#7c3aed;}
 .bbb-ott-epad{display:none; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 @media (max-width:980px){ .bbb-ott-epad{display:flex;} }
 
@@ -844,6 +852,15 @@
         <div class="bbb-ott-vote99-timernote">রাত ১২টায় নতুন ৯৯ ভোট পাবে</div>
       </div>
       <button type="button" class="bbb-ott-vote99-sharebtn2" id="bbb-ott-vote99-submit-share">↗ বন্ধুদের সাথে শেয়ার করো</button>
+      <div class="bbb-ott-vote99-platforms">
+        <div class="bbb-ott-vote99-platforms-label">অথবা এখানে শেয়ার করো:</div>
+        <div class="bbb-ott-vote99-platforms-row">
+          <button type="button" class="bbb-ott-vote99-plat bbb-ott-vote99-plat--wa" data-bbb-share-platform="whatsapp">WhatsApp</button>
+          <button type="button" class="bbb-ott-vote99-plat bbb-ott-vote99-plat--fb" data-bbb-share-platform="facebook">Facebook</button>
+          <button type="button" class="bbb-ott-vote99-plat bbb-ott-vote99-plat--tg" data-bbb-share-platform="telegram">Telegram</button>
+          <button type="button" class="bbb-ott-vote99-plat bbb-ott-vote99-plat--copy" data-bbb-share-platform="copylink">🔗 লিংক কপি</button>
+        </div>
+      </div>
       <button type="button" class="bbb-ott-vote99-againbtn" id="bbb-ott-vote99-submit-again" hidden>আরও ভোট করো</button>
     </div>
     <!-- Share view (site-64): the poster image + download -->
@@ -853,6 +870,15 @@
       <div class="bbb-ott-vote99-sharerow">
         <a class="bbb-ott-vote99-dlbtn" id="bbb-ott-vote99-poster-dl" download="amar-vote-bigg-boss.png">⬇ ডাউনলোড করো</a>
         <button type="button" class="bbb-ott-vote99-backbtn" id="bbb-ott-vote99-poster-back">ফিরে যাও</button>
+      </div>
+      <div class="bbb-ott-vote99-platforms">
+        <div class="bbb-ott-vote99-platforms-label">অথবা এখানে শেয়ার করো:</div>
+        <div class="bbb-ott-vote99-platforms-row">
+          <button type="button" class="bbb-ott-vote99-plat bbb-ott-vote99-plat--wa" data-bbb-share-platform="whatsapp">WhatsApp</button>
+          <button type="button" class="bbb-ott-vote99-plat bbb-ott-vote99-plat--fb" data-bbb-share-platform="facebook">Facebook</button>
+          <button type="button" class="bbb-ott-vote99-plat bbb-ott-vote99-plat--tg" data-bbb-share-platform="telegram">Telegram</button>
+          <button type="button" class="bbb-ott-vote99-plat bbb-ott-vote99-plat--copy" data-bbb-share-platform="copylink">🔗 লিংক কপি</button>
+        </div>
       </div>
       <div class="bbb-ott-vote99-sharenote">QR স্ক্যান করলেই ভোটের সাইটে যাওয়া যাবে</div>
     </div>
@@ -1622,8 +1648,42 @@
      the video player, shield or embed. */
   var bbbShareBtn = $("#bbb-ott-sharebtn");
   var bbbHeroShareBtn = $("#bbb-ott-hero-share");
+  /* UTM-tagged share links (site-65): every share carries a source tag so
+     Clarity can show which share brought the views. */
+  function bbbUtmUrl(source){
+    return "https://bigg-boss-bangla.pages.dev/?utm_source=" + encodeURIComponent(source) + "&utm_medium=share&utm_campaign=vote";
+  }
+  function bbbCopyFallback(text, done){
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); document.body.removeChild(ta);
+    } catch (e) {}
+    if (done) done();
+  }
+  function bbbPlatformShare(platform, btn){
+    var url = bbbUtmUrl(platform);
+    var text = "আমি Bigg Boss Bangla-তে ভোট দিলাম! তুমিও তোমার প্রিয় প্রতিযোগীকে ভোট দাও: " + url;
+    if (platform === "copylink") {
+      var done = function(){ if (btn) { var t = btn.textContent; btn.textContent = "✓ কপি হয়েছে!"; setTimeout(function(){ btn.textContent = t; }, 2000); } };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, function(){ bbbCopyFallback(url, done); });
+      } else { bbbCopyFallback(url, done); }
+      return;
+    }
+    var shareUrl = "";
+    if (platform === "whatsapp") shareUrl = "https://wa.me/?text=" + encodeURIComponent(text);
+    else if (platform === "facebook") shareUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url);
+    else if (platform === "telegram") shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(url) + "&text=" + encodeURIComponent("আমি Bigg Boss Bangla-তে ভোট দিলাম! তুমিও তোমার প্রিয় প্রতিযোগীকে ভোট দাও!");
+    if (shareUrl) window.open(shareUrl, "_blank");
+  }
+  /* Wire every platform share button (submit view + share view). */
+  Array.prototype.forEach.call(document.querySelectorAll("[data-bbb-share-platform]"), function(btn){
+    btn.addEventListener("click", function(){ bbbPlatformShare(btn.getAttribute("data-bbb-share-platform"), btn); });
+  });
   function bbbDoShare(){
-    var bbbShareUrl = "https://bigg-boss-bangla.pages.dev/";
+    var bbbShareUrl = bbbUtmUrl("hero");
     var bbbShareText = "Bigg Boss Bangla Season 3 — Live 24/7 দেখো! ভোট দাও, লাইভ চ্যাট করো: " + bbbShareUrl;
     if (navigator.share) {
       navigator.share({title: "Bigg Boss Bangla — Live 24/7", text: bbbShareText, url: bbbShareUrl}).catch(function(){});
@@ -2774,7 +2834,7 @@
     vote99PosterCanvas().then(function(cv){
       vote99PosterBusy = false;
       if (!cv) return;
-      var url = "https://bigg-boss-bangla.pages.dev/";
+      var url = bbbUtmUrl("vote_poster");
       var text = "আমি Bigg Boss Bangla-তে ভোট দিলাম! তুমিও তোমার প্রিয় প্রতিযোগীকে ভোট দাও: " + url;
       function showShareView(){
         var img = $("#bbb-ott-vote99-posterimg");
