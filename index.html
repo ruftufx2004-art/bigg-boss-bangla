@@ -156,6 +156,7 @@
 .bbb-ott-ov-msg{word-break:break-word;}
 .bbb-ott-ov-msg b{color:#c4b5fd;}
 .bbb-ott-ov-pin{border:1.5px solid #fbbf24; border-radius:10px; background:rgba(251,191,36,.08); padding:8px 10px; word-break:break-word;}
+.bbb-ott-ov-pinned{padding:10px 12px 0;}
 .bbb-ott-ov-pin .bbb-ott-ov-pin-tag{font-size:10px; font-weight:800; color:#1a1206; background:#fbbf24; border-radius:999px; padding:1px 8px;}
 .bbb-ott-ov-pin b{color:#fbbf24;}
 .bbb-ott-ov-msg .bbb-ott-ov-time{color:rgba(255,255,255,.6); font-size:11px; margin-left:6px;}
@@ -772,6 +773,7 @@
            longer covers half of it. SAME chat as the comment section below the vote. -->
       <div class="bbb-ott-chat-overlay" id="bbb-ott-chat-overlay">
         <div class="bbb-ott-ov-head"><span>Live Chat</span><span><span class="bbb-ott-ov-live">● LIVE</span><button type="button" class="bbb-ott-ov-close" id="bbb-ott-ov-close" title="Hide chat">✕</button></span></div>
+        <div class="bbb-ott-ov-pinned" id="bbb-ott-ov-pinned" hidden></div>
         <div class="bbb-ott-ov-list" id="bbb-ott-ov-list"></div>
         <form class="bbb-ott-ov-form" id="bbb-ott-ov-form" autocomplete="off">
           <input type="text" id="bbb-ott-ov-input" maxlength="200" placeholder="Comment লিখো..." aria-label="Chat message" />
@@ -2284,6 +2286,7 @@
   /* ---------- Transparent chat overlay over the video (same chat) ---------- */
   var ovBox = $("#bbb-ott-chat-overlay");
   var ovList = $("#bbb-ott-ov-list");
+  var ovPinned = $("#bbb-ott-ov-pinned");
   var ovForm = $("#bbb-ott-ov-form");
   var ovInput = $("#bbb-ott-ov-input");
   var ovClose = $("#bbb-ott-ov-close");
@@ -2295,10 +2298,11 @@
       .slice(-30);
     ovList.textContent = "";
     if (!all.length) { ovList.textContent = "No messages yet."; return; }
-    /* Pinned comment first (site-74), same as the main chat. */
+    /* Pinned comment first (site-74/75) — in its OWN fixed box above the
+       scrolling list, so it never scrolls away (same as the main chat). */
     var pinned = null;
     Object.keys(chatData).forEach(function(id){ if (chatData[id] && chatData[id].pinned) pinned = chatData[id]; });
-    if (pinned) {
+    if (pinned && ovPinned) {
       var pd = document.createElement("div");
       pd.className = "bbb-ott-ov-pin";
       var pt = document.createElement("span");
@@ -2309,7 +2313,9 @@
       var ptx = document.createElement("span");
       ptx.textContent = " " + (pinned.text || "");
       pd.appendChild(pt); pd.appendChild(pb); pd.appendChild(ptx);
-      ovList.appendChild(pd);
+      ovPinned.textContent = "";
+      ovPinned.appendChild(pd);
+      ovPinned.hidden = false;
     }
     all.forEach(function(m){
       if (m.pinned) return;
