@@ -348,18 +348,42 @@
 .bbb-ott-epcard img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
 .bbb-ott-epcard span{display:block;padding:8px 10px 0;font-size:11px;font-weight:800;color:var(--bbb-gold);letter-spacing:.06em;}
 .bbb-ott-epcard b{display:block;padding:2px 10px 10px;font-size:13px;line-height:1.35;}
-.bbb-ott-poll{margin-top:28px;padding:22px;border-radius:12px;background:var(--bbb-card);border:1px solid var(--bbb-line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,.45);}
-.bbb-ott-poll h2{margin:0 0 4px;font-size:clamp(18px,2.4vw,24px);}
-.bbb-ott-poll p{margin:0 0 14px;font-size:13px;color:var(--bbb-muted);}
-.bbb-ott-poll-opt{display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1px solid var(--bbb-line);background:rgba(255,255,255,.05);color:var(--bbb-text);font-size:14px;cursor:pointer;position:relative;overflow:hidden;font-family:'Hind Siliguri','Poppins',sans-serif;}
-.bbb-ott-poll-opt i{position:absolute;inset:0;background:linear-gradient(90deg,rgba(139,92,246,.35),rgba(139,92,246,.25));width:0%;transition:width .8s cubic-bezier(.22,1,.36,1);}
-.bbb-ott-poll-opt{transition:transform .6s cubic-bezier(.22,1,.36,1), border-color .3s, opacity .3s;}
-.bbb-ott-poll-opt span,.bbb-ott-poll-opt b{position:relative;z-index:1;}
-.bbb-ott-poll-opt b{float:right;color:var(--bbb-gold);}
-.bbb-ott-poll-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:10px;border:2px solid var(--bbb-gold);}
-.bbb-ott-poll-opt:disabled{cursor:default;}
-.bbb-ott-poll-opt.bbb-ott-voted{border-color:var(--bbb-gold);}
-.bbb-ott-poll-total{font-size:12px;color:var(--bbb-muted);margin-top:6px;}
+/* Hotstar-style hero + 99-vote panel (site-47) */
+.bbb-ott-hero{position:relative;margin-top:14px;border-radius:12px;overflow:hidden;background:linear-gradient(120deg,#1a0b2e 0%,#3b0764 55%,#0f1014 100%);border:1px solid var(--bbb-line);padding:20px;}
+.bbb-ott-hero-bg{position:absolute;top:0;right:0;bottom:0;width:45%;object-fit:cover;opacity:.28;pointer-events:none;}
+.bbb-ott-hero-in{position:relative;z-index:1;}
+.bbb-ott-hero-live{display:inline-block;padding:4px 10px;border-radius:12px;background:#e11d48;color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;}
+.bbb-ott-hero h2{margin:10px 0 6px;font-size:clamp(20px,3vw,28px);}
+.bbb-ott-hero p{margin:0 0 12px;font-size:13px;color:var(--bbb-muted);}
+.bbb-ott-hero-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.bbb-ott-hero-btn{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;border:0;font-family:inherit;text-decoration:none;display:inline-block;}
+.bbb-ott-hero-btn--primary{background:#1f80e0;color:#fff;}
+.bbb-ott-hero-btn--ghost{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--bbb-text);}
+.bbb-ott-hero-meta{margin-top:12px;font-size:12px;color:var(--bbb-muted);}
+.bbb-ott-hero-meta b{color:var(--bbb-text);}
+.bbb-ott-vote99{margin-top:28px;border-radius:12px;background:#0f1014;border:1px solid var(--bbb-line);overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45);}
+.bbb-ott-vote99-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 4px;}
+.bbb-ott-vote99-head h2{margin:0;font-size:clamp(18px,2.4vw,24px);}
+.bbb-ott-vote99-sub{text-align:center;font-size:11px;letter-spacing:.12em;color:var(--bbb-muted);padding:6px 18px 0;}
+.bbb-ott-vote99-left{text-align:center;font-size:13px;font-weight:700;padding:6px 18px 0;}
+.bbb-ott-vote99-thanks{text-align:center;font-size:14px;font-weight:800;color:#4ade80;padding:8px 18px 0;}
+.bbb-ott-vote99-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;padding:16px 18px;justify-items:center;}
+.bbb-ott-vote99-cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:0;padding:0;font-family:inherit;color:var(--bbb-text);}
+.bbb-ott-vote99-cell:nth-child(4){grid-column:2;}
+.bbb-ott-vote99-picwrap{position:relative;width:84px;height:84px;}
+.bbb-ott-vote99-pic{width:84px;height:84px;border-radius:50%;object-fit:cover;display:block;border:3px solid transparent;box-sizing:border-box;background:#222;}
+.bbb-ott-vote99-pic--voted{border-color:#1f80e0;}
+.bbb-ott-vote99-badge{position:absolute;top:-2px;right:-2px;min-width:24px;height:24px;padding:0 5px;border-radius:12px;background:#1f80e0;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #0f1014;box-sizing:border-box;}
+.bbb-ott-vote99-name{font-size:13px;font-weight:600;}
+.bbb-ott-vote99-results{padding:4px 18px 16px;display:flex;flex-direction:column;gap:10px;}
+.bbb-ott-vote99-row{display:flex;align-items:center;gap:10px;}
+.bbb-ott-vote99-rpic{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:0 0 auto;border:2px solid transparent;}
+.bbb-ott-vote99-rmid{flex:1;min-width:0;}
+.bbb-ott-vote99-rtop{display:flex;justify-content:space-between;font-size:13px;font-weight:700;}
+.bbb-ott-vote99-rbar{height:7px;border-radius:7px;background:rgba(255,255,255,.15);margin-top:5px;overflow:hidden;}
+.bbb-ott-vote99-rfill{height:100%;background:linear-gradient(90deg,#1f80e0,#7c3aed);border-radius:7px;transition:width .8s;}
+.bbb-ott-vote99-bar{height:6px;background:linear-gradient(90deg,#1f80e0,#7c3aed,#ec4899);}
+.bbb-ott-vote99-note{font-size:12px;color:var(--bbb-muted);padding:0 18px 14px;text-align:center;}
 .bbb-ott-epad{display:none; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 @media (max-width:980px){ .bbb-ott-epad{display:flex;} }
 
@@ -452,6 +476,21 @@
 </script>
 <script type="text/javascript" src="https://bancadeltempoidea.org/22/cfc15cc6fb4dd4278572d183b4e169e4"></script>
   </div>
+
+  <!-- ===== Hero: Hotstar-style top banner (site-47) ===== -->
+  <section class="bbb-ott-hero" id="bbb-ott-hero">
+    <img class="bbb-ott-hero-bg" src="https://thumb.wikimedia.org/wikipedia/en/thumb/4/4a/Bigg_Boss_Bangla_season_3.jpg/330px-Bigg_Boss_Bangla_season_3.jpg" alt="" aria-hidden="true" loading="lazy">
+    <div class="bbb-ott-hero-in">
+      <span class="bbb-ott-hero-live">● LIVE 24/7</span>
+      <h2>Bigg Boss Bangla<br>Season 3</h2>
+      <p>ঘরের ভেতরের লাইভ দেখো, ভোট দাও আর লাইভ চ্যাট করো — সব এক জায়গায়।</p>
+      <div class="bbb-ott-hero-btns">
+        <a class="bbb-ott-hero-btn bbb-ott-hero-btn--primary" href="#bbb-ott-stage">▶ Watch Live</a>
+        <a class="bbb-ott-hero-btn bbb-ott-hero-btn--ghost" href="#bbb-ott-vote99">Vote Now</a>
+      </div>
+      <div class="bbb-ott-hero-meta">এখন দেখছে: <b id="bbb-ott-hero-viewers">—</b> &nbsp;•&nbsp; ফিনালে: ৬ ডিসেম্বর, রাত ৯:৩০</div>
+    </div>
+  </section>
 
   <!-- ===== Theater: Player + Chat ===== -->
   <section class="bbb-ott-theater">
@@ -606,12 +645,16 @@
   </div>
 
 
-  <!-- ===== Vote Poll: Who will win? (real votes via Cloudflare KV, 1 vote per device) ===== -->
-  <section class="bbb-ott-poll" id="bbb-ott-poll">
-    <h2>🗳️ ভোট দিন — কে জিতবে Bigg Boss Bangla Season 3?</h2>
-    <p>একটি ডিভাইস থেকে মাত্র ১টি ভোট দেওয়া যাবে। আসল ভোটের ফলাফল নিচে দেখা যাবে।</p>
-    <div id="bbb-ott-poll-list"><p>ভোট লোড হচ্ছে…</p></div>
-    <div class="bbb-ott-poll-total" id="bbb-ott-poll-total"></div>
+  <!-- ===== Vote 99: Hotstar-style vote to save (site-47) ===== -->
+  <section class="bbb-ott-vote99" id="bbb-ott-vote99">
+    <div class="bbb-ott-vote99-head"><h2>Bigg Boss</h2></div>
+    <div class="bbb-ott-vote99-sub">VOTE TO SAVE YOUR FAVOURITE CONTESTANT!</div>
+    <div class="bbb-ott-vote99-thanks" id="bbb-ott-vote99-thanks" hidden>ধন্যবাদ! তোমার ভোট দেওয়া হয়েছে</div>
+    <div class="bbb-ott-vote99-left" id="bbb-ott-vote99-left">৯৯ ভোট বাকি — ভোট দিতে থাকো!</div>
+    <div class="bbb-ott-vote99-grid" id="bbb-ott-vote99-grid"></div>
+    <div class="bbb-ott-vote99-results" id="bbb-ott-vote99-results"></div>
+    <div class="bbb-ott-vote99-note" id="bbb-ott-vote99-note">ছবিতে চাপ দিলেই ১টা করে ভোট যাবে — বারবার চাপলে ভোট বাড়তে থাকবে।</div>
+    <div class="bbb-ott-vote99-bar"></div>
   </section>
 
   <!-- ===== Episodes: Star Jalsha Official YouTube ===== -->
@@ -1352,11 +1395,11 @@
   });
 
   /* ---------- Real viewer counter (from /api/stats — no fake numbers) ---------- */
-  var viewEl = $("#bbb-ott-viewcount"), chatCountEl = $("#bbb-ott-chatcount");
+  var viewEl = $("#bbb-ott-viewcount"), chatCountEl = $("#bbb-ott-chatcount"), heroViewEl = $("#bbb-ott-hero-viewers");
   function fmt(n){ return n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,"") + "K" : String(n); }
   function loadRealCounts(){
     fetch("/api/stats").then(function(r){ return r.json(); }).then(function(d){
-      if (d.liveNow != null) viewEl.textContent = fmt(d.liveNow);
+      if (d.liveNow != null) { viewEl.textContent = fmt(d.liveNow); if (heroViewEl) heroViewEl.textContent = fmt(d.liveNow) + " জন"; }
       if (d.chatTotal != null) chatCountEl.textContent = fmt(d.chatTotal);
     }).catch(function(){});
   }
@@ -1768,11 +1811,29 @@
     ovOpen.hidden = true;
   });
 
-  /* ---------- Vote Poll (real shared votes, 1 per device) ---------- */
-  var pollList = $("#bbb-ott-poll-list");
-  var pollTotal = $("#bbb-ott-poll-total");
-  var pollNames = ["Monami Ghosh","Durnibar Saha","Niranjan Mondal (Laughtersane)","Tanushree Roy Das","Srijla Guha","Rajveer Dey","Jeetu Kamal","Sourav Das"];
-  var pollPhotos = {"Monami Ghosh": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-4603.jpg", "Durnibar Saha": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-927.jpg", "Niranjan Mondal (Laughtersane)": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-1237.jpg", "Tanushree Roy Das": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-2519.jpg", "Srijla Guha": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20260831201339-3976.jpg", "Rajveer Dey": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111195628-9939.jpg", "Jeetu Kamal": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111195840-8371.jpg", "Sourav Das": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111184132-5879.jpg", "Ranieeta Dash": "https://images.filmibeat.com/img/popcorn/list_items/bigg-boss-bangla-3-contestants-list-with-photos-20261111184423-4386.jpg"};
+  /* ---------- Vote 99: Hotstar-style vote to save (site-47) ---------- */
+  var vote99Grid = $("#bbb-ott-vote99-grid");
+  var vote99Results = $("#bbb-ott-vote99-results");
+  var vote99Left = $("#bbb-ott-vote99-left");
+  var vote99Thanks = $("#bbb-ott-vote99-thanks");
+  var VOTE99_TOTAL = 99;
+  var VOTE99 = [
+    {key:"Rajveer Dey", short:"Rajveer", photo:"/contestants/rajveer.jpg"},
+    {key:"Srijla Guha", short:"Srijla", photo:"/contestants/srijla.jpg"},
+    {key:"Tanushree Roy Das", short:"Tanushree", photo:"/contestants/tanushree.jpg"},
+    {key:"Niranjan Mondal (Laughtersane)", short:"Niranjan", photo:"/contestants/niranjan.jpg"}
+  ];
+  var vote99Mine = {};
+  var vote99Used = 0;
+  var vote99Counts = {};
+  var vote99TotalAll = 0;
+  try {
+    var saved99 = JSON.parse(localStorage.getItem("bbb-vote99") || "{}");
+    if (saved99 && typeof saved99 === "object") {
+      VOTE99.forEach(function(p){ var v = parseInt(saved99[p.key], 10) || 0; if (v > 0) { vote99Mine[p.key] = v; vote99Used += v; } });
+    }
+  } catch (e) {}
+  function vote99SaveMine(){ try { localStorage.setItem("bbb-vote99", JSON.stringify(vote99Mine)); } catch (e) {} }
   var deviceId = localStorage.getItem("bbb-poll-device");
   if (!deviceId) { deviceId = "d" + Date.now().toString(36) + Math.random().toString(36).slice(2,10); localStorage.setItem("bbb-poll-device", deviceId); }
   // Cute default chat name: the server gives each device one unique cute name.
@@ -1795,50 +1856,119 @@
     track("view");
     setInterval(function(){ track("heartbeat"); }, 60000);
   })();
-  var pollNodes = {};
-  function pollRender(data){
-    var total = data.total || 0;
-    // Ranked: most votes on top, then serial by vote count (fluid — nodes are reused, bars animate)
-    var ranked = pollNames.slice().sort(function(a, b){
-      var na = (data.counts && data.counts[a]) || 0;
-      var nb = (data.counts && data.counts[b]) || 0;
-      return nb - na || pollNames.indexOf(a) - pollNames.indexOf(b);
-    });
-    ranked.forEach(function(name){
-      var n = (data.counts && data.counts[name]) || 0;
-      var pct = total ? Math.round(n * 100 / total) : 0;
-      var btn = pollNodes[name];
-      if (!btn) {
-        btn = document.createElement("button");
-        btn.type = "button";
-        var bar = document.createElement("i");
-        var pic = document.createElement("img");
-        pic.className = "bbb-ott-poll-pic"; pic.alt = name; pic.loading = "lazy";
-        pic.onerror = function(){ this.style.display = "none"; };
+  function vote99Render(){
+    var left = VOTE99_TOTAL - vote99Used;
+    if (left < 0) left = 0;
+    if (vote99Left) vote99Left.textContent = left > 0 ? (left + " Votes left today. Keep voting!") : "0 Votes left today. Thanks for voting!";
+    if (vote99Thanks) vote99Thanks.hidden = vote99Used <= 0;
+    if (vote99Grid) {
+      vote99Grid.textContent = "";
+      VOTE99.forEach(function(p){
+        var mine = vote99Mine[p.key] || 0;
+        var cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "bbb-ott-vote99-cell";
+        var wrap = document.createElement("span");
+        wrap.className = "bbb-ott-vote99-picwrap";
+        var img = document.createElement("img");
+        img.className = "bbb-ott-vote99-pic" + (mine > 0 ? " bbb-ott-vote99-pic--voted" : "");
+        img.src = p.photo; img.alt = p.short; img.loading = "lazy";
+        img.onerror = function(){ this.style.display = "none"; };
+        wrap.appendChild(img);
+        if (mine > 0) {
+          var badge = document.createElement("span");
+          badge.className = "bbb-ott-vote99-badge";
+          badge.textContent = mine;
+          wrap.appendChild(badge);
+        }
         var nm = document.createElement("span");
-        var pc = document.createElement("b");
-        btn.appendChild(bar); btn.appendChild(pic); btn.appendChild(nm); btn.appendChild(pc);
-        btn.addEventListener("click", function(){ pollVote(name); });
-        pollNodes[name] = btn;
-      }
-      btn.className = "bbb-ott-poll-opt" + (data.voted === name ? " bbb-ott-voted" : "");
-      btn.disabled = !!data.voted;
-      btn.children[0].style.width = pct + "%";
-      if (pollPhotos[name]) btn.children[1].src = pollPhotos[name]; else btn.children[1].style.display = "none";
-      btn.children[2].textContent = name + (data.voted === name ? " ✓ আপনার ভোট" : "");
-      btn.children[3].textContent = pct + "% (" + n + ")";
-      pollList.appendChild(btn);
-    });
-    pollTotal.textContent = total ? ("মোট ভোট: " + total + " • সবার ভোট সবার কাছে দৃশ্যমান • একটি ডিভাইস থেকে ১টি ভোট") : "এখনো কোনো ভোট পড়েনি — প্রথম ভোটটি দিন!";
+        nm.className = "bbb-ott-vote99-name";
+        nm.textContent = p.short;
+        cell.appendChild(wrap); cell.appendChild(nm);
+        cell.addEventListener("click", function(){ vote99Cast(p.key, 1); });
+        vote99Grid.appendChild(cell);
+      });
+    }
+    if (vote99Results) {
+      vote99Results.textContent = "";
+      var all = vote99TotalAll;
+      VOTE99.forEach(function(p){
+        var n = vote99Counts[p.key] || 0;
+        var pct = all ? Math.round(n * 100 / all) : 0;
+        var row = document.createElement("div");
+        row.className = "bbb-ott-vote99-row";
+        var rpic = document.createElement("img");
+        rpic.className = "bbb-ott-vote99-rpic"; rpic.src = p.photo; rpic.alt = p.short; rpic.loading = "lazy";
+        rpic.onerror = function(){ this.style.display = "none"; };
+        var rmid = document.createElement("div");
+        rmid.className = "bbb-ott-vote99-rmid";
+        var rtop = document.createElement("div");
+        rtop.className = "bbb-ott-vote99-rtop";
+        var rnm = document.createElement("span"); rnm.textContent = p.short;
+        var rct = document.createElement("span"); rct.textContent = n + " ভোট • " + pct + "%";
+        rtop.appendChild(rnm); rtop.appendChild(rct);
+        var rbar = document.createElement("div");
+        rbar.className = "bbb-ott-vote99-rbar";
+        var rfill = document.createElement("div");
+        rfill.className = "bbb-ott-vote99-rfill";
+        rfill.style.width = pct + "%";
+        rbar.appendChild(rfill);
+        rmid.appendChild(rtop); rmid.appendChild(rbar);
+        row.appendChild(rpic); row.appendChild(rmid);
+        vote99Results.appendChild(row);
+      });
+    }
   }
-  function pollLoad(){
-    fetch("/api/poll?device=" + encodeURIComponent(deviceId)).then(function(r){ return r.json(); }).then(pollRender).catch(function(){
-      pollList.textContent = "ভোট গণনা এখনো চালু হয়নি — শীঘ্রই আসছে।";
-    });
+  function vote99Apply(data){
+    if (!data) return;
+    if (data.counts) vote99Counts = data.counts;
+    if (typeof data.total === "number") vote99TotalAll = data.total;
+    if (data.voted && typeof data.voted === "object") {
+      vote99Mine = {}; vote99Used = 0;
+      VOTE99.forEach(function(p){ var v = parseInt(data.voted[p.key], 10) || 0; if (v > 0) { vote99Mine[p.key] = v; vote99Used += v; } });
+      vote99SaveMine();
+    }
+    if (typeof data.used === "number") vote99Used = data.used;
+    vote99Render();
   }
-  function pollVote(name){
-    fetch("/api/poll", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: deviceId, choice: name})})
-      .then(function(r){ return r.json(); }).then(pollRender).catch(pollLoad);
+  function vote99Load(){
+    fetch("/api/poll?device=" + encodeURIComponent(deviceId)).then(function(r){
+      if (!r.ok) throw new Error("api");
+      return r.json();
+    }).then(vote99Apply).catch(function(){ vote99LoadDirect(); });
+  }
+  function vote99LoadDirect(){
+    try {
+      fetch(sbBase() + "poll_votes?select=name,count", {headers: sbHeaders()}).then(function(r){
+        if (!r.ok) throw new Error("sb");
+        return r.json();
+      }).then(function(rows){
+        var counts = {}; var total = 0;
+        (rows || []).forEach(function(r){ if (r && typeof r.name === "string") { counts[r.name] = parseInt(r.count, 10) || 0; total += counts[r.name]; } });
+        vote99Counts = counts; vote99TotalAll = total;
+        vote99Render();
+      }).catch(function(){ vote99Render(); });
+    } catch (e) { vote99Render(); }
+  }
+  function vote99Cast(key, n){
+    if (vote99Used >= VOTE99_TOTAL) return;
+    var give = Math.min(n, VOTE99_TOTAL - vote99Used);
+    vote99Mine[key] = (vote99Mine[key] || 0) + give;
+    vote99Used += give;
+    vote99SaveMine();
+    vote99Render();
+    fetch("/api/poll", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: deviceId, choice: key, count: give})})
+      .then(function(r){ if (!r.ok) throw new Error("api"); return r.json(); })
+      .then(vote99Apply)
+      .catch(function(){ vote99CastDirect(key, give); });
+  }
+  function vote99CastDirect(key, give){
+    try {
+      fetch(sbBase() + "rpc/cast_vote99", {method:"POST", headers: Object.assign({}, sbHeaders(), {"Content-Type":"application/json"}), body: JSON.stringify({p_device: deviceId, p_choice: key, p_n: give})})
+        .then(function(r){ if (!r.ok) throw new Error("rpc"); return r.json(); })
+        .then(function(d){ if (d) vote99Apply(d); })
+        .catch(function(){});
+    } catch (e) {}
   }
   /* Site config from Admin Panel (live links + poll names); falls back to built-in values */
   function applyConfig(cfg){
@@ -1868,11 +1998,9 @@
         else { showVideo(); frame.removeAttribute("src"); }
       }
     }
-    if (cfg && cfg.pollNames && cfg.pollNames.length) pollNames = cfg.pollNames;
-    if (cfg && cfg.pollPhotos) pollPhotos = cfg.pollPhotos;
   }
-  if (pollList) {
-    fetch("/api/config",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); pollLoad(); }).catch(function(){ pollLoad(); });
+  if (vote99Grid) {
+    fetch("/api/config",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); vote99Load(); }).catch(function(){ vote99Load(); });
   }
 })();
 </script>
