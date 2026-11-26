@@ -178,46 +178,79 @@
 .bbb-ott-loader-svg{display:block;}
 .bbb-ott-loader-pct{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:16px;}
 .bbb-ott-loader-text{color:#fff; font-size:13px; font-weight:700; margin-top:10px;}
-/* ===== Results overlay (site-61): transparent card pushed onto the video.
-   Lives INSIDE .bbb-ott-player, so it shows in fullscreen + landscape + normal view. ===== */
-.bbb-ott-resultsov{position:absolute; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; background:rgba(5,2,15,.45); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); opacity:0; transform:scale(.97); transition:opacity .45s ease, transform .45s ease; pointer-events:none;}
+/* ===== Results overlay (site-61/63): TOTALLY transparent, pushed onto the video.
+   Lives INSIDE .bbb-ott-player, so it shows in fullscreen + landscape + normal view.
+   No dark card, no backdrop — the video shows through completely; text uses a
+   shadow so it stays readable. Three versions: normal (side-panel graphics),
+   landscape (wider card), fullscreen (biggest). ===== */
+.bbb-ott-resultsov{position:absolute; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; background:transparent; opacity:0; transform:scale(.97); transition:opacity .45s ease, transform .45s ease; pointer-events:none;}
 .bbb-ott-resultsov[hidden]{display:none;}
 .bbb-ott-resultsov--show{opacity:1; transform:scale(1); pointer-events:auto;}
-.bbb-ott-resultsov-card{width:min(88%,360px); max-height:100%; overflow:auto; background:rgba(15,8,32,.88); border:1px solid rgba(251,191,36,.45); border-radius:16px; padding:12px 12px 10px; box-shadow:0 18px 50px rgba(0,0,0,.6); color:#fff;}
+.bbb-ott-resultsov-card{width:min(88%,360px); max-height:100%; overflow:hidden; background:transparent; border:0; box-shadow:none; padding:12px 12px 10px; color:#fff;}
 .bbb-ott-resultsov-head{display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:8px;}
-.bbb-ott-resultsov-title{font-size:14px; font-weight:800;}
+.bbb-ott-resultsov-title{font-size:14px; font-weight:800; text-shadow:0 1px 4px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.7);}
 .bbb-ott-resultsov-headr{display:flex; align-items:center; gap:6px;}
-.bbb-ott-resultsov-timer{background:rgba(251,191,36,.16); border:1px solid rgba(251,191,36,.5); color:#fbbf24; font-size:11px; font-weight:800; padding:3px 7px; border-radius:10px; font-variant-numeric:tabular-nums; white-space:nowrap;}
+.bbb-ott-resultsov-timer{background:rgba(0,0,0,.45); border:1px solid rgba(251,191,36,.6); color:#fbbf24; font-size:11px; font-weight:800; padding:3px 7px; border-radius:10px; font-variant-numeric:tabular-nums; white-space:nowrap;}
 .bbb-ott-resultsov-live{background:#e11d48; color:#fff; font-size:10px; font-weight:800; padding:3px 7px; border-radius:10px; white-space:nowrap;}
-.bbb-ott-resultsov-msg{text-align:center; font-size:12px; font-weight:700; color:#fde68a; background:rgba(251,191,36,.10); border:1px solid rgba(251,191,36,.30); border-radius:10px; padding:6px 8px; margin-bottom:9px; line-height:1.45;}
+.bbb-ott-resultsov-msg{text-align:center; font-size:12px; font-weight:700; color:#fde68a; background:transparent; border:0; padding:6px 8px; margin-bottom:9px; line-height:1.45; text-shadow:0 1px 4px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.7);}
+.bbb-ott-resultsov-msg--short{display:none;}
 .bbb-ott-resultsov-rows{display:flex; flex-direction:column;}
-.bbb-ott-resultsov-row{display:flex; align-items:center; gap:9px; padding:5px 6px; border-radius:10px; margin-bottom:5px; background:rgba(255,255,255,.04); will-change:transform;}
-.bbb-ott-resultsov-row--lead{border:1.5px solid #fbbf24; background:rgba(251,191,36,.10);}
+.bbb-ott-resultsov-row{display:flex; align-items:center; gap:9px; padding:5px 6px; border-radius:10px; margin-bottom:5px; background:transparent; will-change:transform;}
+.bbb-ott-resultsov-row--lead{border:1.5px solid #fbbf24; background:rgba(0,0,0,.25);}
 .bbb-ott-resultsov-ava{position:relative; width:46px; height:46px; border-radius:50%; flex:0 0 auto; background:linear-gradient(135deg,#8b5cf6,#ec4899); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:20px;}
 .bbb-ott-resultsov-ring{position:absolute; inset:-4px; border-radius:50%; background:conic-gradient(from 0deg,#fbbf24,#fff7cc,#f59e0b,transparent 55%,#fbbf24); animation:bbbResultsovSpin 2.2s linear infinite; -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px)); mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px));}
 @keyframes bbbResultsovSpin{to{transform:rotate(360deg);}}
 .bbb-ott-resultsov-ava img{position:absolute; inset:0; width:100%; height:100%; border-radius:50%; object-fit:cover;}
 .bbb-ott-resultsov-mid{flex:1; min-width:0;}
-.bbb-ott-resultsov-top{display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:3px;}
+.bbb-ott-resultsov-top{display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:3px; text-shadow:0 1px 4px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.7);}
 .bbb-ott-resultsov-pct{color:#fbbf24;}
-.bbb-ott-resultsov-bar{height:7px; border-radius:4px; background:rgba(255,255,255,.14); overflow:hidden;}
+.bbb-ott-resultsov-bar{height:7px; border-radius:4px; background:rgba(0,0,0,.35); box-shadow:0 0 0 1px rgba(255,255,255,.25); overflow:hidden;}
 .bbb-ott-resultsov-fill{height:100%; width:0; border-radius:4px; background:linear-gradient(90deg,#1f80e0,#7c3aed);}
 .bbb-ott-resultsov-row--lead .bbb-ott-resultsov-fill{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
 .bbb-ott-resultsov-vote{margin-top:8px; width:100%; padding:10px; border-radius:12px; border:0; background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#111; font-weight:800; font-size:14px; cursor:pointer;}
-/* site-62: phone display — compact overlay so it fits the small video player. */
+/* site-63: NORMAL (portrait phone) — side-panel graphics like a game HUD: one
+   side of the video, everything visible at once, NO scrolling. */
 @media (max-width:600px){
-  .bbb-ott-resultsov-card{width:94%; padding:8px 8px 7px; border-radius:12px;}
-  .bbb-ott-resultsov-head{margin-bottom:5px;}
-  .bbb-ott-resultsov-title{font-size:12px;}
-  .bbb-ott-resultsov-timer{font-size:10px; padding:2px 6px;}
-  .bbb-ott-resultsov-live{font-size:9px; padding:2px 6px;}
-  .bbb-ott-resultsov-msg{font-size:10.5px; padding:5px 6px; margin-bottom:6px; line-height:1.35;}
-  .bbb-ott-resultsov-row{gap:8px; padding:4px 5px; margin-bottom:4px;}
-  .bbb-ott-resultsov-ava{width:34px; height:34px; font-size:16px;}
+  .bbb-ott-resultsov{justify-content:flex-end; align-items:stretch;}
+  .bbb-ott-resultsov-card{width:58%; height:100%; max-height:100%; overflow:hidden; border-radius:0; padding:6px 8px 5px; display:flex; flex-direction:column;}
+  .bbb-ott-resultsov-head{margin-bottom:2px;}
+  .bbb-ott-resultsov-title{font-size:11px;}
+  .bbb-ott-resultsov-timer{font-size:10px; padding:2px 5px;}
+  .bbb-ott-resultsov-live{font-size:8px; padding:2px 5px;}
+  .bbb-ott-resultsov-msg{display:none;}
+  .bbb-ott-resultsov-msg--short{display:block; font-size:9.5px; padding:3px 4px; margin-bottom:2px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .bbb-ott-resultsov-rows{flex:1; min-height:0; display:flex; flex-direction:column; justify-content:space-evenly;}
+  .bbb-ott-resultsov-row{gap:7px; padding:2px 4px; margin-bottom:0;}
+  .bbb-ott-resultsov-ava{width:26px; height:26px; font-size:13px;}
   .bbb-ott-resultsov-ring{inset:-3px;}
-  .bbb-ott-resultsov-top{font-size:11px; margin-bottom:2px;}
-  .bbb-ott-resultsov-bar{height:6px;}
-  .bbb-ott-resultsov-vote{margin-top:6px; padding:8px; font-size:13px;}
+  .bbb-ott-resultsov-top{font-size:10.5px; margin-bottom:2px;}
+  .bbb-ott-resultsov-bar{height:5px;}
+  .bbb-ott-resultsov-vote{margin-top:4px; padding:6px; font-size:12px;}
+}
+/* site-63: LANDSCAPE — wider card, bigger photos and text. */
+@media (orientation:landscape){
+  .bbb-ott-resultsov-card{width:min(92%,520px); padding:16px 16px 12px;}
+  .bbb-ott-resultsov-title{font-size:16px;}
+  .bbb-ott-resultsov-timer{font-size:13px;}
+  .bbb-ott-resultsov-live{font-size:11px;}
+  .bbb-ott-resultsov-msg{font-size:13px; padding:8px 10px; margin-bottom:10px;}
+  .bbb-ott-resultsov-row{gap:12px; padding:7px 8px; margin-bottom:7px;}
+  .bbb-ott-resultsov-ava{width:56px; height:56px; font-size:24px;}
+  .bbb-ott-resultsov-top{font-size:14px;}
+  .bbb-ott-resultsov-bar{height:9px;}
+  .bbb-ott-resultsov-vote{padding:12px; font-size:15px;}
+}
+/* site-63: FULLSCREEN — biggest, most spacious and premium. */
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-card, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-card{width:min(92%,560px); padding:20px 20px 16px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-title, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-title{font-size:18px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-timer, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-timer{font-size:14px; padding:4px 10px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-live, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-live{font-size:12px; padding:4px 10px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-msg, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-msg{font-size:14px; padding:10px 12px; margin-bottom:12px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-row, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-row{gap:14px; padding:9px 10px; margin-bottom:8px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-ava, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-ava{width:64px; height:64px; font-size:28px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-top, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-top{font-size:15px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-bar, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-bar{height:10px;}
+.bbb-ott-player:fullscreen .bbb-ott-resultsov-vote, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-vote{padding:14px; font-size:16px;}
 }
 
 
@@ -629,6 +662,7 @@
               <span class="bbb-ott-resultsov-headr"><span class="bbb-ott-resultsov-timer" id="bbb-ott-resultsov-timer">⏱ ১:০০</span><span class="bbb-ott-resultsov-live">● LIVE</span></span>
             </div>
             <div class="bbb-ott-resultsov-msg">🗳️ ভোট করো — আমাদের প্ল্যাটফর্মে তোমার ভোট তোমার কন্টেস্ট্যান্টকে বাঁচাতে পারে!</div>
+            <div class="bbb-ott-resultsov-msg bbb-ott-resultsov-msg--short">🗳️ ভোট করো — তোমার ভোট বাঁচাতে পারে!</div>
             <div class="bbb-ott-resultsov-rows" id="bbb-ott-resultsov-rows"></div>
             <button type="button" class="bbb-ott-resultsov-vote" id="bbb-ott-resultsov-vote">👉 ভোট করো</button>
           </div>
