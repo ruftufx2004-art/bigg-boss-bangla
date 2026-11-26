@@ -501,6 +501,48 @@
 .bbb-ott-vote99-submit{padding:12px 28px;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;border:0;font-family:inherit;background:#22c55e;color:#fff;width:100%;max-width:340px;}
 .bbb-ott-vote99-submit:disabled{background:#333;color:#888;cursor:not-allowed;}
 .bbb-ott-vote99-errline{text-align:center;color:#f87171;font-weight:700;font-size:13px;padding:6px 18px 0;}
+/* site-64: grayscale for contestants with no votes once the daily 99 are spent */
+.bbb-ott-vote99-pic--bw{filter:grayscale(1) brightness(.75);}
+.bbb-ott-vote99-name--bw{color:#888;}
+.bbb-ott-vote99-nolabel{font-size:11px;color:#888;}
+/* site-64: countdown line in the panel when the daily 99 are spent */
+.bbb-ott-vote99-timerline{text-align:center;font-size:13px;font-weight:800;color:#c7d2fe;padding:4px 18px 0;}
+.bbb-ott-vote99-timerline b{color:#fbbf24;}
+/* site-64: Hotstar-style submit page (celebration + voted photos + timer + share) */
+.bbb-ott-vote99-submitview{text-align:center;padding:12px 18px 16px;}
+.bbb-ott-vote99-celebrate{position:relative;width:88px;height:88px;margin:4px auto 0;}
+.bbb-ott-vote99-celeglow{position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(31,128,224,.5),rgba(124,58,237,.25) 55%,transparent 72%);animation:bbbOttGlowPulse 1.6s ease-in-out infinite;}
+.bbb-ott-vote99-celering{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#1f80e0,#7c3aed,#ec4899,#1f80e0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 5px));mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 5px));animation:bbbOttSpin 2.4s linear infinite;}
+.bbb-ott-vote99-celecore{position:absolute;inset:5px;border-radius:50%;background:#0f0a24;display:flex;align-items:center;justify-content:center;}
+@keyframes bbbOttSpin{to{transform:rotate(360deg);}}
+@keyframes bbbOttGlowPulse{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.18);opacity:1;}}
+.bbb-ott-vote99-submitthanks{font-size:19px;font-weight:800;color:#fff;margin-top:14px;}
+.bbb-ott-vote99-submitbreak{font-size:13px;color:#c7d2fe;margin-top:7px;line-height:1.7;}
+.bbb-ott-vote99-submitbreak b{color:#fbbf24;}
+.bbb-ott-vote99-votedlabel{font-size:12px;font-weight:700;color:#c7d2fe;margin-top:14px;}
+.bbb-ott-vote99-votedrow{display:flex;justify-content:center;gap:18px;margin-top:10px;flex-wrap:wrap;}
+.bbb-ott-vote99-votedcell{text-align:center;}
+.bbb-ott-vote99-votedpicwrap{position:relative;width:74px;height:74px;margin:0 auto;}
+.bbb-ott-vote99-votedpic{width:74px;height:74px;border-radius:50%;object-fit:cover;border:3px solid #fbbf24;box-shadow:0 0 14px rgba(251,191,36,.45);display:block;}
+.bbb-ott-vote99-votedbadge{position:absolute;bottom:-4px;right:-4px;background:#fbbf24;color:#111;font-size:12px;font-weight:800;min-width:26px;height:26px;padding:0 5px;border-radius:13px;display:flex;align-items:center;justify-content:center;border:2px solid #0f1014;box-sizing:border-box;}
+.bbb-ott-vote99-votedname{margin-top:6px;font-weight:700;font-size:13px;}
+.bbb-ott-vote99-timercard{margin-top:16px;border-radius:14px;padding:12px 10px 10px;background:linear-gradient(135deg,rgba(31,128,224,.22),rgba(124,58,237,.22));border:1px solid rgba(124,58,237,.55);box-shadow:0 0 24px rgba(124,58,237,.25);}
+.bbb-ott-vote99-timertitle{font-size:13px;font-weight:700;color:#c7d2fe;}
+.bbb-ott-vote99-timerrow{display:flex;align-items:flex-start;justify-content:center;gap:7px;margin-top:9px;}
+.bbb-ott-vote99-timerbox{min-width:58px;padding:7px 5px;border-radius:11px;background:linear-gradient(135deg,#1f80e0,#7c3aed);font-size:27px;font-weight:800;color:#fff;box-shadow:0 0 16px rgba(31,128,224,.45);font-variant-numeric:tabular-nums;}
+.bbb-ott-vote99-timerbox--sec{background:linear-gradient(135deg,#7c3aed,#ec4899);box-shadow:0 0 16px rgba(124,58,237,.45);}
+.bbb-ott-vote99-timercolon{font-size:25px;font-weight:800;color:#818cf8;padding-top:5px;}
+.bbb-ott-vote99-timerunit{font-size:11px;color:#a5b4fc;margin-top:5px;}
+.bbb-ott-vote99-timernote{font-size:12px;color:#c7d2fe;margin-top:9px;}
+.bbb-ott-vote99-sharebtn2{width:100%;margin-top:16px;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,#1f80e0,#7c3aed);color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;}
+.bbb-ott-vote99-againbtn{width:100%;margin-top:10px;padding:12px;border:0;border-radius:12px;background:transparent;color:#c7d2fe;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid #7c3aed;}
+.bbb-ott-vote99-shareview{text-align:center;padding:10px 18px 16px;}
+.bbb-ott-vote99-sharetitle{font-size:14px;font-weight:800;color:#fff;margin-bottom:10px;}
+.bbb-ott-vote99-posterimg{width:100%;border-radius:12px;display:block;border:1px solid rgba(124,58,237,.5);}
+.bbb-ott-vote99-sharerow{display:flex;gap:10px;margin-top:12px;}
+.bbb-ott-vote99-dlbtn{flex:1;padding:12px;border-radius:11px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;font-size:15px;font-weight:800;text-decoration:none;text-align:center;}
+.bbb-ott-vote99-backbtn{flex:1;padding:12px;border-radius:11px;border:1px solid #7c3aed;background:rgba(124,58,237,.18);color:#c7d2fe;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+.bbb-ott-vote99-sharenote{font-size:12px;color:#c7d2fe;margin-top:10px;line-height:1.6;}
 .bbb-ott-epad{display:none; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 @media (max-width:980px){ .bbb-ott-epad{display:flex;} }
 
@@ -772,12 +814,48 @@
     <div class="bbb-ott-vote99-thanks" id="bbb-ott-vote99-thanks" hidden>ধন্যবাদ! তোমার ভোট দেওয়া হয়েছে</div>
     <div class="bbb-ott-vote99-sharewrap" id="bbb-ott-vote99-sharewrap" hidden><button type="button" class="bbb-ott-vote99-share" id="bbb-ott-vote99-share">↗ বন্ধুদের সাথে শেয়ার করো</button></div>
     <div class="bbb-ott-vote99-left" id="bbb-ott-vote99-left">ভোট দিতে Google দিয়ে লগইন করো</div>
+    <div class="bbb-ott-vote99-timerline" id="bbb-ott-vote99-timerline" hidden>আবার ভোট দিতে পারবে <b id="bbb-ott-vote99-timerline-t">…</b> পর</div>
     <div class="bbb-ott-vote99-pending" id="bbb-ott-vote99-pending" hidden></div>
     <div class="bbb-ott-vote99-errline" id="bbb-ott-vote99-errline" hidden></div>
     <div class="bbb-ott-vote99-grid" id="bbb-ott-vote99-grid"></div>
     <div class="bbb-ott-vote99-submitwrap"><button type="button" class="bbb-ott-vote99-submit" id="bbb-ott-vote99-submit" disabled>Submit</button></div>
     <div class="bbb-ott-vote99-results" id="bbb-ott-vote99-results"></div>
     <div class="bbb-ott-vote99-note" id="bbb-ott-vote99-note">প্রতিদিন ৯৯ ভোট — রাত ১২টায় আবার নতুন ৯৯ ভোট পাবে। ছবিতে চাপ দিলে ১টা করে ভোট জমা হবে, Submit চাপলে ভোট যাবে। লগইন ছাড়া ভোট যাবে না।</div>
+    <!-- Submit page (site-64): Hotstar celebration + voted photos + timer + share -->
+    <div class="bbb-ott-vote99-submitview" id="bbb-ott-vote99-submitview" hidden>
+      <div class="bbb-ott-vote99-celebrate">
+        <div class="bbb-ott-vote99-celeglow"></div>
+        <div class="bbb-ott-vote99-celering"></div>
+        <div class="bbb-ott-vote99-celecore"><svg width="40" height="40" viewBox="0 0 52 52"><path id="bbb-ott-vote99-celetick" d="M14 27 L22 35 L39 18" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="bbb-ott-vote99-submitthanks">ধন্যবাদ! ভোট দেওয়া হয়েছে!</div>
+      <div class="bbb-ott-vote99-submitbreak" id="bbb-ott-vote99-submitbreak"></div>
+      <div class="bbb-ott-vote99-votedlabel">তুমি যাদের ভোট দিয়েছো</div>
+      <div class="bbb-ott-vote99-votedrow" id="bbb-ott-vote99-submit-voted"></div>
+      <div class="bbb-ott-vote99-timercard" id="bbb-ott-vote99-submit-timer" hidden>
+        <div class="bbb-ott-vote99-timertitle">আবার ভোট দিতে পারবে</div>
+        <div class="bbb-ott-vote99-timerrow">
+          <div><div class="bbb-ott-vote99-timerbox" id="bbb-ott-vote99-th">০০</div><div class="bbb-ott-vote99-timerunit">ঘণ্টা</div></div>
+          <div class="bbb-ott-vote99-timercolon">:</div>
+          <div><div class="bbb-ott-vote99-timerbox" id="bbb-ott-vote99-tm">০০</div><div class="bbb-ott-vote99-timerunit">মিনিট</div></div>
+          <div class="bbb-ott-vote99-timercolon">:</div>
+          <div><div class="bbb-ott-vote99-timerbox bbb-ott-vote99-timerbox--sec" id="bbb-ott-vote99-ts">০০</div><div class="bbb-ott-vote99-timerunit">সেকেন্ড</div></div>
+        </div>
+        <div class="bbb-ott-vote99-timernote">রাত ১২টায় নতুন ৯৯ ভোট পাবে</div>
+      </div>
+      <button type="button" class="bbb-ott-vote99-sharebtn2" id="bbb-ott-vote99-submit-share">↗ বন্ধুদের সাথে শেয়ার করো</button>
+      <button type="button" class="bbb-ott-vote99-againbtn" id="bbb-ott-vote99-submit-again" hidden>আরও ভোট করো</button>
+    </div>
+    <!-- Share view (site-64): the poster image + download -->
+    <div class="bbb-ott-vote99-shareview" id="bbb-ott-vote99-shareview" hidden>
+      <div class="bbb-ott-vote99-sharetitle">এই ছবিটা শেয়ার হবে</div>
+      <img class="bbb-ott-vote99-posterimg" id="bbb-ott-vote99-posterimg" alt="আমার ভোট">
+      <div class="bbb-ott-vote99-sharerow">
+        <a class="bbb-ott-vote99-dlbtn" id="bbb-ott-vote99-poster-dl" download="amar-vote-bigg-boss.png">⬇ ডাউনলোড করো</a>
+        <button type="button" class="bbb-ott-vote99-backbtn" id="bbb-ott-vote99-poster-back">ফিরে যাও</button>
+      </div>
+      <div class="bbb-ott-vote99-sharenote">QR স্ক্যান করলেই ভোটের সাইটে যাওয়া যাবে</div>
+    </div>
     <div class="bbb-ott-vote99-bar"></div>
   </section>
 
@@ -2058,17 +2136,7 @@
   var vote99Left = $("#bbb-ott-vote99-left");
   var vote99Thanks = $("#bbb-ott-vote99-thanks");
   var vote99ShareBtn = $("#bbb-ott-vote99-share");
-  if (vote99ShareBtn) vote99ShareBtn.addEventListener("click", function(){
-    var topKey = null, topN = 0;
-    VOTE99.forEach(function(p){ var v = vote99Mine[p.key] || 0; if (v > topN) { topN = v; topKey = p.short; } });
-    var bbbShareUrl = "https://bigg-boss-bangla.pages.dev/";
-    var bbbShareText = topKey ? ("আমি Bigg Boss Bangla-তে " + topKey + "-কে ভোট দিলাম! তুমিও তোমার প্রিয় প্রতিযোগীকে ভোট দাও: " + bbbShareUrl) : ("Bigg Boss Bangla Season 3 — Live 24/7 দেখো! ভোট দাও, লাইভ চ্যাট করো: " + bbbShareUrl);
-    if (navigator.share) {
-      navigator.share({title: "Bigg Boss Bangla — Live 24/7", text: bbbShareText, url: bbbShareUrl}).catch(function(){});
-    } else {
-      window.open("https://wa.me/?text=" + encodeURIComponent(bbbShareText), "_blank");
-    }
-  });
+  if (vote99ShareBtn) vote99ShareBtn.addEventListener("click", function(){ vote99SharePoster(); });
   var VOTE99_TOTAL = 99;
   var VOTE99_RESULTS_LOCKED = true; /* site-60: hide the results bars from everyone. */
   var VOTE99 = [
@@ -2247,14 +2315,16 @@
       if (pendEl) pendEl.hidden = true;
     } else if (left > 0) {
       if (vote99Left) vote99Left.textContent = "আজ " + left + " ভোট বাকি — ভোট দিতে থাকো!";
-      if (pendEl) { pendEl.hidden = vote99PendingTotal <= 0; if (vote99PendingTotal > 0) pendEl.textContent = "⏳ " + vote99PendingTotal + " ভোট সাবমিটের অপেক্ষায়"; }
+      if (pendEl) { pendEl.hidden = vote99PendingTotal <= 0 || vote99SubmitShowing; if (vote99PendingTotal > 0) pendEl.textContent = "⏳ " + vote99PendingTotal + " ভোট সাবমিটের অপেক্ষায়"; }
     } else {
       if (vote99Left) vote99Left.textContent = "আজকের ৯৯ ভোট শেষ — আবার কাল রাত ১২টায়!";
-      if (pendEl) { pendEl.hidden = vote99PendingTotal <= 0; if (vote99PendingTotal > 0) pendEl.textContent = "⏳ " + vote99PendingTotal + " ভোট সাবমিটের অপেক্ষায়"; }
+      if (pendEl) { pendEl.hidden = vote99PendingTotal <= 0 || vote99SubmitShowing; if (vote99PendingTotal > 0) pendEl.textContent = "⏳ " + vote99PendingTotal + " ভোট সাবমিটের অপেক্ষায়"; }
     }
-    if (vote99Thanks) vote99Thanks.hidden = vote99Used <= 0;
+    var vote99TimerLine = $("#bbb-ott-vote99-timerline");
+    if (vote99TimerLine) vote99TimerLine.hidden = !(googleUser && left <= 0) || vote99SubmitShowing;
+    if (vote99Thanks) vote99Thanks.hidden = vote99Used <= 0 || vote99SubmitShowing;
     var vote99ShareWrap = $("#bbb-ott-vote99-sharewrap");
-    if (vote99ShareWrap) vote99ShareWrap.hidden = vote99Used <= 0;
+    if (vote99ShareWrap) vote99ShareWrap.hidden = vote99Used <= 0 || vote99SubmitShowing;
     var submitBtn = $("#bbb-ott-vote99-submit");
     if (submitBtn) {
       submitBtn.disabled = (vote99PendingTotal <= 0) || vote99Submitting || !googleUser;
@@ -2271,8 +2341,9 @@
         cell.className = "bbb-ott-vote99-cell";
         var wrap = document.createElement("span");
         wrap.className = "bbb-ott-vote99-picwrap";
+        var allSpent = googleUser && left <= 0;
         var img = document.createElement("img");
-        img.className = "bbb-ott-vote99-pic" + (mine > 0 ? " bbb-ott-vote99-pic--voted" : "") + ((mine <= 0 && pend > 0) ? " bbb-ott-vote99-pic--pending" : "");
+        img.className = "bbb-ott-vote99-pic" + (mine > 0 ? " bbb-ott-vote99-pic--voted" : "") + ((mine <= 0 && pend > 0) ? " bbb-ott-vote99-pic--pending" : "") + ((allSpent && mine <= 0) ? " bbb-ott-vote99-pic--bw" : "");
         img.src = p.photo; img.alt = p.short; img.loading = "lazy";
         img.onerror = function(){ this.style.display = "none"; };
         wrap.appendChild(img);
@@ -2283,9 +2354,15 @@
           wrap.appendChild(badge);
         }
         var nm = document.createElement("span");
-        nm.className = "bbb-ott-vote99-name";
+        nm.className = "bbb-ott-vote99-name" + ((allSpent && mine <= 0) ? " bbb-ott-vote99-name--bw" : "");
         nm.textContent = p.short;
         cell.appendChild(wrap); cell.appendChild(nm);
+        if (allSpent && mine <= 0) {
+          var nl = document.createElement("span");
+          nl.className = "bbb-ott-vote99-nolabel";
+          nl.textContent = "ভোট পায়নি";
+          cell.appendChild(nl);
+        }
         cell.addEventListener("click", function(){ vote99Tap(p.key); });
         vote99Grid.appendChild(cell);
       });
@@ -2394,6 +2471,7 @@
       }
       vote99Render();
       vote99Load();
+      if (!failed.length) vote99ShowSubmit();
     });
   }
   /* Send one contestant's votes: /api/poll first, direct RPC when Workers are down. */
@@ -2407,6 +2485,321 @@
           .then(function(r){ if (!r.ok) throw new Error("rpc"); return r.json(); })
           .then(function(d){ if (d) vote99Apply(d); return d; });
       });
+  }
+  /* ===== Site-64: Hotstar submit page + countdown timer + poster share ===== */
+  var vote99SubmitShowing = false; /* true while the submit page is up */
+  function vote99Bn(n){ return String(n).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯"[+d]; }); }
+  function vote99MsToMidnight(){
+    var now = new Date();
+    var dhaka = new Date(now.getTime() + 6 * 3600 * 1000);
+    var y = dhaka.getUTCFullYear(), m = dhaka.getUTCMonth(), d = dhaka.getUTCDate();
+    return Math.max(0, Date.UTC(y, m, d + 1, 0, 0, 0) - 6 * 3600 * 1000 - now.getTime());
+  }
+  function vote99Pad(n){ return String(n).padStart(2, "0"); }
+  /* Live countdown to midnight Dhaka: updates the panel line + the submit-page boxes. */
+  var vote99TimerStarted = false;
+  function vote99TimerTick(){
+    var ms = vote99MsToMidnight();
+    var sec = Math.floor(ms / 1000);
+    var h = Math.floor(sec / 3600), mi = Math.floor((sec % 3600) / 60), se = sec % 60;
+    var tH = $("#bbb-ott-vote99-th"), tM = $("#bbb-ott-vote99-tm"), tS = $("#bbb-ott-vote99-ts");
+    if (tH) tH.textContent = vote99Bn(vote99Pad(h));
+    if (tM) tM.textContent = vote99Bn(vote99Pad(mi));
+    if (tS) tS.textContent = vote99Bn(vote99Pad(se));
+    var tl = $("#bbb-ott-vote99-timerline-t");
+    if (tl) tl.textContent = vote99Bn(vote99Pad(h)) + ":" + vote99Bn(vote99Pad(mi)) + ":" + vote99Bn(vote99Pad(se));
+  }
+  function vote99TimerStart(){
+    if (vote99TimerStarted) return;
+    vote99TimerStarted = true;
+    vote99TimerTick();
+    setInterval(vote99TimerTick, 1000);
+  }
+  vote99TimerStart();
+  /* Voting UI elements hidden while the submit page is showing. */
+  var vote99VoteUI = ["#bbb-ott-vote99-grid", "#bbb-ott-vote99-submit", "#bbb-ott-vote99-left", "#bbb-ott-vote99-pending", "#bbb-ott-vote99-errline", "#bbb-ott-vote99-thanks", "#bbb-ott-vote99-sharewrap", "#bbb-ott-vote99-note", "#bbb-ott-vote99-timerline"];
+  function vote99SetVoteUIVisible(v){
+    vote99SubmitShowing = !v;
+    vote99VoteUI.forEach(function(sel){
+      var el = document.querySelector(sel);
+      if (!el) return;
+      /* The Submit button lives inside its wrap; hide the wrap instead. */
+      if (sel === "#bbb-ott-vote99-submit") { var w = el.closest(".bbb-ott-vote99-submitwrap"); if (w) w.hidden = !v; return; }
+      el.hidden = !v;
+    });
+    var sub = $("#bbb-ott-vote99-submitview"), shr = $("#bbb-ott-vote99-shareview");
+    if (sub) sub.hidden = v;
+    if (shr) shr.hidden = true;
+  }
+  function vote99VotedList(){
+    return VOTE99.filter(function(p){ return (vote99Mine[p.key] || 0) > 0; });
+  }
+  /* Build + show the submit page after a successful Submit. */
+  function vote99ShowSubmit(){
+    var left = VOTE99_TOTAL - vote99Used;
+    if (left < 0) left = 0;
+    var voted = vote99VotedList();
+    /* Breakdown line: "তুমি রাজবীরকে ৬০ ভোট আর শ্রীজলাকে ৩৯ ভোট দিয়েছো" */
+    var br = $("#bbb-ott-vote99-submitbreak");
+    if (br) {
+      var parts = voted.map(function(p){ return p.short + "কে <b>" + vote99Bn(vote99Mine[p.key]) + " ভোট</b>"; });
+      br.innerHTML = parts.length ? ("তুমি " + parts.join(" আর ") + " দিয়েছো") : "তোমার ভোট দেওয়া হয়েছে";
+    }
+    /* Voted photos with counts. */
+    var row = $("#bbb-ott-vote99-submit-voted");
+    if (row) {
+      row.textContent = "";
+      voted.forEach(function(p){
+        var cell = document.createElement("div");
+        cell.className = "bbb-ott-vote99-votedcell";
+        var wrap = document.createElement("div");
+        wrap.className = "bbb-ott-vote99-votedpicwrap";
+        var im = document.createElement("img");
+        im.className = "bbb-ott-vote99-votedpic"; im.src = p.photo; im.alt = p.short;
+        im.onerror = function(){ im.style.display = "none"; };
+        wrap.appendChild(im);
+        var bd = document.createElement("span");
+        bd.className = "bbb-ott-vote99-votedbadge";
+        bd.textContent = vote99Bn(vote99Mine[p.key]);
+        wrap.appendChild(bd);
+        var nm = document.createElement("div");
+        nm.className = "bbb-ott-vote99-votedname";
+        nm.textContent = p.short;
+        cell.appendChild(wrap); cell.appendChild(nm);
+        row.appendChild(cell);
+      });
+    }
+    /* Timer shows only when the daily 99 are all spent. */
+    var timer = $("#bbb-ott-vote99-submit-timer");
+    if (timer) timer.hidden = left > 0;
+    var again = $("#bbb-ott-vote99-submit-again");
+    if (again) again.hidden = left <= 0;
+    /* Replay the checkmark draw-in. */
+    var tick = $("#bbb-ott-vote99-celetick");
+    if (tick) {
+      try {
+        var len = tick.getTotalLength();
+        tick.style.strokeDasharray = len;
+        tick.style.strokeDashoffset = len;
+        tick.animate([{strokeDashoffset: len}, {strokeDashoffset: 0}], {duration: 650, delay: 150, easing: "cubic-bezier(.3,.8,.3,1)", fill: "forwards"});
+      } catch (e) {}
+    }
+    vote99SetVoteUIVisible(false);
+    vote99TimerTick();
+    var sec = document.querySelector("#bbb-ott-vote99");
+    if (sec) { try { sec.scrollIntoView({behavior: "smooth", block: "start"}); } catch (e) {} }
+  }
+  var vote99AgainBtn = $("#bbb-ott-vote99-submit-again");
+  if (vote99AgainBtn) vote99AgainBtn.addEventListener("click", function(){ vote99SetVoteUIVisible(true); vote99Render(); });
+  var vote99SubmitShareBtn = $("#bbb-ott-vote99-submit-share");
+  if (vote99SubmitShareBtn) vote99SubmitShareBtn.addEventListener("click", function(){ vote99SharePoster(); });
+  var vote99PosterBack = $("#bbb-ott-vote99-poster-back");
+  if (vote99PosterBack) vote99PosterBack.addEventListener("click", function(){
+    var shr = $("#bbb-ott-vote99-shareview"), sub = $("#bbb-ott-vote99-submitview");
+    if (shr) shr.hidden = true;
+    if (sub) sub.hidden = false;
+  });
+  /* ---------- Canvas poster (1080x1080) of who this user voted for ---------- */
+  function vote99LoadImg(src){
+    return new Promise(function(res){
+      var im = new Image();
+      im.onload = function(){ res(im); };
+      im.onerror = function(){ res(null); };
+      im.src = src;
+    });
+  }
+  function vote99RoundRect(ctx, x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function vote99PosterCanvas(){
+    var voted = vote99VotedList();
+    if (!voted.length) return Promise.resolve(null);
+    var W = 1080, H = 1080;
+    var cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext("2d");
+    var BN = "Hind Siliguri", LAT = "Poppins";
+    /* Make sure the webfonts are ready before drawing text. */
+    var fontReady = Promise.resolve();
+    try {
+      if (document.fonts && document.fonts.load) {
+        fontReady = Promise.all([
+          document.fonts.load('700 86px "' + BN + '"'),
+          document.fonts.load('700 46px "' + LAT + '"'),
+          document.fonts.load('700 32px "' + BN + '"'),
+          document.fonts.load('700 30px "' + BN + '"')
+        ]).catch(function(){});
+      }
+    } catch (e) {}
+    var imgs = voted.map(function(p){ return vote99LoadImg(p.photo); });
+    return Promise.all([fontReady].concat(imgs).concat([vote99LoadImg("/qr-site.png")])).then(function(all){
+      var photos = all.slice(1, 1 + voted.length);
+      var qr = all[all.length - 1];
+      /* Background: diagonal gradient blue -> purple -> near-black. */
+      var bg = ctx.createLinearGradient(0, 0, W, H);
+      bg.addColorStop(0, "#122056"); bg.addColorStop(0.5, "#340e58"); bg.addColorStop(1, "#080514");
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+      function orb(cx, cy, r, col, a){
+        var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = g;
+        ctx.fillRect(cx - r, cy - r, r * 2, r * 2); ctx.restore();
+      }
+      orb(W * 0.10, H * 0.06, W * 0.45, "#1f80e0", 0.20);
+      orb(W * 0.92, H * 0.28, W * 0.42, "#ec4899", 0.16);
+      orb(W * 0.50, H * 0.90, W * 0.55, "#7c3aed", 0.18);
+      /* Top hairline: blue -> pink. */
+      var hair = ctx.createLinearGradient(0, 0, W, 0);
+      hair.addColorStop(0, "#1f80e0"); hair.addColorStop(1, "#ec4899");
+      ctx.fillStyle = hair; ctx.fillRect(0, 0, W, 7);
+      /* Brand: gold bar-chart icon + BIGG BOSS BANGLA SEASON 3. */
+      var brand = "BIGG BOSS BANGLA  •  SEASON 3";
+      ctx.font = '700 30px "' + LAT + '", sans-serif';
+      ctx.fillStyle = "#fbbf24"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+      var bw = ctx.measureText(brand).width;
+      var bx = (W - (34 + 12 + bw)) / 2, by = 52;
+      [16, 26, 36].forEach(function(h, i){ ctx.fillRect(bx + i * 11, by + 38 - h, 7, h); });
+      ctx.textAlign = "left";
+      ctx.fillText(brand, bx + 34 + 12, by + 38);
+      /* Title + gold underline + subtitle. */
+      ctx.textAlign = "center";
+      ctx.font = '700 86px "' + BN + '", sans-serif';
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("আমার ভোট", W / 2, 196);
+      var ul = ctx.createLinearGradient((W - 180) / 2, 0, (W + 180) / 2, 0);
+      ul.addColorStop(0, "#fbbf24"); ul.addColorStop(1, "#ec4899");
+      ctx.fillStyle = ul; ctx.fillRect((W - 180) / 2, 222, 180, 6);
+      ctx.font = '700 32px "' + BN + '", sans-serif';
+      ctx.fillStyle = "#dcdceb";
+      ctx.fillText("আমি যাদের বাঁচাতে ভোট দিয়েছি", W / 2, 276);
+      /* Contestant cards (layout by count). */
+      var n = voted.length;
+      var cardW, cardH, cardY = 306, gapX;
+      var cols = [], rows = [];
+      if (n === 1) { cardW = 480; cardH = 408; gapX = 0; cols = [(W - cardW) / 2]; rows = [cardY]; }
+      else if (n === 2) { cardW = 452; cardH = 408; gapX = 36; var xs = (W - (2 * cardW + gapX)) / 2; cols = [xs, xs + cardW + gapX]; rows = [cardY, cardY]; }
+      else if (n === 3) { cardW = 320; cardH = 408; gapX = 24; var xs3 = (W - (3 * cardW + 2 * gapX)) / 2; cols = [xs3, xs3 + cardW + gapX, xs3 + 2 * (cardW + gapX)]; rows = [cardY, cardY, cardY]; }
+      else { cardW = 240; cardH = 360; gapX = 16; var xs4 = (W - (4 * cardW + 3 * gapX)) / 2; cols = [xs4, xs4 + cardW + gapX, xs4 + 2 * (cardW + gapX), xs4 + 3 * (cardW + gapX)]; rows = [cardY, cardY, cardY, cardY]; }
+      var AV = n >= 4 ? 140 : (n >= 3 ? 170 : 200);
+      var nameFont = n >= 4 ? 34 : 46;
+      var pillFont = n >= 4 ? 30 : 36;
+      voted.forEach(function(p, i){
+        var cx0 = cols[i], cy0 = rows[i];
+        vote99RoundRect(ctx, cx0 - 3, cy0 - 3, cardW + 6, cardH + 6, 28);
+        ctx.fillStyle = "#7c3aed"; ctx.fill();
+        vote99RoundRect(ctx, cx0, cy0, cardW, cardH, 26);
+        ctx.fillStyle = "#130928"; ctx.fill();
+        var ax = cx0 + (cardW - AV) / 2, ay = cy0 + 26;
+        var photo = photos[i];
+        ctx.save();
+        ctx.beginPath(); ctx.arc(ax + AV / 2, ay + AV / 2, AV / 2, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+        if (photo) { ctx.drawImage(photo, ax, ay, AV, AV); }
+        else { ctx.fillStyle = "#333"; ctx.fillRect(ax, ay, AV, AV); ctx.fillStyle = "#fff"; ctx.font = '700 80px "' + LAT + '", sans-serif'; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(p.short.charAt(0), ax + AV / 2, ay + AV / 2); ctx.textBaseline = "alphabetic"; }
+        ctx.restore();
+        ctx.beginPath(); ctx.arc(ax + AV / 2, ay + AV / 2, AV / 2, 0, Math.PI * 2);
+        ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 5; ctx.stroke();
+        /* Gold checkmark badge on the photo. */
+        var ckx = ax + AV - 22, cky = ay + AV - 22, ckr = 24;
+        ctx.beginPath(); ctx.arc(ckx, cky, ckr, 0, Math.PI * 2);
+        ctx.fillStyle = "#fbbf24"; ctx.fill();
+        ctx.lineWidth = 3; ctx.strokeStyle = "#0a0618"; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ckx - 11, cky); ctx.lineTo(ckx - 3, cky + 8); ctx.lineTo(ckx + 12, cky - 9);
+        ctx.strokeStyle = "#111111"; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke();
+        /* Name. */
+        ctx.font = '700 ' + nameFont + 'px "' + LAT + '", sans-serif';
+        ctx.fillStyle = "#ffffff"; ctx.textAlign = "center";
+        ctx.fillText(p.short, cx0 + cardW / 2, ay + AV + (n >= 4 ? 50 : 62));
+        /* Gold vote pill. */
+        var label = vote99Bn(vote99Mine[p.key]) + " ভোট";
+        ctx.font = '700 ' + pillFont + 'px "' + BN + '", sans-serif';
+        var lw = ctx.measureText(label).width;
+        var pw = lw + 44, ph = n >= 4 ? 44 : 52;
+        var px = cx0 + (cardW - pw) / 2, py = ay + AV + (n >= 4 ? 62 : 78);
+        vote99RoundRect(ctx, px, py, pw, ph, 26);
+        ctx.fillStyle = "#fbbf24"; ctx.fill();
+        ctx.fillStyle = "#111111";
+        ctx.textBaseline = "middle";
+        ctx.fillText(label, cx0 + cardW / 2, py + ph / 2 + 1);
+        ctx.textBaseline = "alphabetic";
+      });
+      /* Message banner: blue -> purple gradient. */
+      var banX = (W - 920) / 2, banY = n >= 4 ? 690 : 752, banW = 920, banH = 96;
+      var ban = ctx.createLinearGradient(banX, 0, banX + banW, 0);
+      ban.addColorStop(0, "#1f80e0"); ban.addColorStop(1, "#7c3aed");
+      vote99RoundRect(ctx, banX, banY, banW, banH, 48);
+      ctx.fillStyle = ban; ctx.fill();
+      ctx.font = '700 30px "' + BN + '", sans-serif';
+      ctx.fillStyle = "#ffffff"; ctx.textAlign = "center";
+      ctx.fillText("ভোট করো — তোমার ভোট তোমার কন্টেস্ট্যান্টকে", W / 2, banY + 40);
+      ctx.fillText("বাঁচাতে পারে!", W / 2, banY + 78);
+      /* Footer bar: QR + scan text + URL + tagline. */
+      var fx = (W - 920) / 2, fy = banY + banH + 30, fw = 920, fh = 168;
+      if (fy + fh > H) fy = H - fh - 20;
+      vote99RoundRect(ctx, fx, fy, fw, fh, 24);
+      ctx.fillStyle = "#0e081e"; ctx.fill();
+      ctx.strokeStyle = "#7c3aed"; ctx.lineWidth = 2; ctx.stroke();
+      var qx = fx + 22, qy = fy + 20;
+      vote99RoundRect(ctx, qx - 8, qy - 8, 128 + 16, 128 + 16, 14);
+      ctx.fillStyle = "#ffffff"; ctx.fill();
+      if (qr) ctx.drawImage(qr, qx, qy, 128, 128);
+      var tx = qx + 128 + 28;
+      ctx.textAlign = "left";
+      ctx.font = '700 28px "' + LAT + '", sans-serif';
+      ctx.fillStyle = "#fbbf24";
+      var qrW = ctx.measureText("QR ").width;
+      ctx.fillText("QR ", tx, fy + 58);
+      ctx.font = '700 28px "' + BN + '", sans-serif';
+      ctx.fillText("স্ক্যান করে ভোট করো", tx + qrW, fy + 58);
+      ctx.font = '700 27px "' + LAT + '", sans-serif';
+      ctx.fillStyle = "#c7d2fe";
+      ctx.fillText("bigg-boss-bangla.pages.dev", tx, fy + 100);
+      ctx.font = '700 28px "' + BN + '", sans-serif';
+      ctx.fillStyle = "#b9b9cd";
+      ctx.fillText("তোমার প্রিয় কন্টেস্ট্যান্টকে বাঁচাও!", tx, fy + 136);
+      return cv;
+    });
+  }
+  /* Share the poster: native share sheet when supported, else show it + download. */
+  var vote99PosterBusy = false;
+  function vote99SharePoster(){
+    if (vote99PosterBusy) return;
+    if (!vote99VotedList().length) return;
+    vote99PosterBusy = true;
+    vote99PosterCanvas().then(function(cv){
+      vote99PosterBusy = false;
+      if (!cv) return;
+      var url = "https://bigg-boss-bangla.pages.dev/";
+      var text = "আমি Bigg Boss Bangla-তে ভোট দিলাম! তুমিও তোমার প্রিয় প্রতিযোগীকে ভোট দাও: " + url;
+      function showShareView(){
+        var img = $("#bbb-ott-vote99-posterimg");
+        var dl = $("#bbb-ott-vote99-poster-dl");
+        var dataUrl = cv.toDataURL("image/png");
+        if (img) img.src = dataUrl;
+        if (dl) dl.href = dataUrl;
+        var sub = $("#bbb-ott-vote99-submitview"), shr = $("#bbb-ott-vote99-shareview");
+        if (sub) sub.hidden = true;
+        if (shr) shr.hidden = false;
+      }
+      try {
+        if (cv.toBlob) {
+          cv.toBlob(function(blob){
+            if (!blob) { showShareView(); return; }
+            var file = new File([blob], "amar-vote-bigg-boss.png", {type: "image/png"});
+            if (navigator.canShare && navigator.canShare({files: [file]})) {
+              navigator.share({files: [file], title: "Bigg Boss Bangla — আমার ভোট", text: text, url: url}).catch(function(){ showShareView(); });
+            } else {
+              showShareView();
+            }
+          }, "image/png");
+        } else { showShareView(); }
+      } catch (e) { showShareView(); }
+    }).catch(function(){ vote99PosterBusy = false; });
   }
   var vote99SubmitBtn = $("#bbb-ott-vote99-submit");
   if (vote99SubmitBtn) vote99SubmitBtn.addEventListener("click", vote99Submit);
