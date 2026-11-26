@@ -178,6 +178,34 @@
 .bbb-ott-loader-svg{display:block;}
 .bbb-ott-loader-pct{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:16px;}
 .bbb-ott-loader-text{color:#fff; font-size:13px; font-weight:700; margin-top:10px;}
+/* ===== Results overlay (site-61): transparent card pushed onto the video.
+   Lives INSIDE .bbb-ott-player, so it shows in fullscreen + landscape + normal view. ===== */
+.bbb-ott-resultsov{position:absolute; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; background:rgba(5,2,15,.45); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); opacity:0; transform:scale(.97); transition:opacity .45s ease, transform .45s ease; pointer-events:none;}
+.bbb-ott-resultsov[hidden]{display:none;}
+.bbb-ott-resultsov--show{opacity:1; transform:scale(1); pointer-events:auto;}
+.bbb-ott-resultsov-card{width:min(88%,360px); max-height:100%; overflow:auto; background:rgba(15,8,32,.88); border:1px solid rgba(251,191,36,.45); border-radius:16px; padding:12px 12px 10px; box-shadow:0 18px 50px rgba(0,0,0,.6); color:#fff;}
+.bbb-ott-resultsov-head{display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:8px;}
+.bbb-ott-resultsov-title{font-size:14px; font-weight:800;}
+.bbb-ott-resultsov-headr{display:flex; align-items:center; gap:6px;}
+.bbb-ott-resultsov-timer{background:rgba(251,191,36,.16); border:1px solid rgba(251,191,36,.5); color:#fbbf24; font-size:11px; font-weight:800; padding:3px 7px; border-radius:10px; font-variant-numeric:tabular-nums; white-space:nowrap;}
+.bbb-ott-resultsov-live{background:#e11d48; color:#fff; font-size:10px; font-weight:800; padding:3px 7px; border-radius:10px; white-space:nowrap;}
+.bbb-ott-resultsov-close{background:rgba(255,255,255,.12); color:#fff; border:0; border-radius:50%; width:22px; height:22px; font-size:12px; font-weight:800; cursor:pointer; line-height:1;}
+.bbb-ott-resultsov-msg{text-align:center; font-size:12px; font-weight:700; color:#fde68a; background:rgba(251,191,36,.10); border:1px solid rgba(251,191,36,.30); border-radius:10px; padding:6px 8px; margin-bottom:9px; line-height:1.45;}
+.bbb-ott-resultsov-rows{display:flex; flex-direction:column;}
+.bbb-ott-resultsov-row{display:flex; align-items:center; gap:9px; padding:5px 6px; border-radius:10px; margin-bottom:5px; background:rgba(255,255,255,.04); will-change:transform;}
+.bbb-ott-resultsov-row--lead{border:1.5px solid #fbbf24; background:rgba(251,191,36,.10);}
+.bbb-ott-resultsov-ava{position:relative; width:46px; height:46px; border-radius:50%; flex:0 0 auto; background:linear-gradient(135deg,#8b5cf6,#ec4899); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:20px;}
+.bbb-ott-resultsov-ring{position:absolute; inset:-4px; border-radius:50%; background:conic-gradient(from 0deg,#fbbf24,#fff7cc,#f59e0b,transparent 55%,#fbbf24); animation:bbbResultsovSpin 2.2s linear infinite; -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px)); mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px));}
+@keyframes bbbResultsovSpin{to{transform:rotate(360deg);}}
+.bbb-ott-resultsov-ava img{position:absolute; inset:0; width:100%; height:100%; border-radius:50%; object-fit:cover;}
+.bbb-ott-resultsov-mid{flex:1; min-width:0;}
+.bbb-ott-resultsov-top{display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:3px;}
+.bbb-ott-resultsov-pct{color:#fbbf24;}
+.bbb-ott-resultsov-bar{height:7px; border-radius:4px; background:rgba(255,255,255,.14); overflow:hidden;}
+.bbb-ott-resultsov-fill{height:100%; width:0; border-radius:4px; background:linear-gradient(90deg,#1f80e0,#7c3aed);}
+.bbb-ott-resultsov-row--lead .bbb-ott-resultsov-fill{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+.bbb-ott-resultsov-vote{margin-top:8px; width:100%; padding:10px; border-radius:12px; border:0; background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#111; font-weight:800; font-size:14px; cursor:pointer;}
+
 .bbb-ott-mini{
   padding:6px 11px; border-radius:12px; font-size:11px; font-weight:600; color:var(--bbb-text);
   background:rgba(255,255,255,.06); border:1px solid var(--bbb-line); transition:.2s;
@@ -574,7 +602,23 @@
           </div>
         </div>
 
-        <div class="bbb-ott-shield" id="bbb-ott-shield"><div class="bbb-ott-shield-strip bbb-ott-shield-strip--top"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--bottom"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--left"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--right"></div></div>
+        <div class="bbb-ott-shield" id="bbb-ott-shield"><div class="bbb-ott-shield-strip bbb-ott-shield-strip--top"></div>
+
+        <!-- Results overlay (site-61): pushed onto the video by Muse on Samiya's command.
+             Transparent, inside the player so it shows in fullscreen + landscape + normal view.
+             Hidden until the live_config.show_results flag turns on. -->
+        <div class="bbb-ott-resultsov" id="bbb-ott-resultsov" hidden>
+          <div class="bbb-ott-resultsov-card">
+            <div class="bbb-ott-resultsov-head">
+              <span class="bbb-ott-resultsov-title">📊 লাইভ ভোটের রেজাল্ট</span>
+              <span class="bbb-ott-resultsov-headr"><span class="bbb-ott-resultsov-timer" id="bbb-ott-resultsov-timer">⏱ ১:০০</span><span class="bbb-ott-resultsov-live">● LIVE</span><button type="button" class="bbb-ott-resultsov-close" id="bbb-ott-resultsov-close" title="Hide">✕</button></span>
+            </div>
+            <div class="bbb-ott-resultsov-msg">🗳️ ভোট করো — আমাদের প্ল্যাটফর্মে তোমার ভোট তোমার কন্টেস্ট্যান্টকে বাঁচাতে পারে!</div>
+            <div class="bbb-ott-resultsov-rows" id="bbb-ott-resultsov-rows"></div>
+            <button type="button" class="bbb-ott-resultsov-vote" id="bbb-ott-resultsov-vote">👉 ভোট করো</button>
+          </div>
+        </div>
+<div class="bbb-ott-shield-strip bbb-ott-shield-strip--bottom"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--left"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--right"></div></div>
 
       </div>
 
@@ -2332,6 +2376,172 @@
   if (vote99Grid) {
     fetch("/api/config",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); vote99Load(); }).catch(function(){ vote99Load(); });
   }
+
+  /* ===== Results overlay (site-61): pushed onto the video by Muse on Samiya's
+     command. Controlled by the live_config.show_results flag, polled DIRECTLY
+     from Supabase (works while the Workers are down). Shows the REAL totals
+     from poll_votes, race-animates ~5s (Rajveer -> Niranjan -> Srijla), then
+     holds with a 1-minute reverse countdown and hides itself automatically. ===== */
+  var resultsOvEl = null, resultsOvRowsEl = null, resultsOvTimerEl = null;
+  var resultsOvActive = false, resultsOvDone = false, resultsOvRaf = null, resultsOvCd = null, resultsOvLastFlag = false;
+  function resultsOvBn(n){ return String(n).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯"[+d]; }); }
+  function resultsOvFmt(s){ return resultsOvBn(Math.floor(s / 60)) + ":" + resultsOvBn(String(s % 60).padStart(2, "0")); }
+  function resultsOvReveal(short, t){
+    if (short === "Rajveer") return Math.min(t / 1.5, 1);
+    if (short === "Niranjan") return Math.min(Math.max((t - 0.8) / 2.2, 0), 1);
+    if (short === "Srijla") return Math.min(Math.max((t - 1.5) / 3.5, 0), 1);
+    return Math.min(t / 2, 1);
+  }
+  function resultsOvBuildRows(){
+    resultsOvRowsEl.innerHTML = "";
+    VOTE99.forEach(function(c){
+      var row = document.createElement("div");
+      row.className = "bbb-ott-resultsov-row";
+      row.setAttribute("data-short", c.short);
+      var av = document.createElement("div");
+      av.className = "bbb-ott-resultsov-ava";
+      var ring = document.createElement("span");
+      ring.className = "bbb-ott-resultsov-ring";
+      av.appendChild(ring);
+      var letter = document.createElement("span");
+      letter.textContent = c.short.charAt(0);
+      av.appendChild(letter);
+      var im = document.createElement("img");
+      im.src = c.photo; im.alt = c.short;
+      im.onerror = function(){ im.remove(); };
+      av.appendChild(im);
+      var mid = document.createElement("div"); mid.className = "bbb-ott-resultsov-mid";
+      var top = document.createElement("div"); top.className = "bbb-ott-resultsov-top";
+      var nm = document.createElement("span"); nm.textContent = c.short;
+      var pc = document.createElement("span"); pc.className = "bbb-ott-resultsov-pct"; pc.textContent = "0%";
+      top.appendChild(nm); top.appendChild(pc);
+      var bar = document.createElement("div"); bar.className = "bbb-ott-resultsov-bar";
+      var fill = document.createElement("div"); fill.className = "bbb-ott-resultsov-fill";
+      bar.appendChild(fill);
+      mid.appendChild(top); mid.appendChild(bar);
+      row.appendChild(av); row.appendChild(mid);
+      resultsOvRowsEl.appendChild(row);
+      c._rovEl = row; c._rovFill = fill; c._rovPc = pc;
+    });
+  }
+  function resultsOvReorder(order){
+    var cur = Array.prototype.map.call(resultsOvRowsEl.children, function(el){ return el.getAttribute("data-short"); });
+    var next = order.map(function(c){ return c.short; });
+    if (cur.join(",") === next.join(",")) return;
+    var tops = {};
+    next.forEach(function(s){ tops[s] = resultsOvEl.querySelector('[data-short="' + s + '"]').getBoundingClientRect().top; });
+    next.forEach(function(s){ resultsOvRowsEl.appendChild(resultsOvEl.querySelector('[data-short="' + s + '"]')); });
+    next.forEach(function(s){
+      var el = resultsOvEl.querySelector('[data-short="' + s + '"]');
+      var dy = tops[s] - el.getBoundingClientRect().top;
+      if (dy) {
+        el.style.transition = "none";
+        el.style.transform = "translateY(" + dy + "px)";
+        void el.offsetWidth;
+        el.style.transition = "transform .45s ease";
+        el.style.transform = "";
+      }
+    });
+  }
+  function resultsOvSetLead(short){
+    VOTE99.forEach(function(c){ if (c._rovEl) c._rovEl.classList.toggle("bbb-ott-resultsov-row--lead", c.short === short); });
+  }
+  function resultsOvShow(finalCounts){
+    if (resultsOvActive) return;
+    resultsOvActive = true; resultsOvDone = false;
+    resultsOvBuildRows();
+    resultsOvEl.hidden = false;
+    void resultsOvEl.offsetWidth;
+    resultsOvEl.classList.add("bbb-ott-resultsov--show");
+    var total = 0;
+    VOTE99.forEach(function(c){ total += finalCounts[c.key] || 0; });
+    if (total <= 0) total = 1;
+    var left = 60;
+    resultsOvTimerEl.textContent = "⏱ " + resultsOvFmt(left);
+    resultsOvCd = setInterval(function(){
+      left--;
+      if (left <= 0) {
+        resultsOvTimerEl.textContent = "⏱ " + resultsOvFmt(0);
+        clearInterval(resultsOvCd); resultsOvCd = null;
+        resultsOvHide();
+        return;
+      }
+      resultsOvTimerEl.textContent = "⏱ " + resultsOvFmt(left);
+    }, 1000);
+    var startTs = null;
+    function frame(ts){
+      if (startTs === null) startTs = ts;
+      var t = Math.min((ts - startTs) / 1000, 5);
+      var rev = {}, revTotal = 0;
+      VOTE99.forEach(function(c){
+        rev[c.short] = (finalCounts[c.key] || 0) * resultsOvReveal(c.short, t);
+        revTotal += rev[c.short];
+      });
+      if (revTotal <= 0) revTotal = 1;
+      var order = VOTE99.slice().sort(function(a, b){ return rev[b.short] - rev[a.short]; });
+      VOTE99.forEach(function(c){
+        var p = rev[c.short] / revTotal * 100;
+        if (c._rovFill) c._rovFill.style.width = p + "%";
+        if (c._rovPc) c._rovPc.textContent = Math.round(p) + "%";
+      });
+      resultsOvReorder(order);
+      resultsOvSetLead(order[0].short);
+      if (t < 5) { resultsOvRaf = requestAnimationFrame(frame); }
+      else { resultsOvRaf = null; }
+    }
+    resultsOvRaf = requestAnimationFrame(frame);
+  }
+  function resultsOvHide(){
+    if (resultsOvRaf) cancelAnimationFrame(resultsOvRaf);
+    resultsOvRaf = null;
+    if (resultsOvCd) clearInterval(resultsOvCd);
+    resultsOvCd = null;
+    if (resultsOvEl) { resultsOvEl.classList.remove("bbb-ott-resultsov--show"); resultsOvEl.hidden = true; }
+    resultsOvActive = false;
+    resultsOvDone = true;
+  }
+  function resultsOvFetchTotals(){
+    return fetch(sbBase() + "poll_votes?select=name,count", {headers: sbHeaders()}).then(function(r){
+      if (!r.ok) throw new Error("sb");
+      return r.json();
+    }).then(function(rows){
+      var counts = {};
+      (rows || []).forEach(function(r){ if (r && typeof r.name === "string") counts[r.name] = parseInt(r.count, 10) || 0; });
+      return counts;
+    });
+  }
+  function resultsOvPollFlag(){
+    try {
+      fetch(sbBase() + "live_config?select=show_results&id=eq.1", {headers: sbHeaders()}).then(function(r){
+        if (!r.ok) throw new Error("sb");
+        return r.json();
+      }).then(function(rows){
+        var flag = !!(rows && rows[0] && rows[0].show_results);
+        if (flag && !resultsOvLastFlag && !resultsOvActive && !resultsOvDone) {
+          resultsOvFetchTotals().then(function(counts){ resultsOvShow(counts); }).catch(function(){});
+        }
+        if (!flag) { resultsOvDone = false; if (resultsOvActive) resultsOvHide(); }
+        resultsOvLastFlag = flag;
+      }).catch(function(){});
+    } catch (e) {}
+  }
+  function resultsOvInit(){
+    resultsOvEl = document.getElementById("bbb-ott-resultsov");
+    resultsOvRowsEl = document.getElementById("bbb-ott-resultsov-rows");
+    resultsOvTimerEl = document.getElementById("bbb-ott-resultsov-timer");
+    if (!resultsOvEl || !resultsOvRowsEl || !resultsOvTimerEl) return;
+    var voteBtn = document.getElementById("bbb-ott-resultsov-vote");
+    if (voteBtn) voteBtn.addEventListener("click", function(){
+      resultsOvHide();
+      var panel = document.getElementById("bbb-ott-vote99");
+      if (panel) panel.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+    var closeBtn = document.getElementById("bbb-ott-resultsov-close");
+    if (closeBtn) closeBtn.addEventListener("click", resultsOvHide);
+    resultsOvPollFlag();
+    setInterval(resultsOvPollFlag, 15000);
+  }
+  resultsOvInit();
 })();
 </script>
 </div>
