@@ -213,8 +213,9 @@
 .bbb-ott-srv:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.2);}
 .bbb-ott-srv.is-active{background:linear-gradient(135deg,var(--bbb-red),#6d28d9); border-color:transparent; box-shadow:0 8px 26px rgba(139,92,246,.45);}
 .bbb-ott-srv.is-active small{color:rgba(255,255,255,.85);}
-.bbb-ott-srv--reload{flex:0 1 150px; background:rgba(139,92,246,.12); border-color:rgba(139,92,246,.45);}
-.bbb-ott-srv--reload:hover{box-shadow:0 8px 24px rgba(139,92,246,.35);}
+.bbb-ott-srv--reload{flex:1 1 100%; background:#fff; color:#111; border-color:#fff; padding:8px 12px;}
+.bbb-ott-srv--reload small{color:#555;}
+.bbb-ott-srv--reload:hover{box-shadow:0 4px 18px rgba(255,255,255,.25);}
 
 /* ---------- Chat ---------- */
 .bbb-ott-chat{
@@ -434,7 +435,7 @@
   .bbb-ott-header{padding:12px; justify-content:center; text-align:center;}
   .bbb-ott-brand,.bbb-ott-pills{justify-content:center;}
   .bbb-ott-srv{flex:1 1 calc(50% - 10px); font-size:12px; padding:10px;}
-  .bbb-ott-srv--reload{flex:1 1 100%;}
+  .bbb-ott-player{margin-left:-10px; margin-right:-10px; width:calc(100% + 20px); border-radius:0;}
   .bbb-ott-details{padding:18px;}
 }
 @media (prefers-reduced-motion:reduce){
@@ -494,7 +495,7 @@
   <section class="bbb-ott-theater">
     <div class="bbb-ott-playercol bbb-ott-stage" id="bbb-ott-stage">
       <div class="bbb-ott-player" id="bbb-ott-player">
-        <span class="bbb-ott-nowtag" id="bbb-ott-nowtag">▶ Server 1 • Main Live HD</span>
+        <span class="bbb-ott-nowtag" id="bbb-ott-nowtag">▶ Main Live HD</span>
 
         <!--
           NOTE (site-32): the live link is set here as the iframe's src so it
@@ -503,7 +504,7 @@
           (verified: the same embed plays on a bare page on this site).
           applyConfig() still reloads it if the Admin Panel link changes,
           so swapping the live from admin works exactly as before.
-          The src/sandbox/allow below match the current Server 1 (OK.ru)
+          The src/sandbox/allow below match the current live (OK.ru)
           settings; load() re-applies them for whichever server is active.
         -->
         <iframe
@@ -573,26 +574,8 @@
 
       <!-- ===== Multi-Server & Quality Switcher =====
            Paste each server's embed link into its data-src attribute. -->
-      <div class="bbb-ott-servers" role="toolbar" aria-label="Stream servers">
-        <button type="button" class="bbb-ott-srv is-active"
-          data-src=""
-          data-srv="s1"
-          data-name="Server 1">▶ Server 1</button>
-          <!-- ▲ Server 1 link comes from /api/config (Admin Panel) — keep data-src empty here -->
-
-        <button type="button" class="bbb-ott-srv"
-          data-src="https://www.youtube-nocookie.com/embed/EaYRymDpVJI?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
-          data-srv="s2"
-          data-name="Server 2">⚡ Server 2</button>
-          <!-- ▲ Server 2 (backup) link goes in data-src="" above -->
-
-        <button type="button" class="bbb-ott-srv"
-          data-src="https://www.youtube-nocookie.com/embed/JOdWmbDoRiM?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1"
-          data-srv="s3"
-          data-name="Server 3">📱 Server 3</button>
-          <!-- ▲ Server 3 (low data / mobile) link goes in data-src="" above -->
-
-        <button type="button" class="bbb-ott-srv bbb-ott-srv--reload" id="bbb-ott-reload">🔄 Reload<small>Fix buffering</small></button>
+      <div class="bbb-ott-servers" role="toolbar" aria-label="Reload player">
+        <button type="button" class="bbb-ott-srv bbb-ott-srv--reload" id="bbb-ott-reload">🔄 Reload<small>যদি লাইভ না চলে এখানে দুই তিনবার ক্লিক করো</small></button>
       </div>
 
       <!-- 24X7 uncut live label -->
@@ -1061,19 +1044,13 @@
     return true;
   }
 
-  /* Initial state: if the iframe src was pasted directly, use it for Server 1 too */
+  /* Initial state: one live only, no server buttons any more. The live
+     link is the iframe src (set in HTML); load() wires up the player
+     around it without reloading it (site-32 src guard). If the iframe
+     has no src, applyConfig() loads the Admin Panel link. */
   (function init(){
     var direct = frame.getAttribute("src");
-    if (isValid(direct)) {
-      if (!isValid(servers[0].getAttribute("data-src"))) servers[0].setAttribute("data-src", direct);
-      /* Set up the shield / sandbox / allow for the src already in the
-         iframe (site-32). load() will not reload it — see the src guard
-         in load() — it only wires up the player around the live embed. */
-      load(direct, "Server 1");
-    } else {
-      var s1 = servers[0].getAttribute("data-src");
-      if (isValid(s1)) load(s1, servers[0].getAttribute("data-name"));
-    }
+    if (isValid(direct)) load(direct, "Main Live HD");
   })();
 
   function setActive(btn){
@@ -2043,26 +2020,9 @@
     if (cfg && cfg.live) cfg.live = extractSrc(cfg.live);
     if (cfg && cfg.s2) cfg.s2 = extractSrc(cfg.s2);
     if (cfg && cfg.s3) cfg.s3 = extractSrc(cfg.s3);
-    if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Server 1");
+    if (cfg && cfg.live && frame && frame.getAttribute("src") !== cfg.live) load(ytApiUrl(cfg.live), "Main Live HD");
     if (webframe && !webframe.hidden) applyFrameGeometry();
-    if (cfg && cfg.live && servers[0]) servers[0].setAttribute("data-src", ytApiUrl(cfg.live));
-    if (cfg && cfg.s2 && servers[1]) servers[1].setAttribute("data-src", ytApiUrl(cfg.s2));
-    if (cfg && cfg.s3 && servers[2]) servers[2].setAttribute("data-src", ytApiUrl(cfg.s3));
-    if (cfg && cfg.serversOn) {
-      var on = cfg.serversOn;
-      servers.forEach(function(b, i){
-        var key = "s" + (i + 1);
-        b.style.display = (on[key] === false) ? "none" : "";
-      });
-      var active = null;
-      servers.forEach(function(b){ if (b.classList.contains("is-active")) active = b; });
-      if (active && active.style.display === "none") {
-        var first = null;
-        servers.forEach(function(b){ if (!first && b.style.display !== "none") first = b; });
-        if (first) { setActive(first); load(first.getAttribute("data-src"), first.getAttribute("data-name")); }
-        else { showVideo(); frame.removeAttribute("src"); }
-      }
-    }
+    /* No server buttons any more (one live only) — nothing to sync here. */
   }
   if (vote99Grid) {
     fetch("/api/config",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(cfg){ applyConfig(cfg); vote99Load(); }).catch(function(){ vote99Load(); });
