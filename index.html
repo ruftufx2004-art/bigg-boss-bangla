@@ -157,6 +157,10 @@
 .bbb-ott-ov-msg b{color:#c4b5fd;}
 .bbb-ott-ov-pin{border:1.5px solid #fbbf24; border-radius:10px; background:rgba(251,191,36,.08); padding:8px 10px; word-break:break-word;}
 .bbb-ott-ov-pinned{padding:10px 12px 0;}
+.bbb-ott-ov-replies{margin:6px 0 0 12px; border-left:2px solid rgba(255,255,255,.14); padding-left:10px; display:flex; flex-direction:column; gap:8px;}
+.bbb-ott-ov-pin-replies{margin:8px 0 0 12px; border-left:2px solid rgba(255,255,255,.14); padding-left:10px; display:flex; flex-direction:column; gap:8px;}
+.bbb-ott-ov-reply .bbb-ott-ov-to{font-size:11px; color:#a78bfa;}
+.bbb-ott-ov-reply .bbb-ott-ov-to b{color:#c4b5fd; font-size:11px;}
 .bbb-ott-ov-pin .bbb-ott-ov-pin-tag{font-size:10px; font-weight:800; color:#1a1206; background:#fbbf24; border-radius:999px; padding:1px 8px;}
 .bbb-ott-ov-pin b{color:#fbbf24;}
 .bbb-ott-ov-msg .bbb-ott-ov-time{color:rgba(255,255,255,.6); font-size:11px; margin-left:6px;}
@@ -379,6 +383,8 @@
 .bbb-ott-chat-empty{color:var(--bbb-muted); font-size:13px; text-align:center; padding:26px 10px;}
 .bbb-ott-msg-time{font-size:10px; color:#7c7d90; margin-left:6px; font-weight:400;}
 .bbb-ott-replies{margin:8px 0 0 39px; display:flex; flex-direction:column; gap:10px; border-left:2px solid rgba(255,255,255,.14); padding-left:12px;}
+.bbb-ott-reply-to{font-size:11px; color:#a78bfa; margin-top:1px;}
+.bbb-ott-reply-to b{color:#c4b5fd; font-size:11px;}
 .bbb-ott-msg--reply .bbb-ott-av{flex-basis:24px; width:24px; height:24px; font-size:10px;}
 /* Pinned comment (site-73): stays at the top of the chat, gold border. */
 .bbb-ott-chat-pinned{padding:10px 14px 0;}
@@ -2212,6 +2218,17 @@
     tm.className = "bbb-ott-msg-time";
     tm.textContent = chatTime(m.t);
     body.appendChild(tm);
+    if (m.parent && chatData[m.parent]) {
+      /* Who this is a reply to (site-76): replier's name is already on the
+         row; this line names the person replied to. */
+      var rt = document.createElement("div");
+      rt.className = "bbb-ott-reply-to";
+      var rtA = document.createElement("span"); rtA.textContent = "↩ ";
+      var rtB = document.createElement("b"); rtB.textContent = chatData[m.parent].name || "Fan";
+      var rtC = document.createElement("span"); rtC.textContent = "-কে রিপ্লাই দিয়েছে";
+      rt.appendChild(rtA); rt.appendChild(rtB); rt.appendChild(rtC);
+      body.appendChild(rt);
+    }
     var p = document.createElement("p");
     p.textContent = m.text;   // textContent keeps user input safe (no HTML injection)
     body.appendChild(p);
@@ -2219,8 +2236,21 @@
     row.appendChild(av); row.appendChild(body);
     chatRows[m.id] = row;
     if (m.pinned) {
-      /* Pinned comments live in the fixed box above the scrolling list. */
-      if (pinnedBox) { pinnedBox.hidden = false; pinnedBox.textContent = ""; pinnedBox.appendChild(row); }
+      /* Pinned comments live in the fixed box above the scrolling list.
+         Wrap in a thread with its own replies container (site-76) so replies
+         to the pinned comment nest in tree form under it. */
+      if (pinnedBox) {
+        pinnedBox.hidden = false;
+        pinnedBox.textContent = "";
+        var pinThread = document.createElement("div");
+        pinThread.className = "bbb-ott-thread";
+        pinThread.appendChild(row);
+        var pinReplies = document.createElement("div");
+        pinReplies.className = "bbb-ott-replies";
+        pinThread.appendChild(pinReplies);
+        chatThreads[m.id] = pinReplies;
+        pinnedBox.appendChild(pinThread);
+      }
       return;
     }
     var dest = m.parent ? topThreadOf(m) : null;
@@ -2291,44 +2321,101 @@
   var ovInput = $("#bbb-ott-ov-input");
   var ovClose = $("#bbb-ott-ov-close");
   var ovOpen = $("#bbb-ott-ov-open");
+  /* One reply element for the below-video chat (site-76): name + "replied to X" + text. */
+  function ovReplyEl(m){
+    var div = document.createElement("div");
+    div.className = "bbb-ott-ov-reply";
+    var b = document.createElement("b");
+    b.textContent = m.name || "Fan";
+    var tm = document.createElement("span");
+    tm.className = "bbb-ott-ov-time";
+    tm.textContent = new Date(m.t || 0).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"});
+    div.appendChild(b); div.appendChild(tm);
+    var par = (m.parent && chatData[m.parent]) ? chatData[m.parent] : null;
+    if (par) {
+      var to = document.createElement("div");
+      to.className = "bbb-ott-ov-to";
+      var a = document.createElement("span"); a.textContent = "↩ ";
+      var nb = document.createElement("b"); nb.textContent = par.name || "Fan";
+      var c = document.createElement("span"); c.textContent = "-কে রিপ্লাই দিয়েছে";
+      to.appendChild(a); to.appendChild(nb); to.appendChild(c);
+      div.appendChild(to);
+    }
+    var tx = document.createElement("span");
+    tx.textContent = " " + (m.text || "");
+    div.appendChild(tx);
+    return div;
+  }
+  /* Top-level ancestor of a message (same rule as the main chat). */
+  function ovTopOf(m){
+    var cur = m, guard = 0;
+    while (cur.parent && chatData[cur.parent] && guard++ < 10) cur = chatData[cur.parent];
+    return cur;
+  }
   function renderOverlayMsgs(){
     if (!ovList) return;
     var all = Object.keys(chatData).map(function(id){ return chatData[id]; })
       .sort(function(a, b){ return (a.t || 0) - (b.t || 0); })
       .slice(-30);
-    ovList.textContent = "";
-    if (!all.length) { ovList.textContent = "No messages yet."; return; }
-    /* Pinned comment first (site-74/75) — in its OWN fixed box above the
-       scrolling list, so it never scrolls away (same as the main chat). */
+    /* Pinned comment (site-75/76) — its OWN fixed box above the scrolling
+       list, with replies to it nested inside in tree form. */
     var pinned = null;
     Object.keys(chatData).forEach(function(id){ if (chatData[id] && chatData[id].pinned) pinned = chatData[id]; });
-    if (pinned && ovPinned) {
-      var pd = document.createElement("div");
-      pd.className = "bbb-ott-ov-pin";
-      var pt = document.createElement("span");
-      pt.className = "bbb-ott-ov-pin-tag";
-      pt.textContent = "📌 PINNED";
-      var pb = document.createElement("b");
-      pb.textContent = " " + (pinned.name || "Fan");
-      var ptx = document.createElement("span");
-      ptx.textContent = " " + (pinned.text || "");
-      pd.appendChild(pt); pd.appendChild(pb); pd.appendChild(ptx);
+    if (ovPinned) {
       ovPinned.textContent = "";
-      ovPinned.appendChild(pd);
-      ovPinned.hidden = false;
+      if (pinned) {
+        var pd = document.createElement("div");
+        pd.className = "bbb-ott-ov-pin";
+        var pt = document.createElement("span");
+        pt.className = "bbb-ott-ov-pin-tag";
+        pt.textContent = "📌 PINNED";
+        var pb = document.createElement("b");
+        pb.textContent = " " + (pinned.name || "Fan");
+        var ptx = document.createElement("span");
+        ptx.textContent = " " + (pinned.text || "");
+        pd.appendChild(pt); pd.appendChild(pb); pd.appendChild(ptx);
+        var pinR = document.createElement("div");
+        pinR.className = "bbb-ott-ov-pin-replies";
+        Object.keys(chatData).forEach(function(id){
+          var r = chatData[id];
+          if (r && r.parent === pinned.id) pinR.appendChild(ovReplyEl(r));
+        });
+        if (pinR.children.length) pd.appendChild(pinR);
+        ovPinned.appendChild(pd);
+        ovPinned.hidden = false;
+      } else {
+        ovPinned.hidden = true;
+      }
     }
+    ovList.textContent = "";
+    if (!all.length) { ovList.textContent = "No messages yet."; return; }
+    /* Group the rest into threads by top-level ancestor (site-76 tree). */
+    var threads = {}, order = [];
     all.forEach(function(m){
       if (m.pinned) return;
+      var top = ovTopOf(m);
+      if (top.pinned) return; /* pinned replies live in the pinned box */
+      if (!threads[top.id]) { threads[top.id] = { top: top, replies: [] }; order.push(top.id); }
+      if (m.id !== top.id) threads[top.id].replies.push(m);
+    });
+    order.forEach(function(tid){
+      var th = threads[tid];
       var div = document.createElement("div");
       div.className = "bbb-ott-ov-msg";
       var b = document.createElement("b");
-      b.textContent = m.name || "Fan";
+      b.textContent = th.top.name || "Fan";
       var tm = document.createElement("span");
       tm.className = "bbb-ott-ov-time";
-      tm.textContent = new Date(m.t || 0).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"});
+      tm.textContent = new Date(th.top.t || 0).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"});
       var tx = document.createElement("span");
-      tx.textContent = " " + (m.text || "");
+      tx.textContent = " " + (th.top.text || "");
       div.appendChild(b); div.appendChild(tm); div.appendChild(tx);
+      if (th.replies.length) {
+        var rc = document.createElement("div");
+        rc.className = "bbb-ott-ov-replies";
+        th.replies.forEach(function(r){ rc.appendChild(ovReplyEl(r)); });
+        div.appendChild(rc);
+      }
       ovList.appendChild(div);
     });
     ovList.scrollTop = ovList.scrollHeight;
