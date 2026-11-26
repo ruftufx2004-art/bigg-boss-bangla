@@ -1315,11 +1315,16 @@
     if (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) return false;
     if (window.navigator.standalone) return false;
     try {
+      if (localStorage.getItem("bbb-pwa-installed")) return false; // already installed: never show again
       var decided = parseInt(localStorage.getItem("bbb-pwa-decided") || "0", 10);
       if (decided && Date.now() - decided < 1 * 24 * 60 * 60 * 1000) return false; // ask again after 1 day
     } catch (e) {}
     return true;
   }
+  /* Once the app is installed, never show the popup again. */
+  window.addEventListener("appinstalled", function(){
+    try { localStorage.setItem("bbb-pwa-installed", "1"); } catch (e) {}
+  });
   var deferredPwaPrompt = null;
   var pwaShown = false;
   function pwaShow(){
@@ -1349,7 +1354,10 @@
     deferredPwaPrompt.prompt();
     deferredPwaPrompt.userChoice.then(function(res){
       pwaReport(res.outcome === "accepted" ? "installed" : "cancelled");
-      if (res.outcome === "accepted") toast("✅ অ্যাপ ইনস্টল হচ্ছে — হোম স্ক্রিনে দেখো!");
+      if (res.outcome === "accepted") {
+        try { localStorage.setItem("bbb-pwa-installed", "1"); } catch (e) {}
+        toast("✅ অ্যাপ ইনস্টল হচ্ছে — হোম স্ক্রিনে দেখো!");
+      }
     }).catch(function(){});
     deferredPwaPrompt = null;
   }
@@ -1424,7 +1432,10 @@
     deferredPwaPrompt.prompt();
     deferredPwaPrompt.userChoice.then(function(res){
       pwaReport(res.outcome === "accepted" ? "installed" : "cancelled");
-      if (res.outcome === "accepted") toast("✅ অ্যাপ ইনস্টল হচ্ছে — হোম স্ক্রিনে দেখো!");
+      if (res.outcome === "accepted") {
+        try { localStorage.setItem("bbb-pwa-installed", "1"); } catch (e) {}
+        toast("✅ অ্যাপ ইনস্টল হচ্ছে — হোম স্ক্রিনে দেখো!");
+      }
     }).catch(function(){});
     deferredPwaPrompt = null;
   });
