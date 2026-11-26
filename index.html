@@ -384,10 +384,10 @@
 .bbb-ott-vote99-cell:nth-child(4){grid-column:2;}
 .bbb-ott-vote99-picwrap{position:relative;width:84px;height:84px;}
 .bbb-ott-vote99-pic{width:84px;height:84px;border-radius:50%;object-fit:cover;display:block;border:3px solid transparent;box-sizing:border-box;background:#222;}
-.bbb-ott-vote99-pic--voted{border-color:#1f80e0;}
-.bbb-ott-vote99-badge{position:absolute;top:-2px;right:-2px;min-width:24px;height:24px;padding:0 5px;border-radius:12px;background:#1f80e0;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #0f1014;box-sizing:border-box;}
+.bbb-ott-vote99-pic--voted{border-color:#fbbf24; box-shadow:0 0 0 3px rgba(251,191,36,.30), 0 0 14px rgba(251,191,36,.35);} /* Jio Hotstar-style yellow ring (site-60) */
+.bbb-ott-vote99-badge{position:absolute;top:-2px;right:-2px;min-width:24px;height:24px;padding:0 5px;border-radius:12px;background:#fbbf24;color:#111;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #0f1014;box-sizing:border-box;}
 .bbb-ott-vote99-name{font-size:13px;font-weight:600;}
-.bbb-ott-vote99-results{padding:4px 18px 16px;display:flex;flex-direction:column;gap:10px;}
+.bbb-ott-vote99-results{display:none;} /* Results LOCKED (site-60): no one can see the vote totals. */
 .bbb-ott-vote99-row{display:flex;align-items:center;gap:10px;}
 .bbb-ott-vote99-rpic{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:0 0 auto;border:2px solid transparent;}
 .bbb-ott-vote99-rmid{flex:1;min-width:0;}
@@ -401,7 +401,7 @@
 .bbb-ott-vote99-googlebtn{padding:10px 16px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;border:0;font-family:inherit;background:#fff;color:#111;}
 /* Header profile button (site-59): circular avatar top-right of the hero.
    Logged out = generic person icon; logged in = the user's assigned avatar. */
-.bbb-ott-profilebtn{position:absolute; top:12px; right:12px; z-index:6; width:42px; height:42px; border-radius:50%; border:2px solid rgba(255,255,255,.55); background:rgba(0,0,0,.45); color:#fff; cursor:pointer; display:grid; place-items:center; font-size:19px; overflow:hidden; padding:0;}
+.bbb-ott-profilebtn{position:absolute; top:12px; right:12px; z-index:6; width:42px; height:42px; border-radius:50%; border:2px solid #fbbf24; box-shadow:0 0 0 3px rgba(251,191,36,.28), 0 0 14px rgba(251,191,36,.35); background:rgba(0,0,0,.45); color:#fff; cursor:pointer; display:grid; place-items:center; font-size:19px; overflow:hidden; padding:0;}
 .bbb-ott-profilebtn img{width:100%; height:100%; object-fit:cover; display:block;}
 .bbb-ott-profilebtn [hidden]{display:none;}
 .bbb-ott-profilemenu{position:absolute; top:60px; right:12px; z-index:7; min-width:200px; max-width:260px; background:rgba(20,10,40,.96); border:1px solid var(--bbb-line); border-radius:12px; padding:14px; box-shadow:0 12px 40px rgba(0,0,0,.6); color:#fff;}
@@ -684,7 +684,7 @@
     <div class="bbb-ott-vote99-grid" id="bbb-ott-vote99-grid"></div>
     <div class="bbb-ott-vote99-submitwrap"><button type="button" class="bbb-ott-vote99-submit" id="bbb-ott-vote99-submit" disabled>Submit</button></div>
     <div class="bbb-ott-vote99-results" id="bbb-ott-vote99-results"></div>
-    <div class="bbb-ott-vote99-note" id="bbb-ott-vote99-note">ছবিতে চাপ দিলে ১টা করে ভোট জমা হবে — Submit চাপলে ভোট যাবে। লগইন ছাড়া ভোট যাবে না।</div>
+    <div class="bbb-ott-vote99-note" id="bbb-ott-vote99-note">প্রতিদিন ৯৯ ভোট — রাত ১২টায় আবার নতুন ৯৯ ভোট পাবে। ছবিতে চাপ দিলে ১টা করে ভোট জমা হবে, Submit চাপলে ভোট যাবে। লগইন ছাড়া ভোট যাবে না।</div>
     <div class="bbb-ott-vote99-bar"></div>
   </section>
 
@@ -1977,6 +1977,7 @@
     }
   });
   var VOTE99_TOTAL = 99;
+  var VOTE99_RESULTS_LOCKED = true; /* site-60: hide the results bars from everyone. */
   var VOTE99 = [
     {key:"Rajveer Dey", short:"Rajveer", photo:"/contestants/rajveer.jpg"},
     {key:"Srijla Guha", short:"Srijla", photo:"/contestants/srijla.jpg"},
@@ -2006,7 +2007,15 @@
     try { if (googleUser) localStorage.setItem(GOOGLE_USER_KEY, JSON.stringify(googleUser)); else localStorage.removeItem(GOOGLE_USER_KEY); } catch (e) {}
   }
   /* Vote key: "g_" + Google user id. Null when logged out (no voting). */
-  function voteKey(){ return googleUser ? ("g_" + googleUser.id) : null; }
+  /* Vote key: "g_" + Google id + today's Dhaka date, so each Gmail gets a
+     fresh 99 votes every day; the budget resets at 12 midnight (Dhaka). */
+  function bbbTodayDhaka(){
+    try { return new Intl.DateTimeFormat("en-CA", {timeZone: "Asia/Dhaka", year: "numeric", month: "2-digit", day: "2-digit"}).format(new Date()); }
+    catch (e) { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  }
+  function voteKey(){ return googleUser ? ("g_" + googleUser.id + "_" + bbbTodayDhaka()) : null; }
+  /* Profile key (stable, no date): vote_profiles.user_id stays per Google account. */
+  function profileKey(){ return googleUser ? ("g_" + googleUser.id) : null; }
   function mineStorageKey(){ var k = voteKey(); return k ? ("bbb-google-vote99-" + k) : null; }
   function vote99SaveMine(){
     var k = mineStorageKey(); if (!k) return;
@@ -2064,7 +2073,7 @@
      user_id = the vote key, so vote99.device joins vote_profiles.user_id. */
   function upsertProfile(){
     if (!googleUser) return;
-    var body = { user_id: voteKey(), name: googleUser.name || "", email: googleUser.email || "", photo: googleUser.avatar || "", updated_at: new Date().toISOString() };
+    var body = { user_id: profileKey(), name: googleUser.name || "", email: googleUser.email || "", photo: googleUser.avatar || "", updated_at: new Date().toISOString() };
     try {
       fetch(sbBase() + "vote_profiles", {method: "POST", headers: Object.assign({}, sbHeaders(), {"Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"}), body: JSON.stringify(body)}).catch(function(){});
     } catch (e) {}
@@ -2144,10 +2153,10 @@
       if (vote99Left) vote99Left.textContent = "ভোট দিতে Google দিয়ে লগইন করো";
       if (pendEl) pendEl.hidden = true;
     } else if (left > 0) {
-      if (vote99Left) vote99Left.textContent = left + " ভোট বাকি — ভোট দিতে থাকো!";
+      if (vote99Left) vote99Left.textContent = "আজ " + left + " ভোট বাকি — ভোট দিতে থাকো!";
       if (pendEl) { pendEl.hidden = vote99PendingTotal <= 0; if (vote99PendingTotal > 0) pendEl.textContent = "⏳ " + vote99PendingTotal + " ভোট সাবমিটের অপেক্ষায়"; }
     } else {
-      if (vote99Left) vote99Left.textContent = "০ ভোট বাকি — ধন্যবাদ!";
+      if (vote99Left) vote99Left.textContent = "আজকের ৯৯ ভোট শেষ — আবার কাল রাত ১২টায়!";
       if (pendEl) { pendEl.hidden = vote99PendingTotal <= 0; if (vote99PendingTotal > 0) pendEl.textContent = "⏳ " + vote99PendingTotal + " ভোট সাবমিটের অপেক্ষায়"; }
     }
     if (vote99Thanks) vote99Thanks.hidden = vote99Used <= 0;
@@ -2188,7 +2197,7 @@
         vote99Grid.appendChild(cell);
       });
     }
-    if (vote99Results) {
+    if (vote99Results && !VOTE99_RESULTS_LOCKED) {
       vote99Results.textContent = "";
       var all = vote99TotalAll;
       VOTE99.forEach(function(p){

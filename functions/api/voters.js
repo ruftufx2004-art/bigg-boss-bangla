@@ -53,15 +53,22 @@ export async function onRequest(context) {
   for (const r of profRows || []) {
     if (r && typeof r.user_id === "string") profs[r.user_id] = r;
   }
+  // Daily vote keys are "g_<id>_YYYY-MM-DD" (site-60); strip the trailing date
+  // so one Gmail shows as a single voter with its total across days.
+  function baseDevice(device) {
+    const m = typeof device === "string" ? device.match(/^(g_.+?)_\d{4}-\d{2}-\d{2}$/) : null;
+    return m ? m[1] : device;
+  }
   const byDevice = {};
   let totalVotes = 0;
   for (const r of voteRows || []) {
     if (!r || typeof r.device !== "string" || typeof r.choice !== "string") continue;
     const cnt = parseInt(r.cnt, 10) || 0;
     if (cnt <= 0) continue;
-    if (!byDevice[r.device]) byDevice[r.device] = { user_id: r.device, votes: {}, total: 0 };
-    byDevice[r.device].votes[r.choice] = (byDevice[r.device].votes[r.choice] || 0) + cnt;
-    byDevice[r.device].total += cnt;
+    const key = baseDevice(r.device);
+    if (!byDevice[key]) byDevice[key] = { user_id: key, votes: {}, total: 0 };
+    byDevice[key].votes[r.choice] = (byDevice[key].votes[r.choice] || 0) + cnt;
+    byDevice[key].total += cnt;
     totalVotes += cnt;
   }
   const voters = Object.keys(byDevice).map(function (device) {
