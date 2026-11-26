@@ -189,7 +189,6 @@
 .bbb-ott-resultsov-headr{display:flex; align-items:center; gap:6px;}
 .bbb-ott-resultsov-timer{background:rgba(251,191,36,.16); border:1px solid rgba(251,191,36,.5); color:#fbbf24; font-size:11px; font-weight:800; padding:3px 7px; border-radius:10px; font-variant-numeric:tabular-nums; white-space:nowrap;}
 .bbb-ott-resultsov-live{background:#e11d48; color:#fff; font-size:10px; font-weight:800; padding:3px 7px; border-radius:10px; white-space:nowrap;}
-.bbb-ott-resultsov-close{background:rgba(255,255,255,.12); color:#fff; border:0; border-radius:50%; width:22px; height:22px; font-size:12px; font-weight:800; cursor:pointer; line-height:1;}
 .bbb-ott-resultsov-msg{text-align:center; font-size:12px; font-weight:700; color:#fde68a; background:rgba(251,191,36,.10); border:1px solid rgba(251,191,36,.30); border-radius:10px; padding:6px 8px; margin-bottom:9px; line-height:1.45;}
 .bbb-ott-resultsov-rows{display:flex; flex-direction:column;}
 .bbb-ott-resultsov-row{display:flex; align-items:center; gap:9px; padding:5px 6px; border-radius:10px; margin-bottom:5px; background:rgba(255,255,255,.04); will-change:transform;}
@@ -205,6 +204,22 @@
 .bbb-ott-resultsov-fill{height:100%; width:0; border-radius:4px; background:linear-gradient(90deg,#1f80e0,#7c3aed);}
 .bbb-ott-resultsov-row--lead .bbb-ott-resultsov-fill{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
 .bbb-ott-resultsov-vote{margin-top:8px; width:100%; padding:10px; border-radius:12px; border:0; background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#111; font-weight:800; font-size:14px; cursor:pointer;}
+/* site-62: phone display — compact overlay so it fits the small video player. */
+@media (max-width:600px){
+  .bbb-ott-resultsov-card{width:94%; padding:8px 8px 7px; border-radius:12px;}
+  .bbb-ott-resultsov-head{margin-bottom:5px;}
+  .bbb-ott-resultsov-title{font-size:12px;}
+  .bbb-ott-resultsov-timer{font-size:10px; padding:2px 6px;}
+  .bbb-ott-resultsov-live{font-size:9px; padding:2px 6px;}
+  .bbb-ott-resultsov-msg{font-size:10.5px; padding:5px 6px; margin-bottom:6px; line-height:1.35;}
+  .bbb-ott-resultsov-row{gap:8px; padding:4px 5px; margin-bottom:4px;}
+  .bbb-ott-resultsov-ava{width:34px; height:34px; font-size:16px;}
+  .bbb-ott-resultsov-ring{inset:-3px;}
+  .bbb-ott-resultsov-top{font-size:11px; margin-bottom:2px;}
+  .bbb-ott-resultsov-bar{height:6px;}
+  .bbb-ott-resultsov-vote{margin-top:6px; padding:8px; font-size:13px;}
+}
+
 
 .bbb-ott-mini{
   padding:6px 11px; border-radius:12px; font-size:11px; font-weight:600; color:var(--bbb-text);
@@ -611,7 +626,7 @@
           <div class="bbb-ott-resultsov-card">
             <div class="bbb-ott-resultsov-head">
               <span class="bbb-ott-resultsov-title">📊 লাইভ ভোটের রেজাল্ট</span>
-              <span class="bbb-ott-resultsov-headr"><span class="bbb-ott-resultsov-timer" id="bbb-ott-resultsov-timer">⏱ ১:০০</span><span class="bbb-ott-resultsov-live">● LIVE</span><button type="button" class="bbb-ott-resultsov-close" id="bbb-ott-resultsov-close" title="Hide">✕</button></span>
+              <span class="bbb-ott-resultsov-headr"><span class="bbb-ott-resultsov-timer" id="bbb-ott-resultsov-timer">⏱ ১:০০</span><span class="bbb-ott-resultsov-live">● LIVE</span></span>
             </div>
             <div class="bbb-ott-resultsov-msg">🗳️ ভোট করো — আমাদের প্ল্যাটফর্মে তোমার ভোট তোমার কন্টেস্ট্যান্টকে বাঁচাতে পারে!</div>
             <div class="bbb-ott-resultsov-rows" id="bbb-ott-resultsov-rows"></div>
@@ -2536,8 +2551,6 @@
       var panel = document.getElementById("bbb-ott-vote99");
       if (panel) panel.scrollIntoView({behavior:"smooth", block:"start"});
     });
-    var closeBtn = document.getElementById("bbb-ott-resultsov-close");
-    if (closeBtn) closeBtn.addEventListener("click", resultsOvHide);
     resultsOvPollFlag();
     setInterval(resultsOvPollFlag, 15000);
   }
