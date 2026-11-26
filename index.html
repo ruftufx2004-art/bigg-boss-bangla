@@ -252,6 +252,33 @@
 .bbb-ott-player:fullscreen .bbb-ott-resultsov-bar, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-bar{height:10px;}
 .bbb-ott-player:fullscreen .bbb-ott-resultsov-vote, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-vote{padding:14px; font-size:16px;}
 }
+/* site-69: LANDSCAPE short viewport (phone fullscreen, ~420px tall) — compact so all 4 rows + vote button fit. */
+@media (orientation:landscape) and (max-height:520px){
+  .bbb-ott-resultsov-card{width:min(94%,600px); height:100%; max-height:100%; padding:8px 12px 6px; display:flex; flex-direction:column;}
+  .bbb-ott-resultsov-head{margin-bottom:3px;}
+  .bbb-ott-resultsov-title{font-size:13px;}
+  .bbb-ott-resultsov-timer{font-size:11px; padding:2px 6px;}
+  .bbb-ott-resultsov-live{font-size:9px; padding:2px 6px;}
+  .bbb-ott-resultsov-msg{display:none;}
+  .bbb-ott-resultsov-msg--short{display:none;}
+  .bbb-ott-resultsov-rows{flex:1; min-height:0; display:flex; flex-direction:column; justify-content:space-evenly;}
+  .bbb-ott-resultsov-row{gap:8px; padding:3px 5px; margin-bottom:0;}
+  .bbb-ott-resultsov-ava{width:38px; height:38px; font-size:16px;}
+  .bbb-ott-resultsov-ring{inset:-3px;}
+  .bbb-ott-resultsov-top{font-size:12px; margin-bottom:2px;}
+  .bbb-ott-resultsov-bar{height:6px;}
+  .bbb-ott-resultsov-vote{margin-top:5px; padding:8px; font-size:13px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-card, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-card{width:min(94%,600px); height:100%; padding:8px 12px 6px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-title, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-title{font-size:13px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-timer, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-timer{font-size:11px; padding:2px 6px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-live, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-live{font-size:9px; padding:2px 6px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-msg, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-msg{display:none;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-row, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-row{gap:8px; padding:3px 5px; margin-bottom:0;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-ava, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-ava{width:38px; height:38px; font-size:16px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-top, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-top{font-size:12px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-bar, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-bar{height:6px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-vote, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-vote{padding:8px; font-size:13px;}
+}
 
 
 .bbb-ott-mini{
@@ -3066,16 +3093,12 @@
     resultsOvPollFlag();
     setInterval(resultsOvPollFlag, 15000);
   }
-  // Sticky bottom ad close (site-68)
-  var bbbStickyAd = document.getElementById("bbb-ott-stickyad");
-  var bbbStickyAdClose = document.getElementById("bbb-ott-stickyad-close");
-  if (bbbStickyAd && bbbStickyAdClose) bbbStickyAdClose.addEventListener("click", function(){ bbbStickyAd.style.display = "none"; });
   resultsOvInit();
 })();
 </script>
   <!-- Sticky bottom ad (site-68): phone 320x50, desktop 728x90, close button -->
   <div class="bbb-ott-stickyad" id="bbb-ott-stickyad">
-    <button type="button" class="bbb-ott-stickyad-close" id="bbb-ott-stickyad-close" title="Close">✕</button>
+    <button type="button" class="bbb-ott-stickyad-close" id="bbb-ott-stickyad-close" title="Close" onclick="document.getElementById('bbb-ott-stickyad').style.display='none'">✕</button>
     <div class="bbb-ott-stickyad-m"><script type="text/javascript">atOptions={'key':'a7bd3f7ad17b0aedbbf12d313ec2980d','format':'iframe','height':50,'width':320,'params':{}};</script><script type="text/javascript" src="https://bancadeltempoidea.org/22/a7bd3f7ad17b0aedbbf12d313ec2980d"></script></div>
     <div class="bbb-ott-stickyad-d"><script type="text/javascript">atOptions={'key':'cfc15cc6fb4dd4278572d183b4e169e4','format':'iframe','height':90,'width':728,'params':{}};</script><script type="text/javascript" src="https://bancadeltempoidea.org/22/cfc15cc6fb4dd4278572d183b4e169e4"></script></div>
   </div>
