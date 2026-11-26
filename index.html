@@ -390,6 +390,8 @@
 .bbb-ott-vote99-rfill{height:100%;background:linear-gradient(90deg,#1f80e0,#7c3aed);border-radius:7px;transition:width .8s;}
 .bbb-ott-vote99-bar{height:6px;background:linear-gradient(90deg,#1f80e0,#7c3aed,#ec4899);}
 .bbb-ott-vote99-note{font-size:12px;color:var(--bbb-muted);padding:0 18px 14px;text-align:center;}
+.bbb-ott-vote99-sharewrap{text-align:center;padding:0 18px 16px;}
+.bbb-ott-vote99-share{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;border:0;font-family:inherit;background:#7c3aed;color:#fff;}
 .bbb-ott-epad{display:none; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 @media (max-width:980px){ .bbb-ott-epad{display:flex;} }
 
@@ -644,6 +646,7 @@
     <div class="bbb-ott-vote99-head"><h2>Bigg Boss</h2></div>
     <div class="bbb-ott-vote99-sub">VOTE TO SAVE YOUR FAVOURITE CONTESTANT!</div>
     <div class="bbb-ott-vote99-thanks" id="bbb-ott-vote99-thanks" hidden>ধন্যবাদ! তোমার ভোট দেওয়া হয়েছে</div>
+    <div class="bbb-ott-vote99-sharewrap" id="bbb-ott-vote99-sharewrap" hidden><button type="button" class="bbb-ott-vote99-share" id="bbb-ott-vote99-share">↗ বন্ধুদের সাথে শেয়ার করো</button></div>
     <div class="bbb-ott-vote99-left" id="bbb-ott-vote99-left">৯৯ ভোট বাকি — ভোট দিতে থাকো!</div>
     <div class="bbb-ott-vote99-grid" id="bbb-ott-vote99-grid"></div>
     <div class="bbb-ott-vote99-results" id="bbb-ott-vote99-results"></div>
@@ -1858,6 +1861,18 @@
   var vote99Results = $("#bbb-ott-vote99-results");
   var vote99Left = $("#bbb-ott-vote99-left");
   var vote99Thanks = $("#bbb-ott-vote99-thanks");
+  var vote99ShareBtn = $("#bbb-ott-vote99-share");
+  if (vote99ShareBtn) vote99ShareBtn.addEventListener("click", function(){
+    var topKey = null, topN = 0;
+    VOTE99.forEach(function(p){ var v = vote99Mine[p.key] || 0; if (v > topN) { topN = v; topKey = p.short; } });
+    var bbbShareUrl = "https://bigg-boss-bangla.pages.dev/";
+    var bbbShareText = topKey ? ("আমি Bigg Boss Bangla-তে " + topKey + "-কে ভোট দিলাম! তুমিও তোমার প্রিয় প্রতিযোগীকে ভোট দাও: " + bbbShareUrl) : ("Bigg Boss Bangla Season 3 — Live 24/7 দেখো! ভোট দাও, লাইভ চ্যাট করো: " + bbbShareUrl);
+    if (navigator.share) {
+      navigator.share({title: "Bigg Boss Bangla — Live 24/7", text: bbbShareText, url: bbbShareUrl}).catch(function(){});
+    } else {
+      window.open("https://wa.me/?text=" + encodeURIComponent(bbbShareText), "_blank");
+    }
+  });
   var VOTE99_TOTAL = 99;
   var VOTE99 = [
     {key:"Rajveer Dey", short:"Rajveer", photo:"/contestants/rajveer.jpg"},
@@ -1903,6 +1918,8 @@
     if (left < 0) left = 0;
     if (vote99Left) vote99Left.textContent = left > 0 ? (left + " Votes left today. Keep voting!") : "0 Votes left today. Thanks for voting!";
     if (vote99Thanks) vote99Thanks.hidden = vote99Used <= 0;
+    var vote99ShareWrap = $("#bbb-ott-vote99-sharewrap");
+    if (vote99ShareWrap) vote99ShareWrap.hidden = vote99Used <= 0;
     if (vote99Grid) {
       vote99Grid.textContent = "";
       VOTE99.forEach(function(p){
