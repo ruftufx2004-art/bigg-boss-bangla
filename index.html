@@ -349,9 +349,10 @@
 .bbb-ott-epcard span{display:block;padding:8px 10px 0;font-size:11px;font-weight:800;color:var(--bbb-gold);letter-spacing:.06em;}
 .bbb-ott-epcard b{display:block;padding:2px 10px 10px;font-size:13px;line-height:1.35;}
 /* Hotstar-style hero + 99-vote panel (site-47) */
-.bbb-ott-hero{position:relative;margin-top:14px;border-radius:12px;overflow:hidden;background:linear-gradient(120deg,#1a0b2e 0%,#3b0764 55%,#0f1014 100%);border:1px solid var(--bbb-line);padding:20px;}
-.bbb-ott-hero-bg{position:absolute;top:0;right:0;bottom:0;width:45%;object-fit:cover;opacity:.28;pointer-events:none;}
-.bbb-ott-hero-in{position:relative;z-index:1;}
+.bbb-ott-hero{position:relative;margin-top:0;border-radius:12px;overflow:hidden;background:#0f1014;border:1px solid var(--bbb-line);padding:0;min-height:250px;}
+.bbb-ott-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity .8s;opacity:1;}
+.bbb-ott-hero-shade{position:absolute;inset:0;background:linear-gradient(100deg,rgba(10,4,20,.93) 0%,rgba(10,4,20,.6) 55%,rgba(10,4,20,.2) 100%);}
+.bbb-ott-hero-in{position:relative;z-index:1;padding:20px;}
 .bbb-ott-hero-live{display:inline-block;padding:4px 10px;border-radius:12px;background:#e11d48;color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;}
 .bbb-ott-hero h2{margin:10px 0 6px;font-size:clamp(20px,3vw,28px);}
 .bbb-ott-hero p{margin:0 0 12px;font-size:13px;color:var(--bbb-muted);}
@@ -359,8 +360,13 @@
 .bbb-ott-hero-btn{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;border:0;font-family:inherit;text-decoration:none;display:inline-block;}
 .bbb-ott-hero-btn--primary{background:#1f80e0;color:#fff;}
 .bbb-ott-hero-btn--ghost{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--bbb-text);}
+.bbb-ott-hero-btn--share{background:#7c3aed;color:#fff;}
 .bbb-ott-hero-meta{margin-top:12px;font-size:12px;color:var(--bbb-muted);}
 .bbb-ott-hero-meta b{color:var(--bbb-text);}
+.bbb-ott-hero-dots{display:flex;gap:5px;margin-top:14px;align-items:center;}
+.bbb-ott-hero-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;border:0;padding:0;}
+.bbb-ott-hero-dot--on{background:#fff;}
+.bbb-ott-hero-slide-label{font-size:11px;color:#e5e0f5;background:rgba(0,0,0,.45);padding:3px 9px;border-radius:10px;margin-right:8px;}
 .bbb-ott-vote99{margin-top:28px;border-radius:12px;background:#0f1014;border:1px solid var(--bbb-line);overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45);}
 .bbb-ott-vote99-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 4px;}
 .bbb-ott-vote99-head h2{margin:0;font-size:clamp(18px,2.4vw,24px);}
@@ -447,22 +453,6 @@
     </div>
   </div>
 
-  <!-- ===== Header ===== -->
-  <header class="bbb-ott-header">
-    <div class="bbb-ott-brand">
-      <div class="bbb-ott-logo"><img src="https://thumb.wikimedia.org/wikipedia/en/thumb/4/4a/Bigg_Boss_Bangla_season_3.jpg/330px-Bigg_Boss_Bangla_season_3.jpg" alt="Bigg Boss Bangla Season 3" loading="eager"><span>OTT • LIVE HOUSE</span></div>
-      <span class="bbb-ott-live"><i></i>LIVE NOW</span>
-    </div>
-    <div class="bbb-ott-pills">
-      <span class="bbb-ott-pill bbb-ott-pill--gold">1080p FULL HD</span>
-      <span class="bbb-ott-pill">60 FPS</span>
-      <span class="bbb-ott-pill bbb-ott-pill--purple">24/7 UNCUT</span>
-      <span class="bbb-ott-viewers" title="Live viewers">👁 <b id="bbb-ott-viewcount">—</b> Watching</span>
-      <button type="button" class="bbb-ott-appbtn" id="bbb-ott-appbtn" title="অ্যাপ ডাউনলোড করো">📲 অ্যাপ ডাউনলোড</button>
-      <button type="button" class="bbb-ott-sharebtn" id="bbb-ott-sharebtn" title="বন্ধুদের সাথে লাইভ শেয়ার করো">📤 শেয়ার</button>
-    </div>
-  </header>
-
   <!-- Ad: 728x90 banner below header -->
   <div class="bbb-ott-ad bbb-ott-ad-728">
 <script type="text/javascript">
@@ -478,8 +468,10 @@
   </div>
 
   <!-- ===== Hero: Hotstar-style top banner (site-47) ===== -->
-  <section class="bbb-ott-hero" id="bbb-ott-hero">
-    <img class="bbb-ott-hero-bg" src="https://thumb.wikimedia.org/wikipedia/en/thumb/4/4a/Bigg_Boss_Bangla_season_3.jpg/330px-Bigg_Boss_Bangla_season_3.jpg" alt="" aria-hidden="true" loading="lazy">
+  <!-- ===== Header: hero IS the header (site-48) — rotating banners ===== -->
+  <header class="bbb-ott-hero" id="bbb-ott-hero">
+    <div class="bbb-ott-hero-bg" id="bbb-ott-hero-bg"></div>
+    <div class="bbb-ott-hero-shade"></div>
     <div class="bbb-ott-hero-in">
       <span class="bbb-ott-hero-live">● LIVE 24/7</span>
       <h2>Bigg Boss Bangla<br>Season 3</h2>
@@ -487,10 +479,12 @@
       <div class="bbb-ott-hero-btns">
         <a class="bbb-ott-hero-btn bbb-ott-hero-btn--primary" href="#bbb-ott-stage">▶ Watch Live</a>
         <a class="bbb-ott-hero-btn bbb-ott-hero-btn--ghost" href="#bbb-ott-vote99">Vote Now</a>
+        <button type="button" class="bbb-ott-hero-btn bbb-ott-hero-btn--share" id="bbb-ott-hero-share" title="বন্ধুদের সাথে লাইভ শেয়ার করো">↗ Share</button>
       </div>
       <div class="bbb-ott-hero-meta">এখন দেখছে: <b id="bbb-ott-hero-viewers">—</b> &nbsp;•&nbsp; ফিনালে: ৬ ডিসেম্বর, রাত ৯:৩০</div>
+      <div class="bbb-ott-hero-dots"><span class="bbb-ott-hero-slide-label" id="bbb-ott-hero-slide-label">Rajveer</span><span id="bbb-ott-hero-dots"></span></div>
     </div>
-  </section>
+  </header>
 
   <!-- ===== Theater: Player + Chat ===== -->
   <section class="bbb-ott-theater">
@@ -1358,7 +1352,8 @@
      WhatsApp Web when native share is unavailable. It never touches
      the video player, shield or embed. */
   var bbbShareBtn = $("#bbb-ott-sharebtn");
-  if (bbbShareBtn) bbbShareBtn.addEventListener("click", function(){
+  var bbbHeroShareBtn = $("#bbb-ott-hero-share");
+  function bbbDoShare(){
     var bbbShareUrl = "https://bigg-boss-bangla.pages.dev/";
     var bbbShareText = "Bigg Boss Bangla Season 3 — Live 24/7 দেখো! ভোট দাও, লাইভ চ্যাট করো: " + bbbShareUrl;
     if (navigator.share) {
@@ -1366,7 +1361,54 @@
     } else {
       window.open("https://wa.me/?text=" + encodeURIComponent(bbbShareText), "_blank");
     }
-  });
+  }
+  if (bbbShareBtn) bbbShareBtn.addEventListener("click", bbbDoShare);
+  if (bbbHeroShareBtn) bbbHeroShareBtn.addEventListener("click", bbbDoShare);
+  /* Rotating header banners (site-48): 4 contestants + 10 episode moments */
+  (function(){
+    var bg = $("#bbb-ott-hero-bg");
+    var dotsBox = $("#bbb-ott-hero-dots");
+    var label = $("#bbb-ott-hero-slide-label");
+    if (!bg || !dotsBox) return;
+    var slides = [
+      {label:"Rajveer", img:"/contestants/rajveer.jpg"},
+      {label:"Srijla", img:"/contestants/srijla.jpg"},
+      {label:"Tanushree", img:"/contestants/tanushree.jpg"},
+      {label:"Niranjan", img:"/contestants/niranjan.jpg"},
+      {label:"Episode 88", img:"https://i.ytimg.com/vi/-i7S_rpqHsI/hqdefault.jpg"},
+      {label:"Episode 87", img:"https://i.ytimg.com/vi/QbSlVzbZUiw/hqdefault.jpg"},
+      {label:"Episode 86", img:"https://i.ytimg.com/vi/Q7tsSQ4riTs/hqdefault.jpg"},
+      {label:"Episode 85", img:"https://i.ytimg.com/vi/Bb92UdxRtpY/hqdefault.jpg"},
+      {label:"Episode 84", img:"https://i.ytimg.com/vi/geuRSsLTfo8/hqdefault.jpg"},
+      {label:"Episode 83", img:"https://i.ytimg.com/vi/uzEODWZjeNM/hqdefault.jpg"},
+      {label:"Episode 82", img:"https://i.ytimg.com/vi/BExZINisVgQ/hqdefault.jpg"},
+      {label:"Episode 81", img:"https://i.ytimg.com/vi/ZO5eEAx4YlM/hqdefault.jpg"},
+      {label:"Episode 80", img:"https://i.ytimg.com/vi/b0nYC_BoaRU/hqdefault.jpg"},
+      {label:"Episode 79", img:"https://i.ytimg.com/vi/d_sOKhMprNE/hqdefault.jpg"}
+    ];
+    var dots = [];
+    slides.forEach(function(s, i){
+      var d = document.createElement("button");
+      d.type = "button";
+      d.className = "bbb-ott-hero-dot" + (i === 0 ? " bbb-ott-hero-dot--on" : "");
+      d.setAttribute("aria-label", s.label);
+      d.addEventListener("click", function(){ show(i); });
+      dotsBox.appendChild(d); dots.push(d);
+    });
+    var idx = 0;
+    function show(i){
+      idx = i;
+      bg.style.opacity = 0;
+      setTimeout(function(){
+        bg.style.backgroundImage = "url('" + slides[idx].img + "')";
+        if (label) label.textContent = slides[idx].label;
+        dots.forEach(function(d, j){ d.className = "bbb-ott-hero-dot" + (j === idx ? " bbb-ott-hero-dot--on" : ""); });
+        bg.style.opacity = 1;
+      }, 300);
+    }
+    bg.style.backgroundImage = "url('" + slides[0].img + "')";
+    setInterval(function(){ show((idx + 1) % slides.length); }, 4000);
+  })();
   var pwaInstallBtn = $("#bbb-ott-pwa-install");
   if (pwaInstallBtn) pwaInstallBtn.addEventListener("click", function(){
     if (!deferredPwaPrompt) {
@@ -1399,7 +1441,7 @@
   function fmt(n){ return n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,"") + "K" : String(n); }
   function loadRealCounts(){
     fetch("/api/stats").then(function(r){ return r.json(); }).then(function(d){
-      if (d.liveNow != null) { viewEl.textContent = fmt(d.liveNow); if (heroViewEl) heroViewEl.textContent = fmt(d.liveNow) + " জন"; }
+      if (d.liveNow != null) { if (viewEl) viewEl.textContent = fmt(d.liveNow); if (heroViewEl) heroViewEl.textContent = fmt(d.liveNow) + " জন"; }
       if (d.chatTotal != null) chatCountEl.textContent = fmt(d.chatTotal);
     }).catch(function(){});
   }
