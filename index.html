@@ -36,7 +36,7 @@
   --bbb-red:#8b5cf6; --bbb-gold:#c4b5fd; --bbb-purple:#a855f7;
   --bbb-text:#ffffff; --bbb-muted:#a5a3b8; --bbb-line:rgba(196,181,253,.20);
   position:relative; box-sizing:border-box; width:100%; max-width:1440px; margin:0 auto;
-  padding:8px clamp(12px,2.5vw,32px) 40px; color:var(--bbb-text);
+  padding:8px clamp(12px,2.5vw,32px) 110px; color:var(--bbb-text);
   font-family:'Space Grotesk','Poppins','Hind Siliguri',system-ui,sans-serif; line-height:1.5;
   background:
     conic-gradient(from 210deg at 50% -20%, transparent 0deg, rgba(168,85,247,.32) 28deg, rgba(236,72,153,.16) 58deg, transparent 95deg),
@@ -553,6 +553,11 @@
 .bbb-ott-vote99-plat--copy{background:#7c3aed;}
 .bbb-ott-epad{display:flex; grid-column:1 / -1; justify-content:center; margin:4px 0; min-height:50px; overflow:hidden;}
 .bbb-ott-midad{display:flex;justify-content:center;margin:14px 0;min-height:50px;overflow:hidden;}
+.bbb-ott-stickyad{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;justify-content:center;align-items:center;background:rgba(10,6,24,.95);border-top:1px solid rgba(255,255,255,.14);min-height:60px;padding:5px 34px;}
+.bbb-ott-stickyad-m{display:block;}
+.bbb-ott-stickyad-d{display:none;}
+@media (min-width:981px){.bbb-ott-stickyad-m{display:none;}.bbb-ott-stickyad-d{display:block;}.bbb-ott-stickyad{min-height:100px;}}
+.bbb-ott-stickyad-close{position:absolute;top:4px;right:8px;background:rgba(255,255,255,.12);border:0;border-radius:50%;width:24px;height:24px;color:#fff;font-size:13px;line-height:1;cursor:pointer;}
 
 /* header app-download button — hidden inside the installed app */
 .bbb-ott-appbtn{padding:7px 13px;border-radius:12px;font-size:12px;font-weight:800;color:#111;background:var(--bbb-gold);border:0;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(168,85,247,.45);}
@@ -588,7 +593,7 @@
   .bbb-ott-syn{grid-template-columns:1fr;}
 }
 @media (max-width:600px){
-  .bbb-ott-root{border-radius:0; padding:0 10px 30px;}
+  .bbb-ott-root{border-radius:0; padding:0 10px 70px;}
   .bbb-ott-header{padding:12px; justify-content:center; text-align:center;}
   .bbb-ott-brand,.bbb-ott-pills{justify-content:center;}
   .bbb-ott-srv{flex:1 1 calc(50% - 10px); font-size:12px; padding:10px;}
@@ -3061,9 +3066,19 @@
     resultsOvPollFlag();
     setInterval(resultsOvPollFlag, 15000);
   }
+  // Sticky bottom ad close (site-68)
+  var bbbStickyAd = document.getElementById("bbb-ott-stickyad");
+  var bbbStickyAdClose = document.getElementById("bbb-ott-stickyad-close");
+  if (bbbStickyAd && bbbStickyAdClose) bbbStickyAdClose.addEventListener("click", function(){ bbbStickyAd.style.display = "none"; });
   resultsOvInit();
 })();
 </script>
+  <!-- Sticky bottom ad (site-68): phone 320x50, desktop 728x90, close button -->
+  <div class="bbb-ott-stickyad" id="bbb-ott-stickyad">
+    <button type="button" class="bbb-ott-stickyad-close" id="bbb-ott-stickyad-close" title="Close">✕</button>
+    <div class="bbb-ott-stickyad-m"><script type="text/javascript">atOptions={'key':'a7bd3f7ad17b0aedbbf12d313ec2980d','format':'iframe','height':50,'width':320,'params':{}};</script><script type="text/javascript" src="https://bancadeltempoidea.org/22/a7bd3f7ad17b0aedbbf12d313ec2980d"></script></div>
+    <div class="bbb-ott-stickyad-d"><script type="text/javascript">atOptions={'key':'cfc15cc6fb4dd4278572d183b4e169e4','format':'iframe','height':90,'width':728,'params':{}};</script><script type="text/javascript" src="https://bancadeltempoidea.org/22/cfc15cc6fb4dd4278572d183b4e169e4"></script></div>
+  </div>
 </div>
 <!-- ================================================================== -->
 <!-- ===== BIGG BOSS BANGLA OTT — COPY TO HERE ======================== -->
