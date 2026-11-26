@@ -73,14 +73,24 @@ function normMsg(m) {
     id: m.id, name: m.name, text: m.text, t: m.t, parent: m.parent || null,
     likes: Array.isArray(m.likes) ? m.likes : [],
     reacts: (m.reacts && typeof m.reacts === "object") ? m.reacts : {},
-    photo: (typeof m.photo === "string" && m.photo.indexOf("http") === 0) ? m.photo : null
+    photo: (typeof m.photo === "string" && m.photo.indexOf("http") === 0) ? m.photo : null,
+    pinned: !!m.pinned,
+    author: (typeof m.author === "string") ? m.author : null
   };
 }
 async function loadMsgs(env) {
-  const res = await sbReq(env, "chat_messages?select=id,name,text,t,parent,likes,reacts,photo&order=t.desc&limit=" + MAX_MSG);
+  const res = await sbReq(env, "chat_messages?select=id,name,text,t,parent,likes,reacts,photo,pinned,author&order=t.desc&limit=" + MAX_MSG);
   if (!res.ok) throw new Error("chat read failed: " + res.status);
   const rows = await res.json();
-  const list = (Array.isArray(rows) ? rows : []).reverse();
+  // Pinned messages must show even when older than the latest 100 — fetch them too.
+  let pinned = [];
+  try {
+    const pr = await sbReq(env, "chat_messages?select=id,name,text,t,parent,likes,reacts,photo,pinned,author&pinned=eq.true&order=t.asc&limit=10");
+    if (pr.ok) pinned = await pr.json();
+  } catch (e) {}
+  const byId = {};
+  (Array.isArray(rows) ? rows : []).concat(Array.isArray(pinned) ? pinned : []).forEach(function (m) { byId[m.id] = m; });
+  const list = Object.keys(byId).map(function (k) { return byId[k]; }).sort(function (a, b) { return a.t - b.t; });
   return list.map(normMsg);
 }
 // Keep only the latest MAX_MSG rows (best effort — never fails a post).
@@ -127,7 +137,7 @@ export async function onRequest(context) {
   if (body.action === "like" || body.action === "react") {
     let m;
     try {
-      const res = await sbReq(env, "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts,photo");
+      const res = await sbReq(env, "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts,photo,pinned,author");
       if (!res.ok) return json({ error: "chat read failed" }, 500);
       const rows = await res.json();
       if (!Array.isArray(rows) || !rows.length) return json({ error: "not found" }, 404);
@@ -188,7 +198,9 @@ export async function onRequest(context) {
   if (parent && !msgs.find(function (x) { return x.id === parent; })) return json({ error: "no parent" }, 400);
   const msg = {
     id: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-    name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}, photo: photo
+    name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}, photo: photo,
+    pinned: false,
+    author: (function(){ var gid = clean(body.googleId).slice(0, 64); return gid ? ("g_" + gid) : device; })()
   };
   let ins;
   try {

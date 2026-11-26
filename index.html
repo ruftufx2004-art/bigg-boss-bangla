@@ -374,8 +374,19 @@
 .bbb-ott-chat-form input#bbb-ott-chat-name{flex:0 1 120px; min-width:90px; padding:11px 10px;}
 .bbb-ott-chat-empty{color:var(--bbb-muted); font-size:13px; text-align:center; padding:26px 10px;}
 .bbb-ott-msg-time{font-size:10px; color:#7c7d90; margin-left:6px; font-weight:400;}
-.bbb-ott-replies{margin:8px 0 0 39px; display:flex; flex-direction:column; gap:10px;}
+.bbb-ott-replies{margin:8px 0 0 39px; display:flex; flex-direction:column; gap:10px; border-left:2px solid rgba(255,255,255,.14); padding-left:12px;}
 .bbb-ott-msg--reply .bbb-ott-av{flex-basis:24px; width:24px; height:24px; font-size:10px;}
+/* Pinned comment (site-73): stays at the top of the chat, gold border. */
+.bbb-ott-chat-pinned{padding:10px 14px 0;}
+.bbb-ott-chat-pinned .bbb-ott-msg{border:1.5px solid #fbbf24; border-radius:12px; background:linear-gradient(180deg,rgba(251,191,36,.10),rgba(251,191,36,.03)); padding:10px 12px;}
+.bbb-ott-chat-pinned .bbb-ott-msg-body p{white-space:pre-line;}
+.bbb-ott-pin-tag{display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; letter-spacing:.06em; color:#1a1206; background:#fbbf24; border-radius:999px; padding:2px 9px; margin-bottom:6px; font-family:'Poppins',sans-serif;}
+/* Reply notification bell + toast (site-73). */
+.bbb-ott-chat-head-right{display:inline-flex; align-items:center; gap:8px;}
+.bbb-ott-chat-bell{position:relative; border:0; background:transparent; cursor:pointer; font-size:15px; padding:2px 4px; line-height:1;}
+.bbb-ott-chat-bell-badge{position:absolute; top:-4px; right:-6px; min-width:15px; height:15px; border-radius:999px; background:#ef4444; color:#fff; font-size:9px; font-weight:800; display:grid; place-items:center; padding:0 3px; font-family:'Poppins',sans-serif;}
+.bbb-ott-chat-toast{position:absolute; left:12px; right:12px; bottom:64px; z-index:5; background:#1e103c; border:1px solid #fbbf24; border-radius:12px; padding:10px 12px; font-size:13px; box-shadow:0 8px 24px rgba(0,0,0,.55); cursor:pointer;}
+.bbb-ott-chat-toast b{color:#fbbf24;}
 .bbb-ott-msg-actions .bbb-ott-reacted{color:#ffffff;}
 .bbb-ott-react-chips{display:flex; flex-wrap:wrap; gap:4px; margin-top:5px;}
 .bbb-ott-react-chips span{font-size:11px; padding:1px 7px; border-radius:12px; background:rgba(255,255,255,.07); color:#dcdce6;}
@@ -935,8 +946,9 @@
     <aside class="bbb-ott-chat" aria-label="Live Fan Chat">
       <div class="bbb-ott-chat-head">
         <h2>💬 Live Fan Chat</h2>
-        <span><b id="bbb-ott-chatcount">—</b> in chat</span>
+        <span class="bbb-ott-chat-head-right"><button type="button" class="bbb-ott-chat-bell" id="bbb-ott-chat-bell" aria-label="Reply notifications">🔔<span class="bbb-ott-chat-bell-badge" id="bbb-ott-chat-bell-badge" hidden>0</span></button><b id="bbb-ott-chatcount">—</b> in chat</span>
       </div>
+      <div class="bbb-ott-chat-pinned" id="bbb-ott-chat-pinned" hidden></div>
       <div class="bbb-ott-chat-list" id="bbb-ott-chat-list" aria-live="polite"></div>
       <form class="bbb-ott-chat-form" id="bbb-ott-chat-form" autocomplete="off">
         <input type="text" id="bbb-ott-chat-name" maxlength="20" placeholder="নাম" aria-label="Your name" readonly />
@@ -1813,6 +1825,71 @@
 
   /* ---------- Live chat — real shared comments (Facebook style) ---------- */
   var list  = $("#bbb-ott-chat-list");
+  var pinnedBox = $("#bbb-ott-chat-pinned");
+  var bellBtn = $("#bbb-ott-chat-bell");
+  var bellBadge = $("#bbb-ott-chat-bell-badge");
+  /* Reply notifications (site-73): replies to MY comments. "Mine" = my author
+     key (Google "g_"+id, or this device's id when anonymous). */
+  function myAuthorKey(){
+    if (typeof googleUser !== "undefined" && googleUser && googleUser.id) return "g_" + googleUser.id;
+    if (typeof deviceId !== "undefined" && deviceId) return deviceId;
+    /* deviceId is assigned later in the file — read it straight from storage on the first load. */
+    try { var d = localStorage.getItem("bbb-poll-device"); if (d) return d; } catch (e) {}
+    return "";
+  }
+  var notifSeen = {};
+  try { notifSeen = JSON.parse(localStorage.getItem("bbb-chat-notif-seen") || "{}") || {}; } catch (e) { notifSeen = {}; }
+  var notifInit = false, notifUnread = [];
+  function notifSaveSeen(){ try { localStorage.setItem("bbb-chat-notif-seen", JSON.stringify(notifSeen)); } catch (e) {} }
+  function notifShowToast(m){
+    var old = document.querySelector(".bbb-ott-chat-toast");
+    if (old) old.remove();
+    var t = document.createElement("div");
+    t.className = "bbb-ott-chat-toast";
+    t.innerHTML = "";
+    var b = document.createElement("b");
+    b.textContent = (m.name || "কেউ") + " ";
+    var s = document.createElement("span");
+    s.textContent = "তোমার কমেন্টে রিপ্লাই দিয়েছে — দেখতে ট্যাপ করো";
+    t.appendChild(b); t.appendChild(s);
+    var chat = document.querySelector(".bbb-ott-chat");
+    if (chat) chat.appendChild(t);
+    t.addEventListener("click", function(){ notifOpenUnread(); });
+    setTimeout(function(){ if (t.parentNode) t.remove(); }, 8000);
+  }
+  function notifOpenUnread(){
+    if (!notifUnread.length) return;
+    var first = notifUnread[0];
+    var row = chatRows[first.id];
+    if (row) { row.scrollIntoView({behavior: "smooth", block: "center"}); row.style.outline = "2px solid #fbbf24"; setTimeout(function(){ row.style.outline = ""; }, 2500); }
+    notifUnread.forEach(function(m){ notifSeen[m.id] = 1; });
+    notifUnread = []; notifSaveSeen();
+    if (bellBadge) { bellBadge.hidden = true; bellBadge.textContent = "0"; }
+    var t = document.querySelector(".bbb-ott-chat-toast");
+    if (t) t.remove();
+  }
+  if (bellBtn) bellBtn.addEventListener("click", function(){ notifOpenUnread(); });
+  function checkReplyNotifs(){
+    var mine = myAuthorKey();
+    var myIds = {};
+    Object.keys(chatData).forEach(function(id){ if (chatData[id] && chatData[id].author === mine) myIds[id] = 1; });
+    var fresh = [];
+    Object.keys(chatData).forEach(function(id){
+      var m = chatData[id];
+      if (m && m.parent && myIds[m.parent] && !notifSeen[id]) fresh.push(m);
+    });
+    fresh.sort(function(a, b){ return (a.t || 0) - (b.t || 0); });
+    if (!notifInit) {
+      /* First load: mark everything already here as seen — only NEW replies notify. */
+      fresh.forEach(function(m){ notifSeen[m.id] = 1; });
+      notifSaveSeen(); notifInit = true; return;
+    }
+    if (fresh.length) {
+      notifUnread = fresh;
+      if (bellBadge) { bellBadge.hidden = false; bellBadge.textContent = String(fresh.length > 9 ? "9+" : fresh.length); }
+      notifShowToast(fresh[fresh.length - 1]);
+    }
+  }
   var form  = $("#bbb-ott-chat-form");
   var input = $("#bbb-ott-chat-input");
   var nameInput = $("#bbb-ott-chat-name");
@@ -1899,11 +1976,20 @@
     return sbCuteName(deviceId);
   }
   function sbLoad(){
-    return fetch(sbBase() + "chat_messages?select=id,name,text,t,parent,likes,reacts,photo&order=t.desc&limit=100", {headers: sbHeaders()})
+    return fetch(sbBase() + "chat_messages?select=id,name,text,t,parent,likes,reacts,photo,pinned,author&order=t.desc&limit=100", {headers: sbHeaders()})
       .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
       .then(function(rows){
         var list = (Array.isArray(rows) ? rows : []).reverse();
-        return {ok: true, messages: list};
+        /* Pinned messages must show even when older than the latest 100. */
+        return fetch(sbBase() + "chat_messages?select=id,name,text,t,parent,likes,reacts,photo,pinned,author&pinned=eq.true&order=t.asc&limit=10", {headers: sbHeaders()})
+          .then(function(r2){ return r2.ok ? r2.json() : []; })
+          .then(function(pinned){
+            var byId = {};
+            list.concat(Array.isArray(pinned) ? pinned : []).forEach(function(m){ byId[m.id] = m; });
+            var merged = Object.keys(byId).map(function(k){ return byId[k]; }).sort(function(a,b){ return a.t - b.t; });
+            return {ok: true, messages: merged};
+          })
+          .catch(function(){ return {ok: true, messages: list}; });
       });
   }
   function sbChatPost(body){
@@ -1912,7 +1998,7 @@
       return Promise.resolve({ok: true, name: sbDirectName()});
     }
     if (body.action === "like" || body.action === "react") {
-      return fetch(sbBase() + "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts,photo", {headers: sbHeaders()})
+      return fetch(sbBase() + "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts,photo,pinned,author", {headers: sbHeaders()})
         .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
         .then(function(rows){
           if (!rows || !rows.length) throw new Error("err");
@@ -1937,7 +2023,7 @@
           }).then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
           .then(function(rows2){
             var upd = (rows2 && rows2[0]) || m;
-            return {ok: true, message: {id: upd.id, name: upd.name, text: upd.text, t: upd.t, parent: upd.parent || null, likes: upd.likes || [], reacts: upd.reacts || {}}};
+            return {ok: true, message: {id: upd.id, name: upd.name, text: upd.text, t: upd.t, parent: upd.parent || null, likes: upd.likes || [], reacts: upd.reacts || {}, pinned: !!upd.pinned, author: upd.author || null}};
           });
         });
     }
@@ -1960,7 +2046,9 @@
     var parent = String(body.parent || "");
     var msg = {
       id: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-      name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}, photo: photo || null
+      name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}, photo: photo || null,
+      pinned: false,
+      author: (typeof googleUser !== "undefined" && googleUser) ? ("g_" + googleUser.id) : device
     };
     return fetch(sbBase() + "chat_messages", {
       method: "POST",
@@ -1978,6 +2066,7 @@
     if (typeof googleUser !== "undefined" && googleUser && body && body.text) {
       body.googleName = googleUser.name || "";
       body.googlePhoto = googleUser.avatar || "";
+      body.googleId = googleUser.id || "";
     }
     return fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)})
       .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
@@ -2094,7 +2183,7 @@
     hideChatEmpty();
     var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
     var row = document.createElement("div");
-    row.className = "bbb-ott-msg" + (m.parent ? " bbb-ott-msg--reply" : "");
+    row.className = "bbb-ott-msg" + (m.parent ? " bbb-ott-msg--reply" : "") + (m.pinned ? " bbb-ott-msg--pinned" : "");
     if (myPostedIds.has(m.id)) row.classList.add("bbb-ott-msg--me");
     row.setAttribute("data-chat-id", m.id);
     var av = document.createElement("div");
@@ -2108,6 +2197,7 @@
     av.appendChild(avImg);
     var body = document.createElement("div");
     body.className = "bbb-ott-msg-body";
+    if (m.pinned) { var pt = document.createElement("span"); pt.className = "bbb-ott-pin-tag"; pt.textContent = "📌 PINNED"; body.appendChild(pt); }
     var b = document.createElement("b");
     b.textContent = m.name;
     body.appendChild(b);
@@ -2122,6 +2212,11 @@
     renderChatActions(body, m);
     row.appendChild(av); row.appendChild(body);
     chatRows[m.id] = row;
+    if (m.pinned) {
+      /* Pinned comments live in the fixed box above the scrolling list. */
+      if (pinnedBox) { pinnedBox.hidden = false; pinnedBox.textContent = ""; pinnedBox.appendChild(row); }
+      return;
+    }
     var dest = m.parent ? topThreadOf(m) : null;
     if (dest) { dest.appendChild(row); }
     else {
@@ -2145,6 +2240,7 @@
       d.messages.forEach(function(m){ renderChatMsg(m, true); });
       if (!d.messages.length) showChatEmpty();
       renderOverlayMsgs();
+      checkReplyNotifs();
     }).catch(function(){
       // Worker down — read the same chat straight from Supabase.
       chatDirect = true;
@@ -2153,6 +2249,7 @@
         d.messages.forEach(function(m){ renderChatMsg(m, true); });
         if (!d.messages.length) showChatEmpty();
         renderOverlayMsgs();
+        checkReplyNotifs();
       }).catch(function(){});
     });
   }
