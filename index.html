@@ -252,30 +252,30 @@
 .bbb-ott-player:fullscreen .bbb-ott-resultsov-bar, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-bar{height:10px;}
 .bbb-ott-player:fullscreen .bbb-ott-resultsov-vote, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-vote{padding:14px; font-size:16px;}
 }
-/* site-69: LANDSCAPE short viewport (phone fullscreen, ~420px tall) — compact so all 4 rows + vote button fit. */
+/* site-70: LANDSCAPE short viewport — 2 columns per row (2x2 grid), smaller, so all 4 + vote button fit. */
 @media (orientation:landscape) and (max-height:520px){
-  .bbb-ott-resultsov-card{width:min(94%,600px); height:100%; max-height:100%; padding:8px 12px 6px; display:flex; flex-direction:column;}
+  .bbb-ott-resultsov-card{width:min(94%,640px); height:100%; max-height:100%; padding:8px 12px 6px; display:flex; flex-direction:column;}
   .bbb-ott-resultsov-head{margin-bottom:3px;}
   .bbb-ott-resultsov-title{font-size:13px;}
   .bbb-ott-resultsov-timer{font-size:11px; padding:2px 6px;}
   .bbb-ott-resultsov-live{font-size:9px; padding:2px 6px;}
   .bbb-ott-resultsov-msg{display:none;}
   .bbb-ott-resultsov-msg--short{display:none;}
-  .bbb-ott-resultsov-rows{flex:1; min-height:0; display:flex; flex-direction:column; justify-content:space-evenly;}
-  .bbb-ott-resultsov-row{gap:8px; padding:3px 5px; margin-bottom:0;}
-  .bbb-ott-resultsov-ava{width:38px; height:38px; font-size:16px;}
+  .bbb-ott-resultsov-rows{flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:6px 10px; align-content:space-evenly;}
+  .bbb-ott-resultsov-row{gap:7px; padding:4px 6px; margin-bottom:0;}
+  .bbb-ott-resultsov-ava{width:34px; height:34px; font-size:14px;}
   .bbb-ott-resultsov-ring{inset:-3px;}
-  .bbb-ott-resultsov-top{font-size:12px; margin-bottom:2px;}
+  .bbb-ott-resultsov-top{font-size:11.5px; margin-bottom:2px;}
   .bbb-ott-resultsov-bar{height:6px;}
   .bbb-ott-resultsov-vote{margin-top:5px; padding:8px; font-size:13px;}
-  .bbb-ott-player:fullscreen .bbb-ott-resultsov-card, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-card{width:min(94%,600px); height:100%; padding:8px 12px 6px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-card, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-card{width:min(94%,640px); height:100%; padding:8px 12px 6px;}
   .bbb-ott-player:fullscreen .bbb-ott-resultsov-title, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-title{font-size:13px;}
   .bbb-ott-player:fullscreen .bbb-ott-resultsov-timer, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-timer{font-size:11px; padding:2px 6px;}
   .bbb-ott-player:fullscreen .bbb-ott-resultsov-live, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-live{font-size:9px; padding:2px 6px;}
   .bbb-ott-player:fullscreen .bbb-ott-resultsov-msg, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-msg{display:none;}
-  .bbb-ott-player:fullscreen .bbb-ott-resultsov-row, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-row{gap:8px; padding:3px 5px; margin-bottom:0;}
-  .bbb-ott-player:fullscreen .bbb-ott-resultsov-ava, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-ava{width:38px; height:38px; font-size:16px;}
-  .bbb-ott-player:fullscreen .bbb-ott-resultsov-top, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-top{font-size:12px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-row, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-row{gap:7px; padding:4px 6px; margin-bottom:0;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-ava, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-ava{width:34px; height:34px; font-size:14px;}
+  .bbb-ott-player:fullscreen .bbb-ott-resultsov-top, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-top{font-size:11.5px;}
   .bbb-ott-player:fullscreen .bbb-ott-resultsov-bar, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-bar{height:6px;}
   .bbb-ott-player:fullscreen .bbb-ott-resultsov-vote, .bbb-ott-player:-webkit-full-screen .bbb-ott-resultsov-vote{padding:8px; font-size:13px;}
 }
