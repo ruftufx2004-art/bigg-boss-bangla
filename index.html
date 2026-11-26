@@ -160,6 +160,22 @@
 .bbb-ott-ov-replies{margin:6px 0 0 12px; border-left:2px solid rgba(255,255,255,.14); padding-left:10px; display:flex; flex-direction:column; gap:8px;}
 .bbb-ott-ov-reply .bbb-ott-ov-to{font-size:11px; color:#a78bfa;}
 .bbb-ott-ov-reply .bbb-ott-ov-to b{color:#c4b5fd; font-size:11px;}
+/* Fullscreen live chat (site-78): YouTube-style panel over the video.
+   Lives INSIDE .bbb-ott-player so it shows in fullscreen. The 💬 button
+   only appears in fullscreen (in normal view the chat below the video is
+   already visible). */
+.bbb-ott-fs-chatbtn{position:absolute; right:12px; bottom:12px; z-index:9; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.25); background:rgba(0,0,0,.55); color:#fff; font-size:20px; line-height:1; cursor:pointer; display:none;}
+.bbb-ott-player:fullscreen .bbb-ott-fs-chatbtn, .bbb-ott-player:-webkit-full-screen .bbb-ott-fs-chatbtn{display:block;}
+.bbb-ott-fs-chat{position:absolute; top:0; right:0; bottom:0; width:min(320px,85%); z-index:10; display:flex; flex-direction:column; background:rgba(0,0,0,.78); border-left:1px solid rgba(255,255,255,.14); color:#fff;}
+.bbb-ott-fs-chat[hidden]{display:none;}
+.bbb-ott-fs-chat-head{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.14); font-size:14px; font-weight:700;}
+.bbb-ott-fs-chat-live{color:#ff4d4d; font-size:12px; margin-right:8px;}
+.bbb-ott-fs-chat-close{background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); color:#fff; border-radius:50%; width:26px; height:26px; cursor:pointer; font-size:13px; line-height:1;}
+.bbb-ott-fs-chat-pinned{padding:10px 12px 0;}
+.bbb-ott-fs-chat-list{flex:1; overflow-y:auto; padding:10px 12px; display:flex; flex-direction:column; gap:10px; font-size:13px; line-height:1.45;}
+.bbb-ott-fs-chat-form{display:flex; gap:8px; padding:10px 12px; border-top:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.35);}
+.bbb-ott-fs-chat-form input{flex:1; min-width:0; padding:10px 12px; border-radius:20px; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.12); color:#fff; outline:none; font-size:13px;}
+.bbb-ott-fs-chat-form button{padding:0 16px; border:0; border-radius:20px; background:#7c3aed; color:#fff; font-weight:700; font-size:13px; cursor:pointer;}
 .bbb-ott-ov-pin .bbb-ott-ov-pin-tag{font-size:10px; font-weight:800; color:#1a1206; background:#fbbf24; border-radius:999px; padding:1px 8px;}
 .bbb-ott-ov-pin b{color:#fbbf24;}
 .bbb-ott-ov-msg .bbb-ott-ov-time{color:rgba(255,255,255,.6); font-size:11px; margin-left:6px;}
@@ -771,6 +787,20 @@
           </div>
         </div>
 <div class="bbb-ott-shield-strip bbb-ott-shield-strip--bottom"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--left"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--right"></div></div>
+
+        <!-- Fullscreen live chat (site-78): YouTube-style. A 💬 button on the
+             video opens the live chat panel over the video. It lives INSIDE
+             .bbb-ott-player so it shows in fullscreen too. SAME chat. -->
+        <button type="button" class="bbb-ott-fs-chatbtn" id="bbb-ott-fs-chatbtn" title="Live Chat">💬</button>
+        <div class="bbb-ott-fs-chat" id="bbb-ott-fs-chat" hidden>
+          <div class="bbb-ott-fs-chat-head"><span>Live Chat</span><span><span class="bbb-ott-fs-chat-live">● LIVE</span><button type="button" class="bbb-ott-fs-chat-close" id="bbb-ott-fs-chat-close" title="Hide chat">✕</button></span></div>
+          <div class="bbb-ott-fs-chat-pinned" id="bbb-ott-fs-chat-pinned" hidden></div>
+          <div class="bbb-ott-fs-chat-list" id="bbb-ott-fs-chat-list"></div>
+          <form class="bbb-ott-fs-chat-form" id="bbb-ott-fs-chat-form" autocomplete="off">
+            <input type="text" id="bbb-ott-fs-chat-input" maxlength="200" placeholder="Comment লিখো..." aria-label="Chat message" />
+            <button type="submit">Send</button>
+          </form>
+        </div>
 
       </div>
 
@@ -2264,6 +2294,7 @@
       d.messages.forEach(function(m){ renderChatMsg(m, true); });
       if (!d.messages.length) showChatEmpty();
       renderOverlayMsgs();
+      renderFsChat();
       checkReplyNotifs();
     }).catch(function(){
       // Worker down — read the same chat straight from Supabase.
@@ -2273,6 +2304,7 @@
         d.messages.forEach(function(m){ renderChatMsg(m, true); });
         if (!d.messages.length) showChatEmpty();
         renderOverlayMsgs();
+        renderFsChat();
         checkReplyNotifs();
       }).catch(function(){});
     });
@@ -2305,6 +2337,14 @@
   var ovBox = $("#bbb-ott-chat-overlay");
   var ovList = $("#bbb-ott-ov-list");
   var ovPinned = $("#bbb-ott-ov-pinned");
+  /* Fullscreen chat panel (site-78): lives inside .bbb-ott-player. */
+  var fsChatBtn = $("#bbb-ott-fs-chatbtn");
+  var fsChat = $("#bbb-ott-fs-chat");
+  var fsList = $("#bbb-ott-fs-chat-list");
+  var fsPinned = $("#bbb-ott-fs-chat-pinned");
+  var fsForm = $("#bbb-ott-fs-chat-form");
+  var fsInput = $("#bbb-ott-fs-chat-input");
+  var fsClose = $("#bbb-ott-fs-chat-close");
   var ovForm = $("#bbb-ott-ov-form");
   var ovInput = $("#bbb-ott-ov-input");
   var ovClose = $("#bbb-ott-ov-close");
@@ -2345,17 +2385,19 @@
     }
     return cur;
   }
-  function renderOverlayMsgs(){
-    if (!ovList) return;
+  /* Tree chat renderer (site-76/77/78): renders the same chat into any list
+     + pinned box pair — the below-video chat and the fullscreen panel share it. */
+  function renderChatTreeInto(listEl, pinnedEl){
+    if (!listEl) return;
     var all = Object.keys(chatData).map(function(id){ return chatData[id]; })
       .sort(function(a, b){ return (a.t || 0) - (b.t || 0); })
       .slice(-30);
-    /* Pinned comment (site-75/76/77) — its OWN fixed box above the scrolling
-       list. Replies to it stay in the normal list below. */
+    /* Pinned comment — its OWN fixed box above the scrolling list.
+       Replies to it stay in the normal list below. */
     var pinned = null;
     Object.keys(chatData).forEach(function(id){ if (chatData[id] && chatData[id].pinned) pinned = chatData[id]; });
-    if (ovPinned) {
-      ovPinned.textContent = "";
+    if (pinnedEl) {
+      pinnedEl.textContent = "";
       if (pinned) {
         var pd = document.createElement("div");
         pd.className = "bbb-ott-ov-pin";
@@ -2367,14 +2409,14 @@
         var ptx = document.createElement("span");
         ptx.textContent = " " + (pinned.text || "");
         pd.appendChild(pt); pd.appendChild(pb); pd.appendChild(ptx);
-        ovPinned.appendChild(pd);
-        ovPinned.hidden = false;
+        pinnedEl.appendChild(pd);
+        pinnedEl.hidden = false;
       } else {
-        ovPinned.hidden = true;
+        pinnedEl.hidden = true;
       }
     }
-    ovList.textContent = "";
-    if (!all.length) { ovList.textContent = "No messages yet."; return; }
+    listEl.textContent = "";
+    if (!all.length) { listEl.textContent = "No messages yet."; return; }
     /* Group the rest into threads by top-level ancestor (site-76 tree). */
     var threads = {}, order = [];
     all.forEach(function(m){
@@ -2401,10 +2443,12 @@
         th.replies.forEach(function(r){ rc.appendChild(ovReplyEl(r)); });
         div.appendChild(rc);
       }
-      ovList.appendChild(div);
+      listEl.appendChild(div);
     });
-    ovList.scrollTop = ovList.scrollHeight;
+    listEl.scrollTop = listEl.scrollHeight;
   }
+  function renderOverlayMsgs(){ renderChatTreeInto(ovList, ovPinned); }
+  function renderFsChat(){ renderChatTreeInto(fsList, fsPinned); }
   if (ovForm) ovForm.addEventListener("submit", function(e){
     e.preventDefault();
     var v = ovInput.value.replace(/\s+/g," ").trim();
@@ -2415,7 +2459,34 @@
       if (d.message && d.message.name) { nameInput.value = d.message.name; try { localStorage.setItem("bbb-chat-name", d.message.name); } catch (e2) {} }
       renderChatMsg(d.message, true);
       renderOverlayMsgs();
+      renderFsChat();
       ovInput.value = ""; ovInput.focus();
+      loadRealCounts();
+    }).catch(function(){});
+  });
+  /* Fullscreen chat (site-78): 💬 button opens the panel over the video,
+     ✕ closes it. Posting works exactly like the below-video chat. */
+  if (fsChatBtn && fsChat) fsChatBtn.addEventListener("click", function(){
+    fsChat.hidden = false;
+    fsChatBtn.style.display = "none";
+    renderFsChat();
+  });
+  if (fsClose && fsChat && fsChatBtn) fsClose.addEventListener("click", function(){
+    fsChat.hidden = true;
+    fsChatBtn.style.display = "";
+  });
+  if (fsForm) fsForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = fsInput.value.replace(/\s+/g," ").trim();
+    if (!v) { fsInput.focus(); return; }
+    var nm = myChatName() || "Fan";
+    chatPost({device: deviceId, name: nm, text: v}).then(function(d){
+      myPostedIds.add(d.message.id); saveMyPosted();
+      if (d.message && d.message.name) { nameInput.value = d.message.name; try { localStorage.setItem("bbb-chat-name", d.message.name); } catch (e2) {} }
+      renderChatMsg(d.message, true);
+      renderOverlayMsgs();
+      renderFsChat();
+      fsInput.value = ""; fsInput.focus();
       loadRealCounts();
     }).catch(function(){});
   });
