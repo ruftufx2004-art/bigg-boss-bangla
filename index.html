@@ -136,6 +136,43 @@
   background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.15); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   pointer-events:none;
 }
+/* ---------- Transparent chat overlay over the video (YouTube-style) ----------
+   SAME chat, SAME comment box — just shown over the video, transparent.
+   A message posted here shows in the side chat too, and vice versa.
+   Sits above the shield (z-index 5) so the input/buttons are clickable.
+   Lives inside .bbb-ott-player, so it also shows in fullscreen. */
+.bbb-ott-chat-overlay{
+  position:absolute; top:0; right:0; bottom:0; z-index:5;
+  width:340px; max-width:92%;
+  display:flex; flex-direction:column;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+  border-left:1px solid rgba(255,255,255,.12);
+  color:#fff;
+}
+.bbb-ott-chat-overlay--hidden{display:none;}
+.bbb-ott-ov-head{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.14); font-size:14px; font-weight:700;}
+.bbb-ott-ov-head .bbb-ott-ov-live{color:#ff4d4d; font-size:12px; margin-right:8px;}
+.bbb-ott-ov-close{background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); color:#fff; border-radius:50%; width:26px; height:26px; cursor:pointer; font-size:13px; line-height:1; vertical-align:middle;}
+.bbb-ott-ov-list{flex:1; overflow-y:auto; padding:10px 12px; display:flex; flex-direction:column; gap:8px; font-size:14px; line-height:1.45;}
+.bbb-ott-ov-list::-webkit-scrollbar{width:5px;}
+.bbb-ott-ov-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2); border-radius:12px;}
+.bbb-ott-ov-msg{word-break:break-word;}
+.bbb-ott-ov-msg b{color:#c4b5fd;}
+.bbb-ott-ov-msg .bbb-ott-ov-time{color:rgba(255,255,255,.6); font-size:11px; margin-left:6px;}
+.bbb-ott-ov-form{display:flex; gap:8px; padding:10px 12px; border-top:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.35);}
+.bbb-ott-ov-form input{flex:1; min-width:0; padding:10px 12px; border-radius:20px; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.12); color:#fff; outline:none;}
+.bbb-ott-ov-form input::placeholder{color:rgba(255,255,255,.65);}
+.bbb-ott-ov-form button{padding:10px 14px; border-radius:20px; border:none; background:#8b5cf6; color:#fff; cursor:pointer; font-weight:700;}
+.bbb-ott-ov-open{
+  position:absolute; right:10px; bottom:10px; z-index:5;
+  padding:8px 12px; border-radius:20px; border:1px solid rgba(255,255,255,.25);
+  background:rgba(0,0,0,.6); color:#fff; cursor:pointer; font-size:13px; font-weight:700;
+}
+.bbb-ott-ov-open[hidden]{display:none;}
+@media (max-width:560px){
+  .bbb-ott-chat-overlay{top:auto; left:0; right:0; bottom:0; width:100%; max-width:none; height:55%; border-left:none; border-top:1px solid rgba(255,255,255,.12);}
+}
 
 .bbb-ott-mini{
   padding:6px 11px; border-radius:12px; font-size:11px; font-weight:600; color:var(--bbb-text);
@@ -442,6 +479,19 @@
           loading="eager"></iframe>
 
         <div class="bbb-ott-shield" id="bbb-ott-shield"><div class="bbb-ott-shield-strip bbb-ott-shield-strip--top"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--bottom"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--left"></div><div class="bbb-ott-shield-strip bbb-ott-shield-strip--right"></div></div>
+
+        <!-- Transparent chat overlay over the video (YouTube-style).
+             SAME chat, SAME comment box — just shown over the video.
+             A message posted here shows in the side chat too, and vice versa. -->
+        <div class="bbb-ott-chat-overlay" id="bbb-ott-chat-overlay">
+          <div class="bbb-ott-ov-head"><span>Live Chat</span><span><span class="bbb-ott-ov-live">● LIVE</span><button type="button" class="bbb-ott-ov-close" id="bbb-ott-ov-close" title="Hide chat">✕</button></span></div>
+          <div class="bbb-ott-ov-list" id="bbb-ott-ov-list"></div>
+          <form class="bbb-ott-ov-form" id="bbb-ott-ov-form" autocomplete="off">
+            <input type="text" id="bbb-ott-ov-input" maxlength="200" placeholder="Comment লিখো..." aria-label="Chat message" />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+        <button type="button" class="bbb-ott-ov-open" id="bbb-ott-ov-open" hidden>💬 Chat</button>
       </div>
 
       <!-- Website frame mode: shows a cropped part of any website as the live feed -->
@@ -1365,9 +1415,105 @@
     list.appendChild(chatEmpty);
   }
   function hideChatEmpty(){ if (chatEmpty) { chatEmpty.remove(); chatEmpty = null; } }
+  /* ---------- Supabase direct chat (fallback when the Worker is down) ----------
+     SAME chat_messages table the Worker uses, so it is the SAME chat — a
+     message posted here shows in the normal chat too, and vice versa.
+     The anon key is public by design (it is meant for frontend code).
+     Direct mode keeps the cute-name rule client-side ("admin" can never be
+     claimed) and a 5-second per-device post gap, but it cannot enforce them
+     server-side the way the Worker does. */
+  var SB_URL = "https://epozaiuizcfvbppjfoxp.supabase.co";
+  var SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwb3phaXVpemNmdmJwcGpmb3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwMDA2MjgsImV4cCI6MjExMDU3NjYyOH0.HV0yXVWcKCBb6_h5YUfq-1G94njV9p7U3fP8JucVklU";
+  var chatDirect = false; // true once we fall back to direct Supabase
+  var sbLastPostMs = 0;
+  function sbHeaders(){ return {"apikey": SB_ANON, "Authorization": "Bearer " + SB_ANON, "Accept": "application/json"}; }
+  function sbBase(){ return SB_URL.replace(/\/$/, "") + "/rest/v1/"; }
+  function sbCuteName(device){
+    var start = 0;
+    for (var i = 0; i < device.length; i++) start = (start * 31 + device.charCodeAt(i)) >>> 0;
+    return CHAT_CUTE_NAMES[start % CHAT_CUTE_NAMES.length];
+  }
+  function sbDirectName(){
+    var saved = "";
+    try { saved = localStorage.getItem("bbb-chat-name") || ""; } catch (e) {}
+    if (saved === "Admin") return "Admin";
+    if (saved && CHAT_CUTE_NAMES.indexOf(saved) >= 0) return saved;
+    return sbCuteName(deviceId);
+  }
+  function sbLoad(){
+    return fetch(sbBase() + "chat_messages?select=id,name,text,t,parent,likes,reacts&order=t.desc&limit=100", {headers: sbHeaders()})
+      .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
+      .then(function(rows){
+        var list = (Array.isArray(rows) ? rows : []).reverse();
+        return {ok: true, messages: list};
+      });
+  }
+  function sbChatPost(body){
+    var device = deviceId;
+    if (body.action === "myname") {
+      return Promise.resolve({ok: true, name: sbDirectName()});
+    }
+    if (body.action === "like" || body.action === "react") {
+      return fetch(sbBase() + "chat_messages?id=eq." + encodeURIComponent(body.id) + "&select=id,name,text,t,parent,likes,reacts", {headers: sbHeaders()})
+        .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
+        .then(function(rows){
+          if (!rows || !rows.length) throw new Error("err");
+          var m = rows[0];
+          var likes = Array.isArray(m.likes) ? m.likes.slice() : [];
+          var reacts = (m.reacts && typeof m.reacts === "object") ? JSON.parse(JSON.stringify(m.reacts)) : {};
+          if (body.action === "like") {
+            var i = likes.indexOf(device);
+            if (i >= 0) likes.splice(i, 1); else likes.push(device);
+            Object.keys(reacts).forEach(function(k){ var j = reacts[k].indexOf(device); if (j >= 0) reacts[k].splice(j, 1); });
+          } else {
+            var em = CHAT_REACTS.indexOf(body.emoji) >= 0 ? body.emoji : "❤️";
+            var had = false;
+            Object.keys(reacts).forEach(function(k){ var j = reacts[k].indexOf(device); if (j >= 0) { reacts[k].splice(j, 1); if (k === em) had = true; } });
+            if (!had) { reacts[em] = reacts[em] || []; reacts[em].push(device); }
+            var li = likes.indexOf(device); if (li >= 0) likes.splice(li, 1);
+          }
+          return fetch(sbBase() + "chat_messages?id=eq." + encodeURIComponent(m.id), {
+            method: "PATCH",
+            headers: Object.assign({"Content-Type": "application/json", "Prefer": "return=representation"}, sbHeaders()),
+            body: JSON.stringify({likes: likes, reacts: reacts})
+          }).then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
+          .then(function(rows2){
+            var upd = (rows2 && rows2[0]) || m;
+            return {ok: true, message: {id: upd.id, name: upd.name, text: upd.text, t: upd.t, parent: upd.parent || null, likes: upd.likes || [], reacts: upd.reacts || {}}};
+          });
+        });
+    }
+    // New message / reply (direct mode).
+    var text = String(body.text || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    if (!text) return Promise.reject(new Error("empty"));
+    if (Date.now() - sbLastPostMs < 5000) return Promise.reject(new Error("too fast"));
+    sbLastPostMs = Date.now();
+    var name = sbDirectName();
+    if (String(body.name || "").toLowerCase() === "admin" && name !== "Admin") name = sbCuteName(device);
+    var parent = String(body.parent || "");
+    var msg = {
+      id: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      name: name, text: text, t: Date.now(), parent: parent || null, likes: [], reacts: {}
+    };
+    return fetch(sbBase() + "chat_messages", {
+      method: "POST",
+      headers: Object.assign({"Content-Type": "application/json", "Prefer": "return=representation"}, sbHeaders()),
+      body: JSON.stringify(msg)
+    }).then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
+    .then(function(rows){
+      var m2 = (rows && rows[0]) || msg;
+      return {ok: true, message: m2};
+    });
+  }
   function chatPost(body){
     return fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)})
-      .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); });
+      .then(function(r){ if (!r.ok) throw new Error("err"); return r.json(); })
+      .then(function(d){ if (!d || d.error) throw new Error("err"); chatDirect = false; return d; })
+      .catch(function(){
+        // Worker down — go direct to Supabase (same chat, same table).
+        chatDirect = true;
+        return sbChatPost(body);
+      });
   }
   function chatTotals(m){
     var likes = (m.likes || []).length, total = likes, parts = [];
@@ -1448,7 +1594,7 @@
       chatPost({device: deviceId, name: nm, text: v, parent: m.id}).then(function(d){
         myPostedIds.add(d.message.id); saveMyPosted();
         if (d.message && d.message.name) { nameInput.value = d.message.name; try { localStorage.setItem("bbb-chat-name", d.message.name); } catch (e) {} }
-        renderChatMsg(d.message, true); ri.value = ""; rf.classList.remove("is-on");
+        renderChatMsg(d.message, true); renderOverlayMsgs(); ri.value = ""; rf.classList.remove("is-on");
       }).catch(function(){});
     });
     body.appendChild(rf);
@@ -1521,10 +1667,21 @@
   }
   function loadChat(){
     fetch("/api/chat").then(function(r){ return r.json(); }).then(function(d){
-      if (!d.messages) return;
+      if (!d.messages) throw new Error("err");
+      chatDirect = false;
       d.messages.forEach(function(m){ renderChatMsg(m, true); });
       if (!d.messages.length) showChatEmpty();
-    }).catch(function(){});
+      renderOverlayMsgs();
+    }).catch(function(){
+      // Worker down — read the same chat straight from Supabase.
+      chatDirect = true;
+      sbLoad().then(function(d){
+        if (!d.messages) return;
+        d.messages.forEach(function(m){ renderChatMsg(m, true); });
+        if (!d.messages.length) showChatEmpty();
+        renderOverlayMsgs();
+      }).catch(function(){});
+    });
   }
   loadChat(); setInterval(loadChat, 15000);
   setInterval(function(){
@@ -1544,9 +1701,62 @@
       // The server assigns each device one unique cute name — show it in the name box.
       if (d.message && d.message.name) { nameInput.value = d.message.name; try { localStorage.setItem("bbb-chat-name", d.message.name); } catch (e) {} }
       renderChatMsg(d.message, true);
+      renderOverlayMsgs();
       input.value = ""; input.focus();
       loadRealCounts();
     }).catch(function(){});
+  });
+
+  /* ---------- Transparent chat overlay over the video (same chat) ---------- */
+  var ovBox = $("#bbb-ott-chat-overlay");
+  var ovList = $("#bbb-ott-ov-list");
+  var ovForm = $("#bbb-ott-ov-form");
+  var ovInput = $("#bbb-ott-ov-input");
+  var ovClose = $("#bbb-ott-ov-close");
+  var ovOpen = $("#bbb-ott-ov-open");
+  function renderOverlayMsgs(){
+    if (!ovList) return;
+    var all = Object.keys(chatData).map(function(id){ return chatData[id]; })
+      .sort(function(a, b){ return (a.t || 0) - (b.t || 0); })
+      .slice(-30);
+    ovList.textContent = "";
+    if (!all.length) { ovList.textContent = "No messages yet."; return; }
+    all.forEach(function(m){
+      var div = document.createElement("div");
+      div.className = "bbb-ott-ov-msg";
+      var b = document.createElement("b");
+      b.textContent = m.name || "Fan";
+      var tm = document.createElement("span");
+      tm.className = "bbb-ott-ov-time";
+      tm.textContent = new Date(m.t || 0).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"});
+      var tx = document.createElement("span");
+      tx.textContent = " " + (m.text || "");
+      div.appendChild(b); div.appendChild(tm); div.appendChild(tx);
+      ovList.appendChild(div);
+    });
+    ovList.scrollTop = ovList.scrollHeight;
+  }
+  if (ovForm) ovForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = ovInput.value.replace(/\s+/g," ").trim();
+    if (!v) { ovInput.focus(); return; }
+    var nm = myChatName() || "Fan";
+    chatPost({device: deviceId, name: nm, text: v}).then(function(d){
+      myPostedIds.add(d.message.id); saveMyPosted();
+      if (d.message && d.message.name) { nameInput.value = d.message.name; try { localStorage.setItem("bbb-chat-name", d.message.name); } catch (e2) {} }
+      renderChatMsg(d.message, true);
+      renderOverlayMsgs();
+      ovInput.value = ""; ovInput.focus();
+      loadRealCounts();
+    }).catch(function(){});
+  });
+  if (ovClose && ovBox) ovClose.addEventListener("click", function(){
+    ovBox.classList.add("bbb-ott-chat-overlay--hidden");
+    if (ovOpen) ovOpen.hidden = false;
+  });
+  if (ovOpen && ovBox) ovOpen.addEventListener("click", function(){
+    ovBox.classList.remove("bbb-ott-chat-overlay--hidden");
+    ovOpen.hidden = true;
   });
 
   /* ---------- Vote Poll (real shared votes, 1 per device) ---------- */
@@ -1562,7 +1772,13 @@
   try {
     fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"myname", device: deviceId})}).then(function(r){ return r.json(); }).then(function(d){
       if (d && d.name) { nameInput.value = d.name; try { localStorage.setItem("bbb-chat-name", d.name); } catch (e) {} }
-    }).catch(function(){});
+      else throw new Error("err");
+    }).catch(function(){
+      // Worker down — use the deterministic cute name for this device.
+      var n = sbDirectName();
+      nameInput.value = n;
+      try { localStorage.setItem("bbb-chat-name", n); } catch (e) {}
+    });
   } catch (e) {}
   /* ---------- Site stats tracking (Admin Panel) ---------- */
   (function(){
