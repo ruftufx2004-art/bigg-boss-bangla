@@ -167,7 +167,7 @@
 }
 .bbb-ott-ov-open[hidden]{display:none;}
 
-/* Video loader (site-56): JioHotstar-style ring that fills 0-100% while the
+/* Video loader (site-56): JioHotstar-style ring that fills 0-100% over 10s while the
    video (re)loads. Sits over the player; hides when the embed loads + ~2s,
    or after a 10s safety cutoff. Cross-origin, so it cannot see the exact
    second the video starts — the fill is an "almost done" feeling, not real progress. */
@@ -1140,7 +1140,7 @@
   function bbbShowLoader(maxMs){
     if (!loaderEl) return;
     loaderEl.classList.remove("bbb-ott-loader--hidden");
-    var start = Date.now(), dur = 2500, CIRC = 213.6;
+    var start = Date.now(), dur = 10000, CIRC = 213.6;
     if (loaderTimer) clearInterval(loaderTimer);
     loaderTimer = setInterval(function(){
       var p = Math.min(100, Math.round((Date.now()-start)/dur*100));
@@ -1159,7 +1159,7 @@
   /* Hide ~2s after the embed reports loaded; the cutoff above is the safety net
      (the load event may already have fired before this script ran). */
   if (frame) frame.addEventListener("load", function(){ setTimeout(bbbHideLoader, 2000); });
-  bbbShowLoader(6000);
+  bbbShowLoader(10000);
 
   $("#bbb-ott-reload").addEventListener("click", function(){
     bbbShowLoader(10000);
