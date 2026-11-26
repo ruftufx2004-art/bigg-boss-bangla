@@ -1,12 +1,3 @@
-// Monetag verification + push (site 3594228) — required for Monetag ads.
-// Kept together with the PWA worker below so /sw.js serves both.
-self.options = {
-    "domain": "3nbf4.com",
-    "zoneId": 12352266
-}
-self.lary = ""
-importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')
-
 // Bigg Boss Bangla — minimal service worker: cache the shell + icons so the
 // installed app opens fast and works offline for the shell.
 // Live data (/api/*) is NEVER cached — the player, poll, chat and stats must
