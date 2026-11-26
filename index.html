@@ -2478,21 +2478,38 @@
     }).then(vote99Apply).catch(function(){ vote99LoadDirect(); });
   }
   function vote99LoadDirect(){
-    /* Totals come from poll_votes (public). My own votes cannot be read
-       from vote99 (anon has no SELECT on it), so they load from localStorage
-       keyed by my Google vote key and sync from the RPC on each Submit. */
-    vote99LoadMineLocal();
+    /* Totals come from poll_votes (public). My own votes are read from the DB
+       via the read-only get_my_votes RPC (anon can execute it), so a
+       server-side reset (e.g. by the admin) shows up on the next page load.
+       Falls back to localStorage if the RPC is unreachable. */
+    var k = voteKey();
+    function loadTotals(){
+      try {
+        fetch(sbBase() + "poll_votes?select=name,count", {headers: sbHeaders()}).then(function(r){
+          if (!r.ok) throw new Error("sb");
+          return r.json();
+        }).then(function(rows){
+          var counts = {}; var total = 0;
+          (rows || []).forEach(function(r){ if (r && typeof r.name === "string") { counts[r.name] = parseInt(r.count, 10) || 0; total += counts[r.name]; } });
+          vote99Counts = counts; vote99TotalAll = total;
+          vote99Render();
+        }).catch(function(){ vote99Render(); });
+      } catch (e) { vote99Render(); }
+    }
+    if (!k) { vote99LoadMineLocal(); loadTotals(); return; }
     try {
-      fetch(sbBase() + "poll_votes?select=name,count", {headers: sbHeaders()}).then(function(r){
-        if (!r.ok) throw new Error("sb");
-        return r.json();
-      }).then(function(rows){
-        var counts = {}; var total = 0;
-        (rows || []).forEach(function(r){ if (r && typeof r.name === "string") { counts[r.name] = parseInt(r.count, 10) || 0; total += counts[r.name]; } });
-        vote99Counts = counts; vote99TotalAll = total;
-        vote99Render();
-      }).catch(function(){ vote99Render(); });
-    } catch (e) { vote99Render(); }
+      fetch(sbBase() + "rpc/get_my_votes", {method: "POST", headers: Object.assign({}, sbHeaders(), {"Content-Type": "application/json"}), body: JSON.stringify({p_device: k})})
+        .then(function(r){ if (!r.ok) throw new Error("rpc"); return r.json(); })
+        .then(function(mine){
+          if (mine && typeof mine === "object") {
+            vote99Mine = {}; vote99Used = 0;
+            VOTE99.forEach(function(p){ var v = parseInt(mine[p.key], 10) || 0; if (v > 0) { vote99Mine[p.key] = v; vote99Used += v; } });
+            vote99SaveMine();
+          }
+          loadTotals();
+        })
+        .catch(function(){ vote99LoadMineLocal(); loadTotals(); });
+    } catch (e) { vote99LoadMineLocal(); loadTotals(); }
   }
   /* Tap = allocate one vote LOCALLY as pending (not sent yet). */
   function vote99Tap(key){
