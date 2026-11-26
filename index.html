@@ -36,7 +36,7 @@
   --bbb-red:#8b5cf6; --bbb-gold:#c4b5fd; --bbb-purple:#a855f7;
   --bbb-text:#ffffff; --bbb-muted:#a5a3b8; --bbb-line:rgba(196,181,253,.20);
   position:relative; box-sizing:border-box; width:100%; max-width:1440px; margin:0 auto;
-  padding:18px clamp(12px,2.5vw,32px) 40px; color:var(--bbb-text);
+  padding:8px clamp(12px,2.5vw,32px) 40px; color:var(--bbb-text);
   font-family:'Space Grotesk','Poppins','Hind Siliguri',system-ui,sans-serif; line-height:1.5;
   background:
     conic-gradient(from 210deg at 50% -20%, transparent 0deg, rgba(168,85,247,.32) 28deg, rgba(236,72,153,.16) 58deg, transparent 95deg),
@@ -349,10 +349,10 @@
 .bbb-ott-epcard span{display:block;padding:8px 10px 0;font-size:11px;font-weight:800;color:var(--bbb-gold);letter-spacing:.06em;}
 .bbb-ott-epcard b{display:block;padding:2px 10px 10px;font-size:13px;line-height:1.35;}
 /* Hotstar-style hero + 99-vote panel (site-47) */
-.bbb-ott-hero{position:relative;margin-top:0;border-radius:12px;overflow:hidden;background:#0f1014;border:1px solid var(--bbb-line);padding:0;min-height:250px;}
+.bbb-ott-hero{position:relative;margin-top:0;border-radius:12px;overflow:hidden;background:#0f1014;border:1px solid var(--bbb-line);padding:0;}
 .bbb-ott-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity .8s;opacity:1;}
 .bbb-ott-hero-shade{position:absolute;inset:0;background:linear-gradient(100deg,rgba(10,4,20,.93) 0%,rgba(10,4,20,.6) 55%,rgba(10,4,20,.2) 100%);}
-.bbb-ott-hero-in{position:relative;z-index:1;padding:20px;}
+.bbb-ott-hero-in{position:relative;z-index:1;padding:14px 20px 16px;}
 .bbb-ott-hero-live{display:inline-block;padding:4px 10px;border-radius:12px;background:#e11d48;color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;}
 .bbb-ott-hero h2{margin:10px 0 6px;font-size:clamp(20px,3vw,28px);}
 .bbb-ott-hero p{margin:0 0 12px;font-size:13px;color:var(--bbb-muted);}
@@ -361,6 +361,7 @@
 .bbb-ott-hero-btn--primary{background:#1f80e0;color:#fff;}
 .bbb-ott-hero-btn--ghost{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--bbb-text);}
 .bbb-ott-hero-btn--share{background:#7c3aed;color:#fff;}
+.bbb-ott-hero-btn--app{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--bbb-text);}
 .bbb-ott-hero-meta{margin-top:12px;font-size:12px;color:var(--bbb-muted);}
 .bbb-ott-hero-meta b{color:var(--bbb-text);}
 .bbb-ott-hero-dots{display:flex;gap:5px;margin-top:14px;align-items:center;}
@@ -429,7 +430,7 @@
   .bbb-ott-syn{grid-template-columns:1fr;}
 }
 @media (max-width:600px){
-  .bbb-ott-root{border-radius:0; padding:12px 10px 30px;}
+  .bbb-ott-root{border-radius:0; padding:0 10px 30px;}
   .bbb-ott-header{padding:12px; justify-content:center; text-align:center;}
   .bbb-ott-brand,.bbb-ott-pills{justify-content:center;}
   .bbb-ott-srv{flex:1 1 calc(50% - 10px); font-size:12px; padding:10px;}
@@ -482,9 +483,10 @@
         <a class="bbb-ott-hero-btn bbb-ott-hero-btn--primary" href="#bbb-ott-stage">▶ Watch Live</a>
         <a class="bbb-ott-hero-btn bbb-ott-hero-btn--ghost" href="#bbb-ott-vote99">Vote Now</a>
         <button type="button" class="bbb-ott-hero-btn bbb-ott-hero-btn--share" id="bbb-ott-hero-share" title="বন্ধুদের সাথে লাইভ শেয়ার করো">↗ Share</button>
+        <button type="button" class="bbb-ott-hero-btn bbb-ott-hero-btn--app" id="bbb-ott-hero-appbtn" title="অ্যাপ ডাউনলোড করো">📲 অ্যাপ ডাউনলোড</button>
       </div>
       <div class="bbb-ott-hero-meta">এখন দেখছে: <b id="bbb-ott-hero-viewers">—</b> &nbsp;•&nbsp; ফিনালে: ৬ ডিসেম্বর, রাত ৯:৩০</div>
-      <div class="bbb-ott-hero-dots"><span class="bbb-ott-hero-slide-label" id="bbb-ott-hero-slide-label">Rajveer</span><span id="bbb-ott-hero-dots"></span></div>
+      <div class="bbb-ott-hero-dots"><span class="bbb-ott-hero-slide-label" id="bbb-ott-hero-slide-label">Rajveer</span></div>
     </div>
   </header>
 
@@ -1314,7 +1316,7 @@
     if (window.navigator.standalone) return false;
     try {
       var decided = parseInt(localStorage.getItem("bbb-pwa-decided") || "0", 10);
-      if (decided && Date.now() - decided < 7 * 24 * 60 * 60 * 1000) return false; // ask again after 7 days
+      if (decided && Date.now() - decided < 1 * 24 * 60 * 60 * 1000) return false; // ask again after 1 day
     } catch (e) {}
     return true;
   }
@@ -1336,7 +1338,8 @@
      fires — show the popup on a timer anyway. */
   setTimeout(pwaShow, 3000);
   var pwaAppBtn = $("#bbb-ott-appbtn");
-  if (pwaAppBtn) pwaAppBtn.addEventListener("click", function(){
+  var pwaHeroAppBtn = $("#bbb-ott-hero-appbtn");
+  function pwaAppBtnClick(){
     try { fetch("/api/install-stats", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({device: pwaDevice, action: "header"})}).catch(function(){}); } catch (e) {}
     if (!deferredPwaPrompt) {
       if (pwaShowable() && pwaPopup) pwaPopup.hidden = false;
@@ -1349,7 +1352,9 @@
       if (res.outcome === "accepted") toast("✅ অ্যাপ ইনস্টল হচ্ছে — হোম স্ক্রিনে দেখো!");
     }).catch(function(){});
     deferredPwaPrompt = null;
-  });
+  }
+  if (pwaAppBtn) pwaAppBtn.addEventListener("click", pwaAppBtnClick);
+  if (pwaHeroAppBtn) pwaHeroAppBtn.addEventListener("click", pwaAppBtnClick);
   /* Share button (header only): opens the phone's native share sheet
      (WhatsApp / Facebook / Messenger / copy link). Falls back to
      WhatsApp Web when native share is unavailable. It never touches
@@ -1370,9 +1375,8 @@
   /* Rotating header banners (site-48): 4 contestants + 10 episode moments */
   (function(){
     var bg = $("#bbb-ott-hero-bg");
-    var dotsBox = $("#bbb-ott-hero-dots");
     var label = $("#bbb-ott-hero-slide-label");
-    if (!bg || !dotsBox) return;
+    if (!bg) return;
     var slides = [
       {label:"Rajveer", img:"/contestants/rajveer.jpg"},
       {label:"Srijla", img:"/contestants/srijla.jpg"},
@@ -1390,14 +1394,6 @@
       {label:"Episode 79", img:"https://i.ytimg.com/vi/d_sOKhMprNE/hqdefault.jpg"}
     ];
     var dots = [];
-    slides.forEach(function(s, i){
-      var d = document.createElement("button");
-      d.type = "button";
-      d.className = "bbb-ott-hero-dot" + (i === 0 ? " bbb-ott-hero-dot--on" : "");
-      d.setAttribute("aria-label", s.label);
-      d.addEventListener("click", function(){ show(i); });
-      dotsBox.appendChild(d); dots.push(d);
-    });
     var idx = 0;
     function show(i){
       idx = i;
@@ -1405,7 +1401,6 @@
       setTimeout(function(){
         bg.style.backgroundImage = "url('" + slides[idx].img + "')";
         if (label) label.textContent = slides[idx].label;
-        dots.forEach(function(d, j){ d.className = "bbb-ott-hero-dot" + (j === idx ? " bbb-ott-hero-dot--on" : ""); });
         bg.style.opacity = 1;
       }, 300);
     }
