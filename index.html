@@ -3266,7 +3266,7 @@
       var mid = document.createElement("div"); mid.className = "bbb-ott-resultsov-mid";
       var top = document.createElement("div"); top.className = "bbb-ott-resultsov-top";
       var nm = document.createElement("span"); nm.textContent = c.short;
-      var pc = document.createElement("span"); pc.className = "bbb-ott-resultsov-pct"; pc.textContent = "০ (০%)";
+      var pc = document.createElement("span"); pc.className = "bbb-ott-resultsov-pct"; pc.textContent = "0 (0%)";
       top.appendChild(nm); top.appendChild(pc);
       var bar = document.createElement("div"); bar.className = "bbb-ott-resultsov-bar";
       var fill = document.createElement("div"); fill.className = "bbb-ott-resultsov-fill";
@@ -3335,7 +3335,7 @@
       VOTE99.forEach(function(c){
         var p = rev[c.short] / revTotal * 100;
         if (c._rovFill) c._rovFill.style.width = p + "%";
-        if (c._rovPc) c._rovPc.textContent = resultsOvBn(Math.round(rev[c.short]).toLocaleString("en-US")) + " (" + resultsOvBn(Math.round(p)) + "%)";
+        if (c._rovPc) c._rovPc.textContent = Math.round(rev[c.short]).toLocaleString("en-US") + " (" + Math.round(p) + "%)";
       });
       resultsOvReorder(order);
       resultsOvSetLead(order[0].short);
